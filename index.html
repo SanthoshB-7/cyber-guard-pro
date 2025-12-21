@@ -1254,8 +1254,12 @@ async function loadCISAKEV() {
                 <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.05);">
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                         <div>
-                            <div style="font-weight: 600; color: ${severityColor}; margin-bottom: 4px;">${vuln.cve_id}</div>
-                            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">${vuln.vulnerability}</div>
+                            // Line 1257 - Fix CVE ID display
+                            <div style="font-weight: 600; color: ${severityColor}; margin-bottom: 4px;">${vuln.cveID}</div>
+                            
+                            // Line 1258 - Show vulnerability name as title  
+                            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">${vuln.vulnerabilityName}</div>
+                            
                         </div>
                         <div class="cvss-badge" style="background: ${severityColor};">EXPLOITED</div>
                     </div>
