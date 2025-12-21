@@ -1235,8 +1235,9 @@ async function loadCISAKEV() {
     
     try {
         // Call CISA KEV API directly (free, no key required)
-        const cisaUrl = 'https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json';
+        const cisaUrl = '/api/cisa-kev';  // Call your Vercel API instead
         const res = await fetch(cisaUrl);
+
         if (!res.ok) throw new Error('CISA API unavailable');
         const data = await res.json();
         
