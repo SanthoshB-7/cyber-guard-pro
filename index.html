@@ -1408,14 +1408,13 @@ function displayBreaches(breaches, showLoadMore = false) {
         <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">${breach.severity}</span>
       </div>
       
-      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-bottom: 12px;">
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
         <div style="font-size: 12px; color: #ffd700; margin-bottom: 8px;">📅 <strong>${breach.date}</strong></div>
         <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 8px;"><strong style="color: #fff;">Records:</strong> <span style="color: #ffd700;">${formatNumber(breach.recordsAffected)}</span></div>
         <div style="font-size: 12px; color: rgba(255,255,255,0.8);"><strong style="color: #fff;">Data:</strong> ${breach.dataExposed || 'Not specified'}</div>
       </div>
-      
-      <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.4;">${safeDescription}</div>
     </div>`;
+
   });
   
   if (showLoadMore) {
