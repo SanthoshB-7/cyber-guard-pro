@@ -1386,22 +1386,33 @@ function calculateSeverityFromCount(pwnCount) {
   if (pwnCount > 10000) return 'MEDIUM';
   return 'LOW';
 }
-function displayBreaches(breaches) {
+function displayBreaches(breaches, showLoadMore = false) {
   const container = document.getElementById('real-breaches-grid');
   
-  container.innerHTML = breaches.map(breach => `
-    <div class="news-card" style="border-left: 6px solid ${getSeverityColor(breach.severity)}; background: rgba(15,20,25,0.87); color:#fff;">
-      <div style="margin-bottom: 10px; display:flex; justify-content: space-between; align-items: start; gap:8px;">
-        <span style="font-size: 17px; font-weight: 700; color:${getSeverityColor(breach.severity)};">${breach.name}</span>
-        <span class="news-badge" style="background:${getSeverityColor(breach.severity)}; color:#fff; font-weight:600;">${breach.severity}</span>
+  let html = breaches.map(breach => `
+    <div class="news-card" style="border-left: 6px solid ${getSeverityColor(breach.severity)}; background: rgba(15,20,25,0.87); color:#fff; padding: 16px; margin-bottom: 16px; border-radius: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 16px; font-weight: 700; color: ${getSeverityColor(breach.severity)}; word-break: break-word; flex: 1;">${breach.name}</span>
+        <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; margin-left: 8px;">${breach.severity}</span>
       </div>
-      <div style="font-size:13px; color:#ffd700; margin-bottom:5px;">Discovered: ${breach.date || 'Unknown'}</div>
-      <div style="font-size:14px; margin-bottom:5px;"><strong>Records Affected:</strong> <span style="color:#ffd700; font-weight:600;">${formatNumber(breach.recordsAffected)}</span></div>
-      <div style="font-size:13px; color:#fff;"><strong>Data Exposed:</strong> ${breach.dataExposed || 'Not specified'}</div>
-      <div style="font-size:14px; color:rgba(255,255,255,0.8);margin-bottom:6px;"><strong>Description:</strong> ${breach.description}</div>
+      <div style="font-size: 12px; color: #ffd700; margin-bottom: 8px;">📅 Discovered: ${breach.date}</div>
+      <div style="font-size: 13px; margin-bottom: 8px; color: #fff;"><strong>Records Affected:</strong> <span style="color: #ffd700; font-weight: 600;">${formatNumber(breach.recordsAffected)}</span></div>
+      <div style="font-size: 12px; margin-bottom: 8px; color: #ccc;"><strong>Data Exposed:</strong> ${breach.dataExposed || 'Not specified'}</div>
+      <div style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4;"><strong>Details:</strong> ${breach.description}...</div>
     </div>
   `).join('');
+  
+  if (showLoadMore) {
+    html += `<div style="text-align: center; margin-top: 20px;">
+      <button onclick="loadMoreBreaches()" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff5454 100%); color: white; border: none; padding: 12px 24px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
+        📊 Load More Breaches
+      </button>
+    </div>`;
+  }
+  
+  container.innerHTML = html;
 }
+
 
 function formatNumber(num) {
   if (!num) return 'Unknown';
