@@ -1354,33 +1354,9 @@ function formatNumber(num) {
 
 // Call on page load
 window.addEventListener('DOMContentLoaded', loadRealBreaches);
-</script>
-function getSeverityText(sev) {
-    if (sev === "critical") return "Critical";
-    if (sev === "high") return "High";
-    if (sev === "medium") return "Moderate";
-    if (sev === "low") return "Low";
-    return "Notable";
-}
 
-function renderRealBreaches() {
-    const grid = document.getElementById('real-breaches-grid');
-    if (!grid) return;
-    grid.innerHTML = realBreaches2025.slice(0,15).map(breach => {
-        const color = getSeverityColor(breach.severity, breach.affected);
-        return `<div class="news-card" style="border-left: 6px solid ${color}; background: rgba(15,20,25,0.87); color:#fff;">
-            <div style="margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
-                <span style="font-size: 17px; font-weight: 700; color:${color};">${breach.company}</span>
-                <span class="news-badge" style="background:${color}; color:#fff; font-weight:600;">${getSeverityText(breach.severity)}</span>
-            </div>
-            <div style="font-size:13px; color:#ffd700; font-weight:500; margin-bottom:2px;">Discovered: ${breach.date}</div>
-            <div style="font-size:14px; margin-bottom:5px; color:#fff;"><strong>Records Affected:</strong> <span style="color:${color}; font-weight:600;">${breach.affected}</span></div>
-            <div style="font-size:13px; color:#ffd700; margin-bottom:5px;"><strong>Data Exposed:</strong> ${breach.data_exposed}</div>
-            <div style="font-size:14px; color:rgba(255,255,255,0.9);margin-bottom:6px;"><strong>Description:</strong> ${breach.description}</div>
-        </div>`;
-    }).join('');
-}
-document.addEventListener('DOMContentLoaded',function(){renderRealBreaches();});
+
+
 </script>
 
 
