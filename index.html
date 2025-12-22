@@ -1298,17 +1298,63 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 
 
-function getSeverityColor(sev, affected) {
-    if (sev === "critical") return "#ff0040";
-    if (sev === "high") return "#ff6b00";
-    if (sev === "medium") return "#ffd700";
-    if (sev === "low") return "#00d4ff";
-    // Also treat number of records:
-    if (typeof affected === 'string' && affected.match(/[1-9][0-9]{6,}/)) return "#ff0040"; // 1M+
-    if (typeof affected === 'string' && affected.match(/[1-9][0-9]{5,}/)) return "#ff6b00";
-    return "#ffd700";
+function getSeverityColor(severity) {
+  if (!severity) return '#aaa';
+  const sev = severity.toUpperCase();
+  switch(sev) {
+    case 'CRITICAL': return '#ff5454';
+    case 'HIGH': return '#ffa500';
+    case 'MEDIUM': return '#ffdd00';
+    case 'LOW': return '#27ae60';
+    default: return '#aaa';
+  }
 }
 
+
+// Load real-time breach data
+async function loadRealBreaches() {
+  try {
+    const response = await fetch('/api/breaches');
+    
+    if (!response.ok) {
+      throw new Error('API failed');
+    }
+    
+    const data = await response.json();
+    displayBreaches(data.breaches);
+    
+  } catch (error) {
+    console.error('Error loading breaches:', error);
+  }
+}
+
+function displayBreaches(breaches) {
+  const container = document.getElementById('real-breaches-grid');
+  
+  container.innerHTML = breaches.map(breach => `
+    <div class="news-card" style="border-left: 6px solid ${getSeverityColor(breach.severity)}; background: rgba(15,20,25,0.87); color:#fff;">
+      <div style="margin-bottom: 10px; display:flex; justify-content: space-between; align-items: start; gap:8px;">
+        <span style="font-size: 17px; font-weight: 700; color:${getSeverityColor(breach.severity)};">${breach.name}</span>
+        <span class="news-badge" style="background:${getSeverityColor(breach.severity)}; color:#fff; font-weight:600;">${breach.severity}</span>
+      </div>
+      <div style="font-size:13px; color:#ffd700; margin-bottom:5px;">Discovered: ${breach.date || 'Unknown'}</div>
+      <div style="font-size:14px; margin-bottom:5px;"><strong>Records Affected:</strong> <span style="color:#ffd700; font-weight:600;">${formatNumber(breach.recordsAffected)}</span></div>
+      <div style="font-size:13px; color:#fff;"><strong>Data Exposed:</strong> ${breach.dataExposed || 'Not specified'}</div>
+      <div style="font-size:14px; color:rgba(255,255,255,0.8);margin-bottom:6px;"><strong>Description:</strong> ${breach.description}</div>
+    </div>
+  `).join('');
+}
+
+function formatNumber(num) {
+  if (!num) return 'Unknown';
+  if (num > 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num > 1000) return (num / 1000).toFixed(1) + 'K';
+  return num.toString();
+}
+
+// Call on page load
+window.addEventListener('DOMContentLoaded', loadRealBreaches);
+</script>
 function getSeverityText(sev) {
     if (sev === "critical") return "Critical";
     if (sev === "high") return "High";
