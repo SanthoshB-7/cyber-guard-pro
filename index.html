@@ -1392,11 +1392,22 @@ function displayBreaches(breaches, showLoadMore = false) {
   let html = '';
   
   breaches.forEach(breach => {
-    // Escape any HTML in the description to prevent link interpretation
-    const safeDescription = breach.description
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/&/g, '&amp;');
+    // Strip HTML tags from description and limit to first 150 characters
+    const stripHtml = (text) => {
+      // Remove HTML tags completely
+      const stripped = text.replace(/<[^>]*>/g, '');
+      // Decode HTML entities
+      const decoded = stripped
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&#39;/g, "'");
+      // Limit to 150 characters
+      return decoded.length > 150 ? decoded.substring(0, 150) + '...' : decoded;
+    };
+    
+    const cleanDescription = stripHtml(breach.description);
     
     html += `<div style="background: rgba(20, 25, 30, 0.95); border-left: 5px solid ${getSeverityColor(breach.severity)}; border-radius: 6px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); position: relative;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
@@ -1412,7 +1423,7 @@ function displayBreaches(breaches, showLoadMore = false) {
         <div style="font-size: 12px; color: rgba(255,255,255,0.8);"><strong style="color: #fff;">Data:</strong> ${breach.dataExposed || 'Not specified'}</div>
       </div>
       
-      <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.4;">${safeDescription}</div>
+      <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.4;">${cleanDescription}</div>
     </div>`;
   });
   
@@ -1426,6 +1437,7 @@ function displayBreaches(breaches, showLoadMore = false) {
   
   container.innerHTML = html;
 }
+
 
 
 function formatNumber(num) {
