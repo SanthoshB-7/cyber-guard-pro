@@ -1325,13 +1325,22 @@ async function loadRealBreaches() {
     
     const hibpBreaches = await response.json();
     
-    // Convert HIBP format to your format
-    const formattedBreaches = hibpBreaches.slice(0, 15).map(breach => ({
+    // Filter for recent breaches (last 2 years - 2023-2025)
+    const recentBreaches = hibpBreaches.filter(breach => {
+      const breachYear = new Date(breach.BreachDate).getFullYear();
+      return breachYear >= 2023;
+    });
+    
+    // If no recent breaches, show latest 15 breaches
+    const breachesToShow = recentBreaches.length > 0 ? recentBreaches : hibpBreaches;
+    
+    // Convert HIBP format to your format - take first 15
+    const formattedBreaches = breachesToShow.slice(0, 15).map(breach => ({
       name: breach.Name,
       date: breach.BreachDate,
       recordsAffected: breach.PwnCount,
-      dataExposed: breach.DataClasses.join(', '),
-      description: breach.Description.substring(0, 150) + '...',
+      dataExposed: breach.DataClasses.slice(0, 3).join(', '), // Only first 3 data types
+      description: breach.Description.substring(0, 120) + '...', // Shorter description
       severity: calculateSeverityFromCount(breach.PwnCount)
     }));
     
