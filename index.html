@@ -1311,10 +1311,13 @@ function getSeverityColor(severity) {
 }
 
 
+// Global variable to store all breaches for "Load More" functionality
+let allBreachesData = [];
+let currentBreachesShown = 5;
+
 // Load real-time breach data from HaveIBeenPwned
 async function loadRealBreaches() {
   try {
-    // Try to fetch from HaveIBeenPwned (real-time, no auth required)
     const response = await fetch('https://haveibeenpwned.com/api/v3/breaches', {
       headers: { 'User-Agent': 'CyberSecCommand' }
     });
@@ -1325,46 +1328,57 @@ async function loadRealBreaches() {
     
     const hibpBreaches = await response.json();
     
-    // Filter for recent breaches (last 2 years - 2023-2025)
-    const recentBreaches = hibpBreaches.filter(breach => {
-      const breachYear = new Date(breach.BreachDate).getFullYear();
-      return breachYear >= 2023;
-    });
+    // Filter for recent breaches (2023-2025) and sort by date (newest first)
+    const recentBreaches = hibpBreaches
+      .filter(breach => {
+        const breachYear = new Date(breach.BreachDate).getFullYear();
+        return breachYear >= 2023;
+      })
+      .sort((a, b) => new Date(b.BreachDate) - new Date(a.BreachDate));
     
-    // If no recent breaches, show latest 15 breaches
-    const breachesToShow = recentBreaches.length > 0 ? recentBreaches : hibpBreaches;
+    // Fallback to all breaches if no recent ones
+    const breachesToProcess = recentBreaches.length > 0 ? recentBreaches : hibpBreaches;
     
-    // Convert HIBP format to your format - take first 15
-    const formattedBreaches = breachesToShow.slice(0, 15).map(breach => ({
+    // Convert HIBP format
+    allBreachesData = breachesToProcess.map(breach => ({
       name: breach.Name,
       date: breach.BreachDate,
       recordsAffected: breach.PwnCount,
-      dataExposed: breach.DataClasses.slice(0, 3).join(', '), // Only first 3 data types
-      description: breach.Description.substring(0, 120) + '...', // Shorter description
+      dataExposed: breach.DataClasses.slice(0, 2).join(', '),
+      description: breach.Description.substring(0, 100),
       severity: calculateSeverityFromCount(breach.PwnCount)
     }));
     
-    displayBreaches(formattedBreaches);
-    console.log('✅ Real-time breach data loaded from HIBP');
+    // Reset and show first 5
+    currentBreachesShown = 5;
+    displayBreaches(allBreachesData.slice(0, 5), true);
+    console.log('✅ Loaded ' + allBreachesData.length + ' breaches from HIBP');
     
   } catch (error) {
-    console.warn('⚠️ HIBP API failed, using fallback data:', error.message);
+    console.warn('⚠️ HIBP API failed, using fallback:', error.message);
     
-    // Fallback to your local data
     if (typeof realBreaches2025 !== 'undefined' && realBreaches2025.length > 0) {
-      const formattedBreaches = realBreaches2025.map(breach => ({
+      allBreachesData = realBreaches2025.map(breach => ({
         name: breach.company,
         date: breach.date,
-        recordsAffected: breach.affected.replace(/[^0-9]/g, ''),
+        recordsAffected: parseInt(breach.affected.replace(/[^0-9]/g, '')) || 0,
         dataExposed: breach.data_exposed,
         description: breach.description,
         severity: breach.severity
-      }));
-      displayBreaches(formattedBreaches.slice(0, 15));
-      console.log('📦 Using local fallback breach data');
+      })).sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      currentBreachesShown = 5;
+      displayBreaches(allBreachesData.slice(0, 5), true);
+      console.log('📦 Using local fallback data');
     }
   }
 }
+
+function loadMoreBreaches() {
+  currentBreachesShown += 5;
+  displayBreaches(allBreachesData.slice(0, currentBreachesShown), allBreachesData.length > currentBreachesShown);
+}
+
 
 function calculateSeverityFromCount(pwnCount) {
   if (pwnCount > 1000000) return 'CRITICAL';
