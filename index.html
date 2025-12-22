@@ -1392,11 +1392,12 @@ function displayBreaches(breaches, showLoadMore = false) {
   let html = '';
   
   breaches.forEach(breach => {
-        // Remove HTML tags and just show plain text description
+           // Escape any HTML in the description to prevent link interpretation
     const safeDescription = breach.description
-      .replace(/<[^>]*>/g, '')  // Remove all HTML tags
-      .substring(0, 120)  // Limit to 120 chars
-      .trim();
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/&/g, '&amp;');
+
 
     
     html += `<div style="background: rgba(20, 25, 30, 0.95); border-left: 5px solid ${getSeverityColor(breach.severity)}; border-radius: 6px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); position: relative;">
