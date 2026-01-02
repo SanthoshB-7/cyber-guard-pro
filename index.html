@@ -2796,12 +2796,30 @@ async function checkMaliciousURL() {
     btn.classList.add('loading');
     resultDiv.classList.add('hidden');
     try {
-        // Call backend API (VirusTotal URL scan)
-        const res = await fetch('/api/scan-url', {
+        // Call URLhaus API directly
+        const formData = new URLSearchParams();
+        formData.append('url', url.trim());
+
+        const res = await fetch('https://urlhaus-api.abuse.ch/v1/url/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: url.trim() })
+            body: formData
         });
+
+        const data = await res.json();
+        
+        const threat = data.url_count > 0 ? '⚠️ MALICIOUS' : '✅ CLEAN';
+        const color = data.url_count > 0 ? '#ff0040' : '#00ff88';
+        
+        resultDiv.innerHTML = `
+            <div class="tool-result" style="border-left-color:${color};">
+                <h4 style="color:${color}; margin-bottom: 12px;">${threat}</h4>
+                <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8);">
+                    <strong>Status:</strong> ${data.query_status}<br>
+                    ${data.url_count > 0 ? `<strong>Found in:</strong> ${data.url_count} threat(s)` : '<strong>No threats detected</strong>'}<br>
+                </div>
+            </div>
+        `;
+
         
         if (!res.ok) {
             const errData = await res.json();
