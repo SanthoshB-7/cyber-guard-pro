@@ -2707,6 +2707,34 @@ async function checkIPReputation(ip) {
         
         if (!res.ok) {
             const errData = await res.json();
+            throw new Error(errData.error || `API error: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // AbuseIPDB response structure
+        const abuseScore = data.data?.abuseConfidenceScore || 0;
+        const totalReports = data.data?.totalReports || 0;
+        const isMalicious = abuseScore > 75;
+        const isRisky = abuseScore > 25;
+        const color = isMalicious ? '#ff0040' : isRisky ? '#ff6b00' : '#00ff88';
+        const status = isMalicious ? '⚠️ HIGH RISK' : isRisky ? '⚠️ MODERATE RISK' : '✓ LOW RISK';
+
+        resultDiv.innerHTML = `
+            <div class="tool-result" style="border-left-color:${color};">
+                <h4 style="color:${color}; margin-bottom: 12px;">${status}</h4>
+                <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8);">
+                    <strong>IP:</strong> ${ip.trim()}<br>
+                    <strong>Abuse Score:</strong> ${abuseScore}%<br>
+                    <strong>Reports:</strong> ${totalReports}<br>
+                    <strong>Status:</strong> ${isMalicious ? 'Known malicious activity' : isRisky ? 'Suspicious activity detected' : 'No known threats'}<br>
+                </div>
+            </div>
+        `;
+
+        
+        if (!res.ok) {
+            const errData = await res.json();
             throw new Error(errData.error || 'API error');
         }
         
