@@ -6,10 +6,12 @@ export default async function handler(req, res) {
   }
 
   try {
+    const formData = new URLSearchParams();
+    formData.append('url', url);
+
     const response = await fetch('https://urlhaus-api.abuse.ch/v1/url/', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `url=${encodeURIComponent(url)}`
+      body: formData
     });
 
     const data = await response.json();
@@ -18,3 +20,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Failed to check URL', details: error.message });
   }
 }
+
