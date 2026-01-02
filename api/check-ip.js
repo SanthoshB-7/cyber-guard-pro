@@ -11,13 +11,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.abuseipdb.com/api/v2/check', {
-      method: 'POST',
+    const params = new URLSearchParams({
+      ip: ip,
+      maxAgeInDays: '90',
+      verbose: ''
+    });
+
+    const response = await fetch('https://api.abuseipdb.com/api/v2/check?' + params.toString(), {
+      method: 'GET',
       headers: {
         'Key': apiKey,
         'Accept': 'application/json'
-      },
-      body: `ip=${ip}&maxAgeInDays=90&verbose=`
+      }
     });
 
     const data = await response.json();
