@@ -2416,7 +2416,7 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             { name: 'ShinyHunters', type: 'Data Theft', status: 'Active', targets: 'E-commerce & SaaS', regions: 'Global' }
         ];
 
-        // News Data (from application_data_json) with REAL LINKS
+        // News Data (fallback list)
         const newsItems = [
             {
                 category: "Framework",
@@ -2473,6 +2473,48 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                 link: "https://www.gartner.com"
             }
         ];
+
+        let liveNewsItems = [];
+        const newsSources = [
+            { source: 'CISA', url: 'https://www.cisa.gov/news-events/cybersecurity-advisories.xml', badgeColor: 'pink', category: 'Advisory' },
+            { source: 'US-CERT', url: 'https://www.cisa.gov/news-events/alerts.xml', badgeColor: 'orange', category: 'Alert' },
+            { source: 'NIST', url: 'https://www.nist.gov/news-events/cybersecurity/rss.xml', badgeColor: 'blue', category: 'Framework' }
+        ];
+
+        async function fetchLatestNews() {
+            try {
+                const responses = await Promise.all(newsSources.map(async (feed) => {
+                    const proxyUrl = `https://r.jina.ai/http://${feed.url.replace(/^https?:\/\//, '')}`;
+                    const res = await fetch(proxyUrl);
+                    if (!res.ok) return [];
+                    const xmlText = await res.text();
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                    const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 5);
+                    return items.map(item => {
+                        const title = item.querySelector('title')?.textContent?.trim() || 'Security Update';
+                        const link = item.querySelector('link')?.textContent?.trim() || '#';
+                        const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+                        const date = pubDate ? new Date(pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
+                        const description = item.querySelector('description')?.textContent?.replace(/<[^>]*>/g, '').trim().slice(0, 140) || '';
+                        return {
+                            category: feed.category,
+                            title,
+                            description,
+                            date,
+                            source: feed.source,
+                            badgeColor: feed.badgeColor,
+                            link
+                        };
+                    });
+                }));
+
+                liveNewsItems = responses.flat().filter(item => item.link && item.link !== '#');
+            } catch (error) {
+                console.warn('News fetch failed, using fallback.', error);
+                liveNewsItems = [];
+            }
+        }
 
         // Initialize App
         function initApp() {
@@ -3234,11 +3276,12 @@ function analyzePassword() {
         }
 
         // Render News Items (populates the Learning Hub News Grid) - NOW WITH CLICKABLE LINKS
-        function populateNewsGrid() {
+        function populateNewsGrid(itemsToRender = null) {
             const newsGrid = document.getElementById('news-grid');
             if (!newsGrid) return;
-            
-            newsGrid.innerHTML = newsItems.map(item => `
+
+            const items = itemsToRender && itemsToRender.length ? itemsToRender : newsItems;
+            newsGrid.innerHTML = items.map(item => `
                 <div class="news-card">
                     <span class="news-badge badge-${item.badgeColor}">${item.category}</span>
                     <h3>${item.title}</h3>
@@ -3255,8 +3298,9 @@ function analyzePassword() {
         }
         
         // Legacy function kept for compatibility
-        function renderNews() {
-            populateNewsGrid();
+        async function renderNews() {
+            await fetchLatestNews();
+            populateNewsGrid(liveNewsItems);
         }
 
         // Tab Navigation
@@ -3291,7 +3335,7 @@ function analyzePassword() {
             setTimeout(() => {
                 btn.innerHTML = 'Load More Articles';
                 btn.classList.remove('loading');
-                alert('More articles loaded! (This is a demo)');
+                alert('News feeds refreshed. New items will appear as sources update.');
             }, 1500);
         }
 
