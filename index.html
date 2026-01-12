@@ -1780,7 +1780,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- REAL BREACHES DASHBOARD (verified from breach directory, public reports) -->
 <h2 style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches - Verified Incidents</h2>
-<p style="font-size: 15px; color: #ff4444; margin-bottom: 24px; font-weight:500;">Latest confirmed breaches from 2025 and recent 2024 incidents (verified sources)</p>
+<p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified incidents</p>
+<div id="breach-fallback-callout" style="display: none; margin-bottom: 24px; padding: 10px 12px; border-radius: 8px; background: rgba(255, 153, 51, 0.12); border: 1px solid rgba(255, 153, 51, 0.4); color: rgba(255,255,255,0.9); font-size: 13px;">
+  Primary breach registry unavailable; showing curated news feed.
+</div>
 <div style="display: grid; grid-template-columns: 1fr; gap: 12px;" id="real-breaches-grid">
   <!-- Dynamic breach data will load here -->
 </div>
@@ -1807,6 +1810,8 @@ let currentBreachesShown = 5;
 
 // Load real-time breach data from backend aggregator
 async function loadRealBreaches() {
+  const subtitleEl = document.getElementById('breach-subtitle');
+  const fallbackCallout = document.getElementById('breach-fallback-callout');
   try {
     const response = await fetch('/api/breaches');
     
@@ -1816,6 +1821,16 @@ async function loadRealBreaches() {
     
     const breachPayload = await response.json();
     const breachList = breachPayload?.breaches || [];
+    const source = breachPayload?.source;
+
+    if (subtitleEl) {
+      subtitleEl.textContent = source === 'rss'
+        ? 'Breach & incident news feed (fallback)'
+        : 'Verified incidents';
+    }
+    if (fallbackCallout) {
+      fallbackCallout.style.display = source === 'rss' ? 'block' : 'none';
+    }
     
     // Filter for recent breaches (2023-2025) and sort by date (newest first)
     const recentBreaches = breachList
@@ -1845,6 +1860,12 @@ async function loadRealBreaches() {
     
   } catch (error) {
     console.warn('⚠️ Breach API failed, using fallback:', error.message);
+    if (subtitleEl) {
+      subtitleEl.textContent = 'Verified incidents';
+    }
+    if (fallbackCallout) {
+      fallbackCallout.style.display = 'none';
+    }
     
     if (typeof realBreaches2025 !== 'undefined' && realBreaches2025.length > 0) {
       allBreachesData = realBreaches2025.map(breach => ({
@@ -1901,7 +1922,7 @@ function displayBreaches(breaches, showLoadMore = false) {
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
         <div style="font-size: 12px; color: #ff4444; margin-bottom: 8px;">📅 <strong>${breach.date}</strong></div>
         <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 8px;"><strong style="color: #fff;">Records:</strong> <span style="color: #ff4444;">${formatNumber(breach.recordsAffected)}</span></div>
-        <div style="font-size: 12px; color: rgba(255,255,255,0.8);"><strong style="color: #fff;">Data:</strong> ${breach.dataExposed || 'Not specified'}</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,0.8);"><strong style="color: #fff;">Data:</strong> ${breach.dataExposed || 'Not disclosed'}</div>
       </div>
     </div>`;
 
