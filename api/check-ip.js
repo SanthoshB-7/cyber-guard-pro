@@ -31,14 +31,24 @@ export default async function handler(req, res) {
     );
 
     const data = await response.json();
-    
+
     if (!response.ok) {
-      return res.status(response.status).json({ 
-        error: data?.errors?.[0]?.detail || 'AbuseIPDB API failed' 
+      return res.status(response.status).json({
+        error: data?.errors?.[0]?.detail || 'AbuseIPDB API failed'
       });
     }
-    
-    res.status(200).json(data);
+
+    const ipData = data?.data || {};
+    res.status(200).json({
+      success: true,
+      ip: ipData.ipAddress || ip.trim(),
+      abuseScore: ipData.abuseConfidenceScore || 0,
+      totalReports: ipData.totalReports || 0,
+      isp: ipData.isp || 'Unknown',
+      domain: ipData.domain || 'None',
+      usageType: ipData.usageType || 'Unknown',
+      countryCode: ipData.countryCode || 'Unknown'
+    });
   } catch (error) {
     res.status(500).json({ error: 'Server error', details: error.message });
   }
