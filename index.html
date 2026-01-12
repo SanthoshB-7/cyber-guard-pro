@@ -3901,6 +3901,7 @@ function analyzePassword() {
                 functions: 6,
                 categories: 23,
                 subcategories: 108,
+                link: "https://www.nist.gov/cyberframework",
                 description: "Flexible, voluntary framework for managing cybersecurity risks",
                 best_for: "All organizations, especially critical infrastructure",
                 functions_list: ["Govern", "Identify", "Protect", "Detect", "Respond", "Recover"]
@@ -3910,6 +3911,7 @@ function analyzePassword() {
                 version: "5",
                 controls: 1077,
                 families: 20,
+                link: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final",
                 description: "Comprehensive security controls for federal agencies",
                 best_for: "Federal agencies and government contractors"
             },
@@ -3918,6 +3920,7 @@ function analyzePassword() {
                 version: "2022",
                 controls: 93,
                 domains: 4,
+                link: "https://www.iso.org/standard/27001",
                 description: "International standard for information security management",
                 best_for: "Organizations seeking global certification"
             },
@@ -4083,6 +4086,7 @@ function analyzePassword() {
                                 <span style='color:#ff0040;'>${framework.controls || framework.safeguards || framework.subcategories} controls</span>
                             </div>
                             ${framework.functions_list ? `<div style='margin-top:12px; font-size:13px;'>Core Functions: <span style='color:#ff4444;'>${framework.functions_list.join(', ')}</span></div>` : ''}
+                            ${framework.link ? `<a class='news-link' href='${framework.link}' target='_blank' rel='noopener'>View official standard →</a>` : ''}
                         </div>`;
                 });
                 html += `</div>`;
