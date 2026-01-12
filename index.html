@@ -1780,9 +1780,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- REAL BREACHES DASHBOARD (verified from breach directory, public reports) -->
 <h2 id="breach-header" style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches (Verified Dataset)</h2>
-<p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified dataset from public breach registries and Wikipedia.</p>
+<p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified breach registry (HIBP catalog)</p>
 <div id="breach-fallback-callout" style="display: none; margin-bottom: 24px; padding: 10px 12px; border-radius: 8px; background: rgba(255, 153, 51, 0.12); border: 1px solid rgba(255, 153, 51, 0.4); color: rgba(255,255,255,0.9); font-size: 13px;">
-  Primary breach registry unavailable; showing curated intelligence feed.
+  Verified breach registry unavailable; showing live intelligence feed.
 </div>
 <div class="filter-bar" style="margin-bottom: 12px;">
   <select class="form-select" id="breach-mode-switch" style="flex: 1;">
@@ -1837,7 +1837,9 @@ async function loadRealBreaches() {
   const fallbackCallout = document.getElementById('breach-fallback-callout');
   try {
     const mode = getBreachMode();
-    const response = await fetch(`/api/breaches?mode=${encodeURIComponent(mode)}`);
+    const response = mode === 'verified'
+      ? await fetch('/api/hibp-breaches')
+      : await fetch(`/api/breaches?mode=${encodeURIComponent(mode)}`);
     
     if (!response.ok) {
       throw new Error('Breach API failed');
@@ -1845,7 +1847,7 @@ async function loadRealBreaches() {
     
     const breachPayload = await response.json();
     const breachList = breachPayload?.breaches || [];
-    const responseMode = breachPayload?.mode || mode;
+    const responseMode = mode === 'verified' ? 'verified' : (breachPayload?.mode || mode);
 
     if (headerEl) {
       headerEl.textContent = responseMode === 'live'
@@ -1855,7 +1857,7 @@ async function loadRealBreaches() {
     if (subtitleEl) {
       subtitleEl.textContent = responseMode === 'live'
         ? 'Confirmed breach, ransomware, and major incident intelligence.'
-        : 'Verified dataset from public breach registries and Wikipedia.';
+        : 'Verified breach registry (HIBP catalog)';
     }
     if (fallbackCallout) {
       fallbackCallout.style.display = responseMode === 'live' ? 'block' : 'none';
@@ -1893,11 +1895,24 @@ async function loadRealBreaches() {
     
   } catch (error) {
     console.warn('⚠️ Breach API failed, using fallback:', error.message);
+    const mode = getBreachMode();
+    if (mode === 'verified') {
+      if (fallbackCallout) {
+        fallbackCallout.style.display = 'block';
+      }
+      const liveSelect = document.getElementById('breach-mode-switch');
+      if (liveSelect) {
+        liveSelect.value = 'live';
+      }
+      localStorage.setItem(breachModeStorageKey, 'live');
+      await loadRealBreaches();
+      return;
+    }
     if (headerEl) {
       headerEl.textContent = 'Recent Data Breaches (Verified Dataset)';
     }
     if (subtitleEl) {
-      subtitleEl.textContent = 'Verified dataset from public breach registries and Wikipedia.';
+      subtitleEl.textContent = 'Verified breach registry (HIBP catalog)';
     }
     if (fallbackCallout) {
       fallbackCallout.style.display = 'none';
