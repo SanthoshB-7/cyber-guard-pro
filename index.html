@@ -231,6 +231,18 @@ body{
     }
 }
 
+@media (min-width: 1200px) {
+    .main-content {
+        max-width: 1380px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .main-content {
+        max-width: 1560px;
+    }
+}
+
 .tab-content {
     display: none;
     animation: fadeIn var(--duration-slow) var(--ease-standard);
@@ -1070,6 +1082,12 @@ body{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-16);
+}
+
+@media (min-width: 1400px) {
+    #mitre-threat-actors-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 .malware-card {
