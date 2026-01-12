@@ -231,6 +231,18 @@ body{
     }
 }
 
+@media (min-width: 1200px) {
+    .main-content {
+        max-width: 1380px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .main-content {
+        max-width: 1560px;
+    }
+}
+
 .tab-content {
     display: none;
     animation: fadeIn var(--duration-slow) var(--ease-standard);
@@ -902,6 +914,36 @@ body{
     }
 }
 
+.wide-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas: "side" "main";
+    gap: 18px;
+}
+
+.wide-layout .main-col {
+    grid-area: main;
+}
+
+.wide-layout .side-col {
+    grid-area: side;
+}
+
+@media (min-width: 1200px) {
+    .wide-layout {
+        grid-template-columns: minmax(0, 1fr) 340px;
+        grid-template-areas: "main side";
+        align-items: start;
+    }
+
+    .wide-layout .side-col {
+        position: sticky;
+        top: 92px;
+        max-height: calc(100vh - 120px);
+        overflow: auto;
+    }
+}
+
 .epss-insights-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -1042,6 +1084,12 @@ body{
     gap: var(--space-16);
 }
 
+@media (min-width: 1400px) {
+    #mitre-threat-actors-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 .malware-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1054,6 +1102,181 @@ body{
     transform: translateY(-4px);
     box-shadow: var(--shadow-premium);
     border-color: rgba(255, 0, 64, 0.3);
+}
+
+.actor-card {
+    cursor: pointer;
+}
+
+.actor-card:focus-visible {
+    outline: 2px solid rgba(34, 211, 238, 0.8);
+    outline-offset: 2px;
+}
+
+.details-card {
+    background: rgba(14, 18, 28, 0.92);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: var(--radius-lg);
+    padding: var(--space-16);
+    box-shadow: var(--shadow-glow);
+}
+
+.details-card h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-12);
+    color: var(--color-teal-accent);
+}
+
+.detail-meta {
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: var(--space-12);
+}
+
+.detail-description {
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin-bottom: var(--space-10);
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.detail-description.expanded {
+    -webkit-line-clamp: initial;
+}
+
+.detail-toggle {
+    background: none;
+    border: none;
+    color: var(--color-teal-accent);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    margin-bottom: var(--space-12);
+}
+
+.detail-search input {
+    width: 100%;
+    padding: var(--space-8) var(--space-12);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    color: var(--color-white);
+}
+
+.detail-search input:focus-visible {
+    outline: 2px solid rgba(34, 211, 238, 0.8);
+    outline-offset: 2px;
+}
+
+.tech-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    margin-top: var(--space-12);
+}
+
+.tech-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding: var(--space-8) var(--space-10);
+    background: rgba(34, 211, 238, 0.08);
+    border: 1px solid rgba(34, 211, 238, 0.18);
+    border-radius: var(--radius-md);
+}
+
+.tech-item a {
+    color: var(--color-white);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+}
+
+.tech-item a:hover {
+    color: var(--color-teal-accent);
+}
+
+.tech-chip {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: var(--font-size-xs);
+}
+
+.tactic-bars {
+    margin-top: var(--space-12);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.tactic-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 30px;
+    gap: var(--space-8);
+    align-items: center;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tactic-row .bar {
+    height: 8px;
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.6), rgba(34, 211, 238, 0.6));
+    border-radius: var(--radius-full);
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(5, 8, 16, 0.75);
+    z-index: 200;
+}
+
+.modal-backdrop.active {
+    display: flex;
+}
+
+.modal {
+    width: 100%;
+    max-width: 640px;
+    max-height: 85vh;
+    overflow: auto;
+    background: rgba(14, 18, 28, 0.96);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    border-radius: var(--radius-lg);
+    padding: var(--space-16);
+    box-shadow: var(--shadow-premium);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-12);
+    margin-bottom: var(--space-12);
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.modal-close:focus-visible {
+    outline: 2px solid rgba(34, 211, 238, 0.8);
+    outline-offset: 2px;
 }
 
 /* Tools Grid */
@@ -1760,30 +1983,34 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                         <button class="btn btn-secondary" onclick="exportCVEReport()">📄 Export PDF Report</button>
                     </div>
 
-                    <div class="nvd-layout">
-                        <div class="cve-grid" id="nvd-cve-grid"></div>
-                        <div class="epss-insights-card" id="epss-insights-card">
-                            <h3 style="font-size: 16px; margin-bottom: 12px; color: #22d3ee;">📊 EPSS Insights</h3>
-                            <div class="epss-kpis">
-                                <div class="epss-kpi">
-                                    <h4>Avg EPSS</h4>
-                                    <span id="epss-avg">--</span>
+                    <div class="wide-layout">
+                        <div class="main-col">
+                            <div class="cve-grid" id="nvd-cve-grid"></div>
+                        </div>
+                        <div class="side-col">
+                            <div class="epss-insights-card" id="epss-insights-card">
+                                <h3 style="font-size: 16px; margin-bottom: 12px; color: #22d3ee;">📊 EPSS Insights</h3>
+                                <div class="epss-kpis">
+                                    <div class="epss-kpi">
+                                        <h4>Avg EPSS</h4>
+                                        <span id="epss-avg">--</span>
+                                    </div>
+                                    <div class="epss-kpi">
+                                        <h4>Max EPSS</h4>
+                                        <span id="epss-max">--</span>
+                                    </div>
+                                    <div class="epss-kpi">
+                                        <h4>≥10%</h4>
+                                        <span id="epss-10">--</span>
+                                    </div>
+                                    <div class="epss-kpi">
+                                        <h4>≥50%</h4>
+                                        <span id="epss-50">--</span>
+                                    </div>
                                 </div>
-                                <div class="epss-kpi">
-                                    <h4>Max EPSS</h4>
-                                    <span id="epss-max">--</span>
-                                </div>
-                                <div class="epss-kpi">
-                                    <h4>≥10%</h4>
-                                    <span id="epss-10">--</span>
-                                </div>
-                                <div class="epss-kpi">
-                                    <h4>≥50%</h4>
-                                    <span id="epss-50">--</span>
-                                </div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">EPSS Distribution</div>
+                                <div class="mini-histogram" id="epss-histogram"></div>
                             </div>
-                            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">EPSS Distribution</div>
-                            <div class="mini-histogram" id="epss-histogram"></div>
                         </div>
                     </div>
                 </div>
@@ -1794,7 +2021,17 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                         <span>☠️</span> Active Threat Actors (MITRE ATT&amp;CK)
                     </h2>
                     <p style="font-size: 14px; color: #ff4444; margin-bottom: 20px;">Real threat actor campaigns and techniques</p>
-                    <div class="malware-grid" id="mitre-threat-actors-grid"></div>
+                    <div class="wide-layout">
+                        <div class="side-col">
+                            <div class="details-card" id="actor-details-card">
+                                <h3>Actor Details</h3>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6;">Select an actor to view techniques, tactics, and ATT&amp;CK references.</p>
+                            </div>
+                        </div>
+                        <div class="main-col">
+                            <div class="malware-grid" id="mitre-threat-actors-grid"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2458,6 +2695,16 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
         </main>
     </div>
 
+    <div class="modal-backdrop" id="actor-detail-modal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="actor-detail-modal-title">
+            <div class="modal-header">
+                <h3 id="actor-detail-modal-title" style="font-size: 18px; color: #22d3ee;">Actor Details</h3>
+                <button class="modal-close" type="button" aria-label="Close actor details">Close</button>
+            </div>
+            <div id="actor-detail-modal-body"></div>
+        </div>
+    </div>
+
     <script>
         // App State
         const appState = {
@@ -2468,6 +2715,21 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                 youtube: null,
                 document: null
             }
+        };
+
+        const mitreDataUrl = 'https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json';
+        let mitreDataCache = null;
+        let mitreDataPromise = null;
+        let actorCardListenerBound = false;
+        let threatActorsCache = null;
+
+        const mitreIndexes = {
+            techniqueById: new Map(),
+            techniqueDetailsById: new Map(),
+            actorById: new Map(),
+            relationshipsUses: [],
+            actorToTechniques: new Map(),
+            ready: false
         };
 
         // Perplexity API Integration (server-side proxy)
@@ -2631,6 +2893,7 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             setupFileUpload();
             renderBreaches();
             setupLearningHubTabs();
+            setupActorDetailModal();
         }
         
         // Load Threat Intel data when user opens Threat Intel tab
@@ -3024,6 +3287,252 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             `).join('');
         }
 
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        async function fetchMitreData() {
+            if (mitreDataCache) return mitreDataCache;
+            if (mitreDataPromise) return mitreDataPromise;
+            mitreDataPromise = fetch(mitreDataUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('MITRE ATT&CK API unavailable');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    mitreDataCache = data;
+                    return data;
+                })
+                .catch(error => {
+                    mitreDataPromise = null;
+                    throw error;
+                });
+            return mitreDataPromise;
+        }
+
+        function extractTechniqueDetails(technique) {
+            const ref = (technique.external_references || []).find(reference => {
+                return reference.source_name === 'mitre-attack'
+                    && reference.external_id
+                    && reference.external_id.startsWith('T');
+            });
+            const tactics = (technique.kill_chain_phases || [])
+                .map(phase => phase.phase_name)
+                .filter(Boolean);
+            return {
+                id: technique.id,
+                name: technique.name || 'Unknown technique',
+                externalId: ref?.external_id || '',
+                tactics: Array.from(new Set(tactics))
+            };
+        }
+
+        function buildMitreIndexes(data) {
+            if (mitreIndexes.ready) return;
+            const objects = data.objects || [];
+            objects.forEach(obj => {
+                if (obj.type === 'attack-pattern') {
+                    mitreIndexes.techniqueById.set(obj.id, obj);
+                    mitreIndexes.techniqueDetailsById.set(obj.id, extractTechniqueDetails(obj));
+                } else if (obj.type === 'intrusion-set') {
+                    mitreIndexes.actorById.set(obj.id, obj);
+                } else if (obj.type === 'relationship' && obj.relationship_type === 'uses') {
+                    mitreIndexes.relationshipsUses.push(obj);
+                }
+            });
+
+            mitreIndexes.relationshipsUses.forEach(rel => {
+                if (mitreIndexes.actorById.has(rel.source_ref) && mitreIndexes.techniqueById.has(rel.target_ref)) {
+                    const existing = mitreIndexes.actorToTechniques.get(rel.source_ref) || new Set();
+                    existing.add(rel.target_ref);
+                    mitreIndexes.actorToTechniques.set(rel.source_ref, existing);
+                }
+            });
+
+            mitreIndexes.ready = true;
+        }
+
+        function getActorExternalLink(actor) {
+            const ref = (actor.external_references || []).find(reference => {
+                return reference.source_name === 'mitre-attack'
+                    && reference.external_id
+                    && reference.external_id.startsWith('G');
+            });
+            if (!ref) return '';
+            return ref.url || `https://attack.mitre.org/groups/${ref.external_id}/`;
+        }
+
+        function buildActorDetailMarkup(actor) {
+            const actorName = escapeHtml(actor.name || 'Unknown Actor');
+            const aliases = actor.aliases ? actor.aliases.join(', ') : '';
+            const aliasMarkup = aliases ? `<div class="detail-meta"><strong>Aliases:</strong> ${escapeHtml(aliases)}</div>` : '';
+            const description = escapeHtml(actor.description || 'No description available.');
+            const techniqueIds = Array.from(mitreIndexes.actorToTechniques.get(actor.id) || []);
+            const techniques = techniqueIds
+                .map(id => mitreIndexes.techniqueDetailsById.get(id))
+                .filter(Boolean)
+                .filter(detail => detail.externalId);
+
+            const topTechniques = techniques.slice(0, 10);
+            const techniquesMarkup = topTechniques.length
+                ? topTechniques.map(detail => {
+                    const tacticLabel = detail.tactics[0] || 'Unknown';
+                    const techLabel = `${detail.externalId} • ${detail.name}`;
+                    return `
+                        <div class="tech-item" data-tech="${escapeHtml(techLabel.toLowerCase())}">
+                            <a href="https://attack.mitre.org/techniques/${detail.externalId}/" target="_blank" rel="noopener">
+                                <strong>${escapeHtml(detail.externalId)}</strong> ${escapeHtml(detail.name)}
+                            </a>
+                            <span class="tech-chip">${escapeHtml(tacticLabel)}</span>
+                        </div>
+                    `;
+                }).join('')
+                : `<div style="font-size: 13px; color: rgba(255,255,255,0.7);">No technique data mapped yet.</div>`;
+
+            const tacticCounts = {};
+            techniques.forEach(detail => {
+                const tacticList = detail.tactics.length ? detail.tactics : ['Uncategorized'];
+                tacticList.forEach(tactic => {
+                    tacticCounts[tactic] = (tacticCounts[tactic] || 0) + 1;
+                });
+            });
+            const tacticEntries = Object.entries(tacticCounts)
+                .sort((a, b) => b[1] - a[1]);
+            const maxCount = Math.max(...tacticEntries.map(entry => entry[1]), 1);
+            const tacticsMarkup = tacticEntries.length
+                ? tacticEntries.map(([tactic, count]) => {
+                    const width = Math.round((count / maxCount) * 100);
+                    return `
+                        <div class="tactic-row">
+                            <span>${escapeHtml(tactic)}</span>
+                            <div class="bar" style="width: ${width}%;"></div>
+                            <span>${count}</span>
+                        </div>
+                    `;
+                }).join('')
+                : `<div style="font-size: 13px; color: rgba(255,255,255,0.6);">No tactics breakdown available.</div>`;
+
+            const externalLink = getActorExternalLink(actor);
+            const externalButton = externalLink
+                ? `<a class="btn btn-primary btn-full" href="${externalLink}" target="_blank" rel="noopener">Open in MITRE ATT&amp;CK</a>`
+                : '';
+
+            return `
+                <div>
+                    <div style="font-size: 20px; font-weight: 600; color: #ff0040; margin-bottom: 6px;">${actorName}</div>
+                    ${aliasMarkup}
+                    <div class="detail-description" data-description>${description}</div>
+                    <button class="detail-toggle" type="button">Show more</button>
+                    <div class="detail-search" style="margin-top: 12px;">
+                        <input type="text" placeholder="Search techniques..." aria-label="Search techniques" data-tech-search>
+                    </div>
+                    <div style="margin-top: 14px; font-weight: 600; color: #22d3ee;">Top Techniques Used</div>
+                    <div class="tech-list" data-tech-list>
+                        ${techniquesMarkup}
+                    </div>
+                    <div style="margin-top: 16px; font-weight: 600; color: #22d3ee;">Tactics Breakdown</div>
+                    <div class="tactic-bars">
+                        ${tacticsMarkup}
+                    </div>
+                    <div style="margin-top: 16px;">
+                        ${externalButton}
+                    </div>
+                </div>
+            `;
+        }
+
+        function bindActorDetailInteractions(container, descriptionText) {
+            const description = container.querySelector('[data-description]');
+            const toggleBtn = container.querySelector('.detail-toggle');
+            if (description && toggleBtn) {
+                if (!descriptionText || descriptionText.length < 240) {
+                    toggleBtn.style.display = 'none';
+                }
+                toggleBtn.addEventListener('click', () => {
+                    const expanded = description.classList.toggle('expanded');
+                    toggleBtn.textContent = expanded ? 'Show less' : 'Show more';
+                });
+            }
+
+            const searchInput = container.querySelector('[data-tech-search]');
+            const techList = container.querySelector('[data-tech-list]');
+            if (searchInput && techList) {
+                searchInput.addEventListener('input', () => {
+                    const query = searchInput.value.trim().toLowerCase();
+                    const items = techList.querySelectorAll('.tech-item');
+                    items.forEach(item => {
+                        const techText = item.getAttribute('data-tech') || '';
+                        item.style.display = techText.includes(query) ? '' : 'none';
+                    });
+                });
+            }
+        }
+
+        function renderActorDetails(actor, container) {
+            if (!actor || !container) return;
+            const markup = buildActorDetailMarkup(actor);
+            container.innerHTML = markup;
+            bindActorDetailInteractions(container, actor.description || '');
+        }
+
+        function openActorModal(actor) {
+            const backdrop = document.getElementById('actor-detail-modal');
+            const body = document.getElementById('actor-detail-modal-body');
+            if (!backdrop || !body) return;
+            renderActorDetails(actor, body);
+            backdrop.classList.add('active');
+            backdrop.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            const closeBtn = backdrop.querySelector('.modal-close');
+            if (closeBtn) closeBtn.focus();
+        }
+
+        function closeActorModal() {
+            const backdrop = document.getElementById('actor-detail-modal');
+            if (!backdrop || !backdrop.classList.contains('active')) return;
+            backdrop.classList.remove('active');
+            backdrop.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function openActorDetails(actorId) {
+            const actor = mitreIndexes.actorById.get(actorId);
+            if (!actor) return;
+            const isDesktop = window.matchMedia('(min-width: 1200px)').matches;
+            if (isDesktop) {
+                const detailsCard = document.getElementById('actor-details-card');
+                renderActorDetails(actor, detailsCard);
+            } else {
+                openActorModal(actor);
+            }
+        }
+
+        function setupActorDetailModal() {
+            const backdrop = document.getElementById('actor-detail-modal');
+            if (!backdrop) return;
+            const closeBtn = backdrop.querySelector('.modal-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeActorModal);
+            }
+            backdrop.addEventListener('click', event => {
+                if (event.target === backdrop) {
+                    closeActorModal();
+                }
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    closeActorModal();
+                }
+            });
+        }
+
         // Load MITRE ATT&CK Threat Actors from public API
         async function loadMITREThreatActors() {
             const grid = document.getElementById('mitre-threat-actors-grid');
@@ -3032,29 +3541,29 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             grid.innerHTML = '<div style="text-align:center; padding:40px; color:#22d3ee;"><span class="spinner" style="width:32px; height:32px;"></span><br><br>Loading MITRE ATT&amp;CK threat actor data...</div>';
             
             try {
-                // Call MITRE ATT&CK public GitHub API directly
-                const mitreUrl = 'https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json';
-                const response = await fetch(mitreUrl);
-                
-                if (!response.ok) throw new Error('MITRE ATT&CK API unavailable');
-                const data = await response.json();
+                const data = await fetchMitreData();
+                buildMitreIndexes(data);
                 
                 // Extract threat actors (intrusion-sets)
-                const threatActors = (data.objects || [])
-                    .filter(obj => obj.type === 'intrusion-set')
-                    .slice(0, 12)
-                    .map(actor => {
-                        const description = (actor.description || 'Advanced persistent threat group').substring(0, 200);
-                        return {
-                            name: actor.name || 'Unknown Actor',
-                            type: actor.aliases ? actor.aliases.join(', ').substring(0, 50) : 'APT Group',
-                            status: 'Active',
-                            description: description,
-                            targets: extractTargets(actor.description || ''),
-                            regions: extractRegions(actor.description || ''),
-                            techniques: 'Multiple techniques'
-                        };
-                    });
+                if (!threatActorsCache) {
+                    threatActorsCache = (data.objects || [])
+                        .filter(obj => obj.type === 'intrusion-set')
+                        .slice(0, 12)
+                        .map(actor => {
+                            const description = (actor.description || 'Advanced persistent threat group').substring(0, 200);
+                            return {
+                                id: actor.id,
+                                name: actor.name || 'Unknown Actor',
+                                type: actor.aliases ? actor.aliases.join(', ').substring(0, 50) : 'APT Group',
+                                status: 'Active',
+                                description: description,
+                                targets: extractTargets(actor.description || ''),
+                                regions: extractRegions(actor.description || ''),
+                                techniques: 'Multiple techniques'
+                            };
+                        });
+                }
+                const threatActors = threatActorsCache;
                 
                 if (threatActors.length === 0) {
                     grid.innerHTML = '<div style="text-align:center; padding:40px; color:#ff4444;">No threat actor data available</div>';
@@ -3062,7 +3571,7 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                 }
                 
                 grid.innerHTML = threatActors.map(actor => `
-                    <div class="malware-card" style="border: 1px solid rgba(255,0,64,0.3); background: rgba(255,0,64,0.05);">
+                    <div class="malware-card actor-card" tabindex="0" role="button" data-actor-id="${actor.id}" style="border: 1px solid rgba(255,0,64,0.3); background: rgba(255,0,64,0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                             <div>
                                 <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #ff0040;">${actor.name}</div>
@@ -3078,6 +3587,22 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                         </div>
                     </div>
                 `).join('');
+
+                if (!actorCardListenerBound) {
+                    grid.addEventListener('click', event => {
+                        const card = event.target.closest('.actor-card');
+                        if (!card) return;
+                        openActorDetails(card.dataset.actorId);
+                    });
+                    grid.addEventListener('keydown', event => {
+                        if (event.key !== 'Enter' && event.key !== ' ') return;
+                        const card = event.target.closest('.actor-card');
+                        if (!card) return;
+                        event.preventDefault();
+                        openActorDetails(card.dataset.actorId);
+                    });
+                    actorCardListenerBound = true;
+                }
             } catch (err) {
                 grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff0040;">Error loading MITRE data: ${err.message}<br><br>Please refresh and try again.</div>`;
             }
