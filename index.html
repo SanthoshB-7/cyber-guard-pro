@@ -2475,41 +2475,15 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
         ];
 
         let liveNewsItems = [];
-        const newsSources = [
-            { source: 'CISA', url: 'https://www.cisa.gov/news-events/cybersecurity-advisories.xml', badgeColor: 'pink', category: 'Advisory' },
-            { source: 'US-CERT', url: 'https://www.cisa.gov/news-events/alerts.xml', badgeColor: 'orange', category: 'Alert' },
-            { source: 'NIST', url: 'https://www.nist.gov/news-events/cybersecurity/rss.xml', badgeColor: 'blue', category: 'Framework' }
-        ];
-
         async function fetchLatestNews() {
             try {
-                const responses = await Promise.all(newsSources.map(async (feed) => {
-                    const proxyUrl = `https://r.jina.ai/http://${feed.url.replace(/^https?:\/\//, '')}`;
-                    const res = await fetch(proxyUrl);
-                    if (!res.ok) return [];
-                    const xmlText = await res.text();
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-                    const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 5);
-                    return items.map(item => {
-                        const title = item.querySelector('title')?.textContent?.trim() || 'Security Update';
-                        const link = item.querySelector('link')?.textContent?.trim() || '#';
-                        const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
-                        const date = pubDate ? new Date(pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
-                        const description = item.querySelector('description')?.textContent?.replace(/<[^>]*>/g, '').trim().slice(0, 140) || '';
-                        return {
-                            category: feed.category,
-                            title,
-                            description,
-                            date,
-                            source: feed.source,
-                            badgeColor: feed.badgeColor,
-                            link
-                        };
-                    });
-                }));
-
-                liveNewsItems = responses.flat().filter(item => item.link && item.link !== '#');
+                const res = await fetch('/api/news');
+                if (!res.ok) {
+                    liveNewsItems = [];
+                    return;
+                }
+                const data = await res.json();
+                liveNewsItems = (data.items || []).filter(item => item.link && item.link !== '#');
             } catch (error) {
                 console.warn('News fetch failed, using fallback.', error);
                 liveNewsItems = [];
