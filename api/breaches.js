@@ -10,17 +10,33 @@ export default async function handler(req, res) {
     }
     
     const breachData = await breachResponse.json();
-    
+    const breachList = Array.isArray(breachData)
+      ? breachData
+      : breachData?.data || breachData?.breaches || [];
+
     // Format the data for your dashboard
-    const formattedBreaches = breachData.map(breach => ({
-      name: breach.name || breach.title,
-      date: breach.date_discovered || breach.breach_date,
-      recordsAffected: breach.records_affected || breach.num_records,
-      dataExposed: breach.data_exposed || breach.compromised_data,
-      description: breach.description || 'Data breach incident',
-      severity: calculateSeverity(breach.records_affected || 0),
-      source: 'Breach Directory'
-    }));
+    const formattedBreaches = breachList.map(breach => {
+      const recordsAffected =
+        breach.records_affected ??
+        breach.num_records ??
+        breach.recordsAffected ??
+        breach.records ??
+        0;
+      return {
+        name: breach.name || breach.title || breach.company || 'Unknown',
+        date:
+          breach.date_discovered ||
+          breach.breach_date ||
+          breach.date ||
+          breach.discovered ||
+          new Date().toISOString().split('T')[0],
+        recordsAffected,
+        dataExposed: breach.data_exposed || breach.compromised_data || breach.data || '',
+        description: breach.description || breach.summary || 'Data breach incident',
+        severity: calculateSeverity(Number(recordsAffected) || 0),
+        source: breach.source || 'Breach Directory'
+      };
+    });
     
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({

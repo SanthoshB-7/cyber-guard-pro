@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://api.abuseipdb.com/api/v2/check?ip=${encodeURIComponent(ip)}&maxAgeInDays=90`,
+      `https://api.abuseipdb.com/api/v2/check?ipAddress=${encodeURIComponent(ip)}&maxAgeInDays=90`,
       {
         method: 'GET',
         headers: {
