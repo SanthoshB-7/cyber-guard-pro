@@ -1,34 +1,78 @@
+const cacheTtlMs = 6 * 60 * 60 * 1000;
+let breachCache = null;
+
 export default async function handler(req, res) {
+  const timestamp = new Date().toISOString();
   try {
     // Fetch from multiple breach sources for comprehensive data
-    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
     // Option 1: Fetch from Breach Directory (free, no key needed)
-    const breachResponse = await fetch('https://breachdirectory.org/api/v1/breach');
-    
+    let breachResponse;
+    try {
+      breachResponse = await fetch('https://breachdirectory.org/api/v1/breach', {
+        headers: {
+          accept: 'application/json',
+          'user-agent': 'CyberSecCommand'
+        },
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
     if (!breachResponse.ok) {
       throw new Error('Breach API error');
     }
-    
+
     const breachData = await breachResponse.json();
     const breachList = extractBreachList(breachData);
 
     // Format the data for your dashboard
     const formattedBreaches = (Array.isArray(breachList) ? breachList : []).map(breach => normalizeBreach(breach));
-    
+    const sortedBreaches = sortBreachesByDate(formattedBreaches).slice(0, 50);
+
+    breachCache = {
+      breaches: sortedBreaches,
+      timestamp,
+      cachedAt: Date.now()
+    };
+
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({
-      breaches: formattedBreaches.slice(0, 50), // Latest 50 breaches
-      timestamp: new Date().toISOString()
+      breaches: sortedBreaches, // Latest 50 breaches
+      timestamp
     });
-    
   } catch (error) {
+    const allowFallback = req.query?.allowFallback === '1';
     console.error('Breach API Error:', error);
+
     res.setHeader('Content-Type', 'application/json');
-    res.status(200).json({
-      breaches: fallbackBreaches.map(breach => normalizeBreach(breach)),
-      timestamp: new Date().toISOString(),
-      fallback: true,
-      error: error.message
+
+    if (breachCache && Date.now() - breachCache.cachedAt <= cacheTtlMs) {
+      res.status(200).json({
+        breaches: breachCache.breaches,
+        timestamp,
+        stale: true
+      });
+      return;
+    }
+
+    if (allowFallback) {
+      res.status(502).json({
+        breaches: sortBreachesByDate(fallbackBreaches.map(breach => normalizeBreach(breach))).slice(0, 50),
+        timestamp,
+        fallback: true,
+        error: error.message
+      });
+      return;
+    }
+
+    res.status(502).json({
+      error: error.message,
+      timestamp,
+      fallback: false
     });
   }
 }
@@ -118,4 +162,12 @@ function calculateSeverity(recordCount) {
   if (recordCount > 100000) return 'HIGH';
   if (recordCount > 10000) return 'MEDIUM';
   return 'LOW';
+}
+
+function sortBreachesByDate(breaches) {
+  return [...breaches].sort((a, b) => {
+    const timeA = Date.parse(a.date) || 0;
+    const timeB = Date.parse(b.date) || 0;
+    return timeB - timeA;
+  });
 }
