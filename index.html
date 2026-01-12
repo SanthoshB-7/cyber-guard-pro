@@ -1463,7 +1463,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- REAL BREACHES DASHBOARD (verified from haveibeenpwned, public reports) -->
+<!-- REAL BREACHES DASHBOARD (verified from breach directory, public reports) -->
 <h2 style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches - Verified Incidents</h2>
 <p style="font-size: 15px; color: #ff4444; margin-bottom: 24px; font-weight:500;">Latest confirmed breaches from 2025 and recent 2024 incidents (verified sources)</p>
 <div style="display: grid; grid-template-columns: 1fr; gap: 12px;" id="real-breaches-grid">
@@ -1490,47 +1490,46 @@ function getSeverityColor(severity) {
 let allBreachesData = [];
 let currentBreachesShown = 5;
 
-// Load real-time breach data from HaveIBeenPwned
+// Load real-time breach data from backend aggregator
 async function loadRealBreaches() {
   try {
-    const response = await fetch('https://haveibeenpwned.com/api/v3/breaches', {
-      headers: { 'User-Agent': 'CyberSecCommand' }
-    });
+    const response = await fetch('/api/breaches');
     
     if (!response.ok) {
-      throw new Error('HIBP API failed');
+      throw new Error('Breach API failed');
     }
     
-    const hibpBreaches = await response.json();
+    const breachPayload = await response.json();
+    const breachList = breachPayload?.breaches || [];
     
     // Filter for recent breaches (2023-2025) and sort by date (newest first)
-    const recentBreaches = hibpBreaches
+    const recentBreaches = breachList
       .filter(breach => {
-        const breachYear = new Date(breach.BreachDate).getFullYear();
+        const breachYear = new Date(breach.date).getFullYear();
         return breachYear >= 2023;
       })
-      .sort((a, b) => new Date(b.BreachDate) - new Date(a.BreachDate));
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
     
     // Fallback to all breaches if no recent ones
-    const breachesToProcess = recentBreaches.length > 0 ? recentBreaches : hibpBreaches;
+    const breachesToProcess = recentBreaches.length > 0 ? recentBreaches : breachList;
     
-    // Convert HIBP format
+    // Convert API format
     allBreachesData = breachesToProcess.map(breach => ({
-      name: breach.Name,
-      date: breach.BreachDate,
-      recordsAffected: breach.PwnCount,
-      dataExposed: breach.DataClasses.slice(0, 2).join(', '),
-      description: breach.Description.substring(0, 100),
-      severity: calculateSeverityFromCount(breach.PwnCount)
+      name: breach.name,
+      date: breach.date,
+      recordsAffected: breach.recordsAffected || 0,
+      dataExposed: breach.dataExposed,
+      description: breach.description || '',
+      severity: breach.severity || calculateSeverityFromCount(breach.recordsAffected || 0)
     }));
     
     // Reset and show first 5
     currentBreachesShown = 5;
     displayBreaches(allBreachesData.slice(0, 5), true);
-    console.log('✅ Loaded ' + allBreachesData.length + ' breaches from HIBP');
+    console.log('✅ Loaded ' + allBreachesData.length + ' breaches from backend');
     
   } catch (error) {
-    console.warn('⚠️ HIBP API failed, using fallback:', error.message);
+    console.warn('⚠️ Breach API failed, using fallback:', error.message);
     
     if (typeof realBreaches2025 !== 'undefined' && realBreaches2025.length > 0) {
       allBreachesData = realBreaches2025.map(breach => ({
@@ -1865,20 +1864,10 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                         <h3 style="margin-bottom: 16px; font-size: 18px; display: flex; align-items: center; gap: 8px;">
                             <span>🔑</span> Perplexity API Configuration
                         </h3>
-                        <div class="form-group">
-                            <label class="form-label">API Key (Required for accurate results)</label>
-                            <input type="password" class="form-input" id="perplexity-api-key" placeholder="Enter your Perplexity API key">
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="checkbox" id="remember-api-key" style="width: 18px; height: 18px;">
-                                <span style="font-size: 14px;">Remember API key</span>
-                            </label>
-                            <button class="btn btn-secondary" onclick="testAPIKey()" style="padding: 8px 16px; font-size: 13px;">Test Connection</button>
-                        </div>
-                        <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 12px; margin-bottom: 0;">
-                            💡 Get your API key from <a href="https://www.perplexity.ai/settings/api" target="_blank" style="color: #22d3ee;">perplexity.ai/settings/api</a>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 12px;">
+                            Perplexity is configured securely on the server. No manual key entry is required.
                         </p>
+                        <button class="btn btn-secondary" onclick="testAPIKey()" style="padding: 8px 16px; font-size: 13px;">Test Connection</button>
                     </div>
 
                     <div class="premium-card">
@@ -2066,34 +2055,25 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
                                     <span style="color: #00ff88;">✅</span>
-                                    <span><strong>URLhaus:</strong> Active</span>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
-                                    <span style="color: #00ff88;">✅</span>
-                                    <span><strong>HIBP:</strong> Active</span>
+                                    <span><strong>Breach Directory:</strong> Active</span>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- OPTIONAL User-Provided APIs -->
                         <div style="background: rgba(255,165,0,0.05); border: 1px solid rgba(255,165,0,0.2); border-radius: 10px; padding: 16px;">
-                            <h4 style="font-size: 16px; color: #ff4444; margin-bottom: 12px;">⚙️ Optional User API Keys</h4>
-                            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 16px;">Only for Learning Hub features (all Security Tools work without keys)</p>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Perplexity API Key (For AI research features)</label>
-                                <input type="password" class="form-input" id="perplexity-settings-key" placeholder="Enter your Perplexity API key">
-                                <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:6px;">🔗 <a href="https://www.perplexity.ai/settings/api" target="_blank" style="color:#22d3ee;">Get Perplexity API Key</a></p>
-                            </div>
+                            <h4 style="font-size: 16px; color: #ff4444; margin-bottom: 12px;">⚙️ Backend API Keys</h4>
+                            <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 16px;">All integrations are configured securely in Vercel. No user keys required.</p>
                             
                             <div style="margin-top: 16px; padding: 12px; background: rgba(34,211,238,0.1); border-radius: 8px; font-size: 13px; color: rgba(255,255,255,0.8);">
                                 <strong>✅ Backend API Keys Configured:</strong><br>
+                                • Perplexity (Learning Hub)<br>
+                                • NVD (Threat Intel &amp; CVE Lookup)<br>
                                 • AbuseIPDB (IP Reputation)<br>
-                                • VirusTotal (Malware Scanner)<br>
+                                • VirusTotal (URL Scanner)<br>
+                                • HIBP (Email Breach Checker)<br>
                                 • All keys stored securely in Vercel environment variables
                             </div>
-                            
-                            <button class="btn btn-primary" onclick="saveAPIKeys()" style="margin-top:12px;">💾 Save Perplexity Key</button>
                         </div>
                     </div>
                     
@@ -2155,14 +2135,13 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                             Built for security professionals and analysts<br><br>
                             <strong>Integrated APIs (All Free Tier):</strong><br>
                             ✓ <strong>CISA KEV</strong> - Known Exploited Vulnerabilities (No key required)<br>
-                            ✓ <strong>NVD</strong> - National Vulnerability Database (Optional key for higher limits)<br>
+                            ✓ <strong>NVD</strong> - National Vulnerability Database (Server key supported)<br>
                             ✓ <strong>MITRE ATT&amp;CK</strong> - Threat actor intelligence (No key required)<br>
-                            ✓ <strong>VirusTotal</strong> - File hash analysis (User provides key)<br>
-                            ✓ <strong>AbuseIPDB</strong> - IP reputation (User provides key)<br>
+                            ✓ <strong>VirusTotal</strong> - URL scanning (Server key required)<br>
+                            ✓ <strong>AbuseIPDB</strong> - IP reputation (Server key required)<br>
                             ✓ <strong>ThreatMiner</strong> - Threat intelligence (No key required)<br>
-                            ✓ <strong>URLhaus</strong> - Malicious URL detection (No key required)<br>
-                            ✓ <strong>HIBP</strong> - Email breach checker (No key required)<br>
-                            ✓ <strong>Perplexity AI</strong> - Deep research (User provides key)<br><br>
+                            ✓ <strong>HIBP</strong> - Email breach checker (Server key required)<br>
+                            ✓ <strong>Perplexity AI</strong> - Deep research (Server key required)<br><br>
                             <strong>Status:</strong> All APIs real-time, zero placeholders<br>
                             <strong>Security:</strong> All backend keys hidden in Vercel environment variables<br><br>
                             © 2025 All rights reserved
@@ -2185,14 +2164,13 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                                 /<br>
                                 ├── index.html (this file)<br>
                                 ├── api/<br>
+                                │   ├── breaches.js<br>
+                                │   ├── check-ip.js<br>
+                                │   ├── cisa-kev.js<br>
                                 │   ├── nvd-cves.js<br>
                                 │   ├── nvd-lookup.js<br>
-                                │   ├── cisa-kev.js<br>
-                                │   ├── mitre-attack.js<br>
-                                │   ├── virustotal-scan.js<br>
-                                │   ├── abuseipdb-check.js<br>
-                                │   ├── threatminer-search.js<br>
-                                │   ├── urlhaus-check.js<br>
+                                │   ├── perplexity.js<br>
+                                │   ├── scan-url.js<br>
                                 │   └── hibp-check.js
                                 </code><br>
                                 
@@ -2200,10 +2178,14 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                                 From the app.js file provided, copy each function section into separate files.<br>
                                 Example: Copy the entire "// ========== /api/nvd-cves.js ==========" section → Save as /api/nvd-cves.js<br><br>
                                 
-                                <strong style="color: #ff4444;">STEP 4: Set Environment Variables (Optional)</strong><br>
+                                <strong style="color: #ff4444;">STEP 4: Set Environment Variables</strong><br>
                                 In Vercel Dashboard → Settings → Environment Variables:<br>
+                                - <strong>PERPLEXITY_API_KEY</strong> (Required for Learning Hub AI features)<br>
                                 - <strong>NVD_API_KEY</strong> (Optional - Get from <a href="https://nvd.nist.gov/developers/request-an-api-key" target="_blank" style="color: #22d3ee;">nvd.nist.gov</a>)<br>
-                                  Without key: 5 requests/30s | With key: 50 requests/30s<br><br>
+                                  Without key: 5 requests/30s | With key: 50 requests/30s<br>
+                                - <strong>ABUSEIPDB_API_KEY</strong> (Required for IP reputation checks)<br>
+                                - <strong>VIRUSTOTAL_API_KEY</strong> (Required for URL scanning)<br>
+                                - <strong>HIBP_API_KEY</strong> (Required for email breach checks)<br><br>
                                 
                                 <strong style="color: #ff4444;">STEP 5: Deploy</strong><br>
                                 1. Push to Vercel<br>
@@ -2354,52 +2336,27 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             }
         };
 
-        // Perplexity API Integration
-        const PERPLEXITY_API_ENDPOINT = 'https://api.perplexity.ai/chat/completions';
-        const PERPLEXITY_MODEL = 'sonar-pro';
+        // Perplexity API Integration (server-side proxy)
+        const PERPLEXITY_API_ENDPOINT = '/api/perplexity';
 
-        // Load saved API key on init
+        // Load saved API key on init (no-op: keys are managed in Vercel)
         function loadSavedAPIKey() {
-            const savedKey = getAPIKey();
-            if (savedKey) {
-                const input = document.getElementById('perplexity-api-key');
-                if (input) {
-                    input.value = savedKey;
-                    document.getElementById('remember-api-key').checked = true;
-                }
-            }
-        }
-
-        // Get API Key (from memory only - no localStorage)
-        let apiKeyMemory = null;
-        function getAPIKey() {
-            const input = document.getElementById('perplexity-api-key');
-            if (input && input.value.trim()) {
-                apiKeyMemory = input.value.trim();
-                return apiKeyMemory;
-            }
-            return apiKeyMemory;
+            return;
         }
 
         // Test API Connection
         async function testAPIKey() {
-            const apiKey = getAPIKey();
             const btn = event.target;
-            
-            if (!apiKey) {
-                alert('Please enter your Perplexity API key');
-                return;
-            }
 
             btn.innerHTML = '<span class="spinner"></span> Testing...';
             btn.classList.add('loading');
 
             try {
-                const response = await callPerplexityAPI('Test connection', apiKey);
+                const response = await callPerplexityAPI('Test connection');
                 if (response) {
-                    alert('✓ API key is valid! You can now use all research features.');
+                    alert('✓ Connection successful! You can now use all research features.');
                 } else {
-                    alert('✗ API key test failed. Please check your key.');
+                    alert('✗ Connection test failed. Please check the server configuration.');
                 }
             } catch (error) {
                 alert('✗ Error: ' + error.message);
@@ -2410,38 +2367,23 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
         }
 
         // Call Perplexity API
-        async function callPerplexityAPI(query, apiKey = null) {
-            const key = apiKey || getAPIKey();
-            
-            if (!key) {
-                throw new Error('API key is required. Please enter your Perplexity API key.');
-            }
-
+        async function callPerplexityAPI(query) {
             try {
                 const response = await fetch(PERPLEXITY_API_ENDPOINT, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${key}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        model: PERPLEXITY_MODEL,
-                        messages: [{
-                            role: 'user',
-                            content: query
-                        }],
-                        max_tokens: 1000,
-                        temperature: 0.7
-                    })
+                    body: JSON.stringify({ query })
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
-                    throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+                    throw new Error(`API Error: ${response.status} - ${errorData.error || 'Unknown error'}`);
                 }
 
                 const data = await response.json();
-                return data.choices[0].message.content;
+                return data.content;
             } catch (error) {
                 console.error('Perplexity API Error:', error);
                 throw error;
@@ -2474,7 +2416,7 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             { name: 'ShinyHunters', type: 'Data Theft', status: 'Active', targets: 'E-commerce & SaaS', regions: 'Global' }
         ];
 
-        // News Data (from application_data_json) with REAL LINKS
+        // News Data (fallback list)
         const newsItems = [
             {
                 category: "Framework",
@@ -2532,6 +2474,22 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             }
         ];
 
+        let liveNewsItems = [];
+        async function fetchLatestNews() {
+            try {
+                const res = await fetch('/api/news');
+                if (!res.ok) {
+                    liveNewsItems = [];
+                    return;
+                }
+                const data = await res.json();
+                liveNewsItems = (data.items || []).filter(item => item.link && item.link !== '#');
+            } catch (error) {
+                console.warn('News fetch failed, using fallback.', error);
+                liveNewsItems = [];
+            }
+        }
+
         // Initialize App
         function initApp() {
             renderNews();
@@ -2581,14 +2539,7 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
             grid.innerHTML = '<div style="text-align:center; padding:40px; color:#22d3ee;"><span class="spinner" style="width:32px; height:32px;"></span><br><br>Loading real-time CVE data from NVD...</div>';
             
             try {
-                // Call NVD API directly (free, no key required for basic access)
-                const sevenDaysAgo = new Date();
-                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                const startDate = sevenDaysAgo.toISOString().split('T')[0];
-                const endDate = new Date().toISOString().split('T')[0];
-                
-                const nvdUrl = `https://services.nvd.nist.gov/rest/json/cves/2.0?pubStartDate=${startDate}T00:00:00.000&pubEndDate=${endDate}T23:59:59.999&cvssV3Severity=CRITICAL`;
-                const response = await fetch(nvdUrl);
+                const response = await fetch('/api/nvd-cves?days=7&severity=CRITICAL');
                 
                 if (!response.ok) throw new Error('NVD API rate limit reached. Try again in a few minutes.');
                 const data = await response.json();
@@ -2775,21 +2726,20 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
 
         // --- SECURITY TOOLS: Real API Functions ---
 // === 1. CVE Lookup (NVD API direct) ===
-async function lookupCVE() {
-    const query = document.getElementById('cve-input').value;
-    const resultDiv = document.getElementById('cve-result');
-    const btn = event.target;
-    if (!query.trim()) {
-        alert('Please enter a CVE ID or software name');
-        return;
-    }
-    btn.innerHTML = '<span class="spinner"></span> Searching...';
-    btn.classList.add('loading');
-    resultDiv.classList.add('hidden');
-    try {
-        // Call NVD API directly
-        const nvdUrl = `https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=${encodeURIComponent(query.trim())}`;
-        const res = await fetch(nvdUrl);
+        async function lookupCVE() {
+            const query = document.getElementById('cve-input').value;
+            const resultDiv = document.getElementById('cve-result');
+            const btn = event.target;
+            if (!query.trim()) {
+                alert('Please enter a CVE ID or software name');
+                return;
+            }
+            btn.innerHTML = '<span class="spinner"></span> Searching...';
+            btn.classList.add('loading');
+            resultDiv.classList.add('hidden');
+            try {
+        // Call backend NVD proxy
+        const res = await fetch(`/api/nvd-lookup?query=${encodeURIComponent(query.trim())}`);
         if (!res.ok) throw new Error('CVE not found or NVD rate limit hit');
         const data = await res.json();
         if (!data.vulnerabilities || data.vulnerabilities.length === 0) throw new Error('CVE not found');
@@ -3022,7 +2972,7 @@ async function checkMaliciousURL() {
         btn.classList.remove('loading');
     }
 }
-// 7. Email Breach Checker (HIBP - free, no key for basic check)
+// 7. Email Breach Checker (HIBP - backend)
 async function checkEmail() {
     const email = document.getElementById('email-input').value;
     const resultDiv = document.getElementById('email-result');
@@ -3035,10 +2985,10 @@ async function checkEmail() {
     btn.classList.add('loading');
     resultDiv.classList.add('hidden');
     try {
-        // Call HIBP API directly (free for email check)
-        const hibpUrl = `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email.trim())}`;
-        const res = await fetch(hibpUrl, {
-            headers: { 'User-Agent': 'CyberSecCommand/1.0' }
+        const res = await fetch('/api/hibp-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.trim() })
         });
         
         if (res.status === 404) {
@@ -3049,11 +2999,14 @@ async function checkEmail() {
             return;
         }
         
-        if (!res.ok) throw new Error('HIBP API rate limit or error');
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'HIBP API error');
+        }
         const hibpData = await res.json();
         
         const data = {
-            breaches: (hibpData || []).map(breach => ({
+            breaches: (hibpData.breaches || []).map(breach => ({
                 name: breach.Name,
                 date: breach.BreachDate,
                 description: breach.Description
@@ -3065,7 +3018,7 @@ async function checkEmail() {
             resultDiv.innerHTML = `<div class="tool-result" style="border-left-color:#ff6b00;"><h4 style="color:#ff6b00; margin-bottom: 12px;">⚠️ Found in ${data.breaches.length} breaches</h4><div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8);">Your email appeared in: ${data.breaches.map(b=>`${b.name} (${b.date})`).join(', ')}<br><br><strong>Recommendations:</strong><br>• Change passwords for affected accounts<br>• Enable 2FA<br>• Monitor for suspicious activity</div></div>`;
         }
     } catch (err) {
-        resultDiv.innerHTML = `<div class="tool-result"><p style="color:#ff0040;">${err.message}<br><br>Note: HIBP may rate limit requests. Please try again in a few seconds.</p></div>`;
+        resultDiv.innerHTML = `<div class="tool-result"><p style="color:#ff0040;">${err.message}<br><br>Note: HIBP requires a server API key and may rate limit requests.</p></div>`;
     } finally {
         resultDiv.classList.remove('hidden');
         btn.innerHTML = 'Check Breaches';
@@ -3297,11 +3250,12 @@ function analyzePassword() {
         }
 
         // Render News Items (populates the Learning Hub News Grid) - NOW WITH CLICKABLE LINKS
-        function populateNewsGrid() {
+        function populateNewsGrid(itemsToRender = null) {
             const newsGrid = document.getElementById('news-grid');
             if (!newsGrid) return;
-            
-            newsGrid.innerHTML = newsItems.map(item => `
+
+            const items = itemsToRender && itemsToRender.length ? itemsToRender : newsItems;
+            newsGrid.innerHTML = items.map(item => `
                 <div class="news-card">
                     <span class="news-badge badge-${item.badgeColor}">${item.category}</span>
                     <h3>${item.title}</h3>
@@ -3318,8 +3272,9 @@ function analyzePassword() {
         }
         
         // Legacy function kept for compatibility
-        function renderNews() {
-            populateNewsGrid();
+        async function renderNews() {
+            await fetchLatestNews();
+            populateNewsGrid(liveNewsItems);
         }
 
         // Tab Navigation
@@ -3354,7 +3309,7 @@ function analyzePassword() {
             setTimeout(() => {
                 btn.innerHTML = 'Load More Articles';
                 btn.classList.remove('loading');
-                alert('More articles loaded! (This is a demo)');
+                alert('News feeds refreshed. New items will appear as sources update.');
             }, 1500);
         }
 
@@ -3368,12 +3323,6 @@ function analyzePassword() {
 
             if (!topic.trim()) {
                 alert('Please enter a research topic');
-                return;
-            }
-
-            const apiKey = getAPIKey();
-            if (!apiKey) {
-                alert('⚠️ Please enter your Perplexity API key above to get accurate research results.');
                 return;
             }
 
@@ -3417,7 +3366,7 @@ function analyzePassword() {
                     <div class="results-card" style="border-left-color: #ff0040;">
                         <h3 style="color: #ff0040;">⚠️ Error</h3>
                         <p>${error.message}</p>
-                        <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Please check your API key and try again.</p>
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Please check the server configuration and try again.</p>
                     </div>
                 `;
                 resultsDiv.classList.remove('hidden');
@@ -3437,12 +3386,6 @@ function analyzePassword() {
 
             if (!url.trim()) {
                 alert('Please enter a YouTube URL');
-                return;
-            }
-
-            const apiKey = getAPIKey();
-            if (!apiKey) {
-                alert('⚠️ Please enter your Perplexity API key above to analyze YouTube videos.');
                 return;
             }
 
@@ -3511,7 +3454,7 @@ function analyzePassword() {
                     <div class="results-card" style="border-left-color: #ff0040;">
                         <h3 style="color: #ff0040;">⚠️ Error</h3>
                         <p>${error.message}</p>
-                        <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Please check your API key and try again.</p>
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Please check the server configuration and try again.</p>
                     </div>
                 `;
                 resultsDiv.classList.remove('hidden');
@@ -3684,12 +3627,6 @@ function analyzePassword() {
                 return;
             }
 
-            const apiKey = getAPIKey();
-            if (!apiKey) {
-                alert('⚠️ Please enter your Perplexity API key to analyze documents.');
-                return;
-            }
-
             btn.innerHTML = '<span class="spinner"></span> Analyzing with AI...';
             btn.classList.add('loading');
             resultsDiv.classList.add('hidden');
@@ -3769,7 +3706,7 @@ function analyzePassword() {
                     <div class="results-card" style="border-left-color: #ff0040;">
                         <h3 style="color: #ff0040;">⚠️ Error</h3>
                         <p>${error.message}</p>
-                        <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Please check your API key and try again.</p>
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Please check the server configuration and try again.</p>
                     </div>
                 `;
                 resultsDiv.classList.remove('hidden');
@@ -3877,12 +3814,6 @@ function analyzePassword() {
             
             if (!question.trim()) {
                 alert('Please enter a question');
-                return;
-            }
-
-            const apiKey = getAPIKey();
-            if (!apiKey) {
-                alert('⚠️ Please enter your Perplexity API key.');
                 return;
             }
 
@@ -4357,11 +4288,6 @@ function analyzePassword() {
             });
         }
 
-        // API Key Management (Perplexity only)
-        function saveAPIKeys() {
-            alert('✓ Perplexity API key saved for this session!');
-        }
-        
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             initApp();
