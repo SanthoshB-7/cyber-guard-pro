@@ -1,4 +1,5 @@
-const cacheTtlMs = 45 * 60 * 1000;
+const verifiedCacheTtlMs = 24 * 60 * 60 * 1000;
+const liveCacheTtlMs = 45 * 60 * 1000;
 const rssSources = [
   { name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/', type: 'news' },
   { name: 'The Hacker News', url: 'https://feeds.feedburner.com/TheHackersNews', type: 'news' },
@@ -8,42 +9,47 @@ const rssSources = [
   { name: 'GitHub Status', url: 'https://www.githubstatus.com/history.rss', type: 'status' },
   { name: 'CISA Advisories', url: 'https://www.cisa.gov/cybersecurity-advisories/rss.xml', type: 'official' }
 ];
-let breachCache = null;
+const wikiPageTitle = 'List_of_data_breaches';
+let verifiedCache = null;
+let liveCache = null;
 
 export default async function handler(req, res) {
   const timestamp = new Date().toISOString();
-  try {
-    const breachDirectoryResult = await fetchBreachDirectory();
-    if (breachDirectoryResult?.breaches?.length) {
-      const responsePayload = {
-        breaches: breachDirectoryResult.breaches,
-        timestamp,
-        source: 'breachdirectory',
-        stale: false,
-        registryAvailable: true
-      };
-      breachCache = {
-        ...responsePayload,
-        cachedAt: Date.now()
-      };
-      res.setHeader('Content-Type', 'application/json');
-      res.status(200).json(responsePayload);
-      return;
+  const requestedMode = (req.query?.mode || 'verified').toLowerCase();
+  const mode = requestedMode === 'live' ? 'live' : 'verified';
+
+  if (mode === 'verified') {
+    try {
+      const verifiedResult = await fetchVerifiedBreaches();
+      if (verifiedResult?.breaches?.length) {
+        const responsePayload = {
+          breaches: verifiedResult.breaches,
+          timestamp,
+          source: 'wikipedia',
+          mode: 'verified'
+        };
+        verifiedCache = {
+          ...responsePayload,
+          cachedAt: Date.now()
+        };
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(responsePayload);
+        return;
+      }
+    } catch (error) {
+      console.warn('Verified dataset unavailable:', error.message);
     }
-  } catch (error) {
-    console.warn('Breach Directory unavailable:', error.message);
   }
 
-  const rssResult = await fetchRssBreaches();
-  if (rssResult?.breaches?.length) {
+  const liveResult = await fetchLiveBreaches();
+  if (liveResult?.breaches?.length) {
     const responsePayload = {
-      breaches: rssResult.breaches,
+      breaches: liveResult.breaches,
       timestamp,
       source: 'intelligence_feed',
-      stale: false,
-      registryAvailable: false
+      mode: 'live'
     };
-    breachCache = {
+    liveCache = {
       ...responsePayload,
       cachedAt: Date.now()
     };
@@ -53,13 +59,15 @@ export default async function handler(req, res) {
   }
 
   res.setHeader('Content-Type', 'application/json');
-  if (breachCache && Date.now() - breachCache.cachedAt <= cacheTtlMs) {
+  const cache = mode === 'verified' ? verifiedCache : liveCache;
+  const cacheTtl = mode === 'verified' ? verifiedCacheTtlMs : liveCacheTtlMs;
+  if (cache && Date.now() - cache.cachedAt <= cacheTtl) {
     res.status(200).json({
-      breaches: breachCache.breaches,
+      breaches: cache.breaches,
       timestamp,
-      source: breachCache.source,
-      stale: true,
-      registryAvailable: breachCache.registryAvailable ?? false
+      source: cache.source,
+      mode: cache.mode,
+      stale: true
     });
     return;
   }
@@ -68,8 +76,8 @@ export default async function handler(req, res) {
     error: 'Breach sources unavailable',
     timestamp,
     source: 'unavailable',
-    stale: true,
-    registryAvailable: false
+    mode,
+    stale: true
   });
 }
 
@@ -152,7 +160,8 @@ function normalizeBreach(breach) {
     source: breach.source || 'Breach Directory',
     url: breach.url || breach.link || '',
     category: breach.category || 'breach',
-    sourceName: breach.sourceName || 'Breach Directory'
+    sourceName: breach.sourceName || 'Breach Directory',
+    attackType: breach.attackType || 'Unknown'
   };
 }
 
@@ -171,13 +180,18 @@ function sortBreachesByDate(breaches) {
   });
 }
 
-async function fetchBreachDirectory() {
+async function fetchVerifiedBreaches() {
+  const cacheValid = verifiedCache && Date.now() - verifiedCache.cachedAt <= verifiedCacheTtlMs;
+  if (cacheValid) {
+    return { breaches: verifiedCache.breaches };
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-  let breachResponse;
+  let response;
   try {
-    breachResponse = await fetch('https://breachdirectory.org/api/v1/breach', {
+    const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${wikiPageTitle}&prop=text&format=json&origin=*`;
+    response = await fetch(url, {
       headers: {
         accept: 'application/json',
         'user-agent': 'CyberSecCommand'
@@ -188,25 +202,26 @@ async function fetchBreachDirectory() {
     clearTimeout(timeoutId);
   }
 
-  if (!breachResponse.ok) {
-    throw new Error('Breach API error');
+  if (!response.ok) {
+    throw new Error('Wikipedia API error');
   }
 
-  const breachData = await breachResponse.json();
-  const breachList = extractBreachList(breachData);
-  const formattedBreaches = (Array.isArray(breachList) ? breachList : []).map(breach => normalizeBreach({
-    ...breach,
-    category: 'breach',
-    sourceName: 'Breach Directory'
-  }));
+  const payload = await response.json();
+  const html = payload?.parse?.text?.['*'] || '';
+  const items = parseWikipediaBreaches(html);
+  const deduped = dedupeBreaches(items);
   return {
-    breaches: sortBreachesByDate(formattedBreaches).slice(0, 50)
+    breaches: sortBreachesByDate(deduped).slice(0, 50)
   };
 }
 
-async function fetchRssBreaches() {
-  const collected = [];
+async function fetchLiveBreaches() {
+  const cacheValid = liveCache && Date.now() - liveCache.cachedAt <= liveCacheTtlMs;
+  if (cacheValid) {
+    return { breaches: liveCache.breaches };
+  }
 
+  const collected = [];
   for (const source of rssSources) {
     try {
       const rssResponse = await fetchWithTimeout(source.url, {
@@ -221,7 +236,7 @@ async function fetchRssBreaches() {
       const xmlText = await rssResponse.text();
       const items = parseFeedItems(xmlText, source);
       const normalized = items
-        .map(item => normalizeRssBreach(item))
+        .map(item => normalizeLiveItem(item))
         .filter(item => item);
       collected.push(...normalized);
     } catch (error) {
@@ -233,7 +248,7 @@ async function fetchRssBreaches() {
     return { breaches: [] };
   }
 
-  const filtered = applyRssFilters(collected);
+  const filtered = applyLiveFilters(collected);
   return {
     breaches: sortBreachesByDate(filtered).slice(0, 50)
   };
@@ -292,52 +307,56 @@ function stripHtml(value) {
   return value.replace(/<[^>]*>/g, '').replace(/\\s+/g, ' ').trim();
 }
 
-function normalizeRssBreach(item) {
+function normalizeLiveItem(item) {
   const title = stripHtml(item.title || 'Untitled incident');
   const summary = stripHtml(item.description || '');
   const pubDate = item.pubDate ? new Date(item.pubDate) : null;
   const date = pubDate && !Number.isNaN(pubDate.getTime())
     ? pubDate.toISOString()
     : new Date().toISOString();
-  const category = classifyRssCategory(title, summary, item.sourceType);
+  const category = classifyLiveCategory(title, summary, item.sourceType);
 
   if (!category) {
     return null;
   }
 
-  const severityScore = scoreRssSeverity({
+  const severityScore = scoreLiveSeverity({
     title,
     summary,
     category,
     sourceType: item.sourceType,
     sourceName: item.sourceName
   });
+  const attackType = inferAttackType(title, summary);
+  const recordsAffected = parseRecordCount(`${title} ${summary}`) || 'Unknown';
 
   return {
     name: title,
     date,
     url: item.link || '',
-    recordsAffected: 'Unknown',
+    recordsAffected,
     dataExposed: 'Not disclosed',
     description: summary,
     severity: severityFromScore(severityScore),
     category,
-    sourceName: item.sourceName || 'Intelligence Feed'
+    sourceName: item.sourceName || 'Intelligence Feed',
+    attackType
   };
 }
 
-function applyRssFilters(items) {
+function applyLiveFilters(items) {
   return items.filter(item => {
     if (!item) return false;
     if (isLowSignalItem(item)) return false;
+    if (hasExcludedTerms(item)) return false;
     if (item.category === 'incident') {
       return isMajorIncident(item) || isOfficialSource(item.sourceName);
     }
-    return item.category === 'ransomware' || item.category === 'breach';
+    return isConfirmedLiveItem(item);
   });
 }
 
-function classifyRssCategory(title, summary, sourceType) {
+function classifyLiveCategory(title, summary, sourceType) {
   const text = `${title} ${summary}`.toLowerCase();
   const ransomwareMatch = ransomwareKeywords.some(keyword => text.includes(keyword));
   const breachMatch = breachKeywords.some(keyword => text.includes(keyword));
@@ -349,7 +368,7 @@ function classifyRssCategory(title, summary, sourceType) {
   return null;
 }
 
-function scoreRssSeverity({ title, summary, category, sourceType, sourceName }) {
+function scoreLiveSeverity({ title, summary, category, sourceType, sourceName }) {
   const text = `${title} ${summary}`.toLowerCase();
   let score = 0;
   if (category === 'ransomware') score += 4;
@@ -426,3 +445,129 @@ const lowSignalKeywords = [
   'patch tuesday', 'how to', 'tutorial', 'tips', 'guide', 'update',
   'release', 'preview', 'webinar', 'podcast', 'product launch', 'explainer'
 ];
+
+const excludeKeywords = [
+  'denies', 'denied', 'alleged', 'claims', 'rumored', 'unconfirmed',
+  'possible', 'might', 'suspected', 'no evidence'
+];
+
+const confirmationKeywords = [
+  'confirmed', 'discloses', 'disclosed', 'breach notification', 'regulator',
+  'sec', 'settlement', 'investigation found', 'data exposed'
+];
+
+const attackTypeKeywords = [
+  { type: 'ransomware/extortion', keywords: ['ransomware', 'extortion', 'data leak site', 'lockbit', 'alphv', 'blackcat', 'cl0p', 'ransomhub', '8base', 'akira', 'medusa', 'play', 'royal'] },
+  { type: 'misconfiguration/exposed database', keywords: ['misconfiguration', 'exposed database', 'open database', 'publicly accessible'] },
+  { type: 'credential stuffing', keywords: ['credential stuffing', 'password spray'] },
+  { type: 'phishing', keywords: ['phishing', 'spearphishing'] },
+  { type: 'supply chain', keywords: ['supply chain', 'third-party'] },
+  { type: 'insider', keywords: ['insider', 'employee'] },
+  { type: 'third-party vendor', keywords: ['vendor', 'third-party', 'service provider'] }
+];
+
+function parseWikipediaBreaches(html) {
+  const tables = html.match(/<table[^>]*class="[^"]*wikitable[^"]*"[\s\S]*?<\/table>/gi) || [];
+  const items = [];
+
+  tables.forEach(table => {
+    const rows = table.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    rows.forEach(row => {
+      const cells = row.match(/<td[\s\S]*?<\/td>/gi);
+      if (!cells || cells.length < 2) return;
+      const textCells = cells.map(cell => stripHtml(cell).replace(/\[[^\]]+\]/g, '').trim());
+      const linkMatch = row.match(/<a[^>]+href="([^"]+)"[^>]*>/i);
+      const url = linkMatch ? `https://en.wikipedia.org${linkMatch[1]}` : '';
+
+      const dateText = textCells[0];
+      const name = textCells[1] || 'Unknown';
+      const recordsText = textCells[2] || '';
+      const description = textCells.slice(3).join(' ').trim() || textCells[2] || 'Reported breach incident';
+      const date = parseDateFromText(dateText);
+      if (!date || !name) return;
+
+      const recordsAffected = parseRecordCount(recordsText) || parseRecordCount(description) || 'Unknown';
+      const attackType = inferAttackType(name, description);
+      items.push({
+        name,
+        date,
+        url,
+        recordsAffected,
+        dataExposed: 'Unknown',
+        description,
+        severity: severityFromScore(recordsAffected !== 'Unknown' ? scoreSeverityByRecords(recordsAffected) : 4),
+        category: 'breach',
+        attackType,
+        sourceName: 'Wikipedia'
+      });
+    });
+  });
+
+  return items;
+}
+
+function parseDateFromText(value) {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const parsed = Date.parse(trimmed);
+  if (!Number.isNaN(parsed)) return new Date(parsed).toISOString();
+  const yearMatch = trimmed.match(/\b(19|20)\d{2}\b/);
+  if (yearMatch) {
+    return new Date(`${yearMatch[0]}-01-01`).toISOString();
+  }
+  return null;
+}
+
+function dedupeBreaches(items) {
+  const seen = new Set();
+  return items.filter(item => {
+    const key = `${item.name.toLowerCase()}-${item.date.split('T')[0]}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function parseRecordCount(text) {
+  if (!text) return null;
+  const normalized = text.toLowerCase().replace(/,/g, '');
+  const match = normalized.match(/(\d+(?:\.\d+)?)\s*(million|billion|bn|m|k)?/i);
+  if (!match) return null;
+  const value = Number(match[1]);
+  if (Number.isNaN(value)) return null;
+  const unit = match[2];
+  if (!unit) return Math.round(value);
+  if (unit === 'billion' || unit === 'bn') return Math.round(value * 1_000_000_000);
+  if (unit === 'million' || unit === 'm') return Math.round(value * 1_000_000);
+  if (unit === 'k') return Math.round(value * 1_000);
+  return Math.round(value);
+}
+
+function inferAttackType(title, summary) {
+  const text = `${title} ${summary}`.toLowerCase();
+  for (const group of attackTypeKeywords) {
+    if (group.keywords.some(keyword => text.includes(keyword))) {
+      return group.type;
+    }
+  }
+  return 'Unknown';
+}
+
+function scoreSeverityByRecords(records) {
+  if (typeof records !== 'number') return 4;
+  if (records > 1_000_000) return 8;
+  if (records > 100_000) return 6;
+  if (records > 10_000) return 4;
+  return 3;
+}
+
+function hasExcludedTerms(item) {
+  const text = `${item.name} ${item.description}`.toLowerCase();
+  return excludeKeywords.some(keyword => text.includes(keyword));
+}
+
+function isConfirmedLiveItem(item) {
+  if (item.category !== 'breach' && item.category !== 'ransomware') return true;
+  const text = `${item.name} ${item.description}`.toLowerCase();
+  return confirmationKeywords.some(keyword => text.includes(keyword));
+}

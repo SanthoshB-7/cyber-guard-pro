@@ -1779,10 +1779,16 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- REAL BREACHES DASHBOARD (verified from breach directory, public reports) -->
-<h2 style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches - Verified Incidents</h2>
-<p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified incidents</p>
+<h2 id="breach-header" style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches (Verified Dataset)</h2>
+<p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified dataset from public breach registries and Wikipedia.</p>
 <div id="breach-fallback-callout" style="display: none; margin-bottom: 24px; padding: 10px 12px; border-radius: 8px; background: rgba(255, 153, 51, 0.12); border: 1px solid rgba(255, 153, 51, 0.4); color: rgba(255,255,255,0.9); font-size: 13px;">
   Primary breach registry unavailable; showing curated intelligence feed.
+</div>
+<div class="filter-bar" style="margin-bottom: 12px;">
+  <select class="form-select" id="breach-mode-switch" style="flex: 1;">
+    <option value="verified" selected>Verified Breach Dataset</option>
+    <option value="live">Live Intelligence (Filtered)</option>
+  </select>
 </div>
 <div class="filter-bar" style="margin-bottom: 16px;">
   <select class="form-select" id="breach-category-filter" style="flex: 1;">
@@ -1822,13 +1828,16 @@ function getSeverityColor(severity) {
 let allBreachesData = [];
 let filteredBreaches = [];
 let currentBreachesShown = 5;
+const breachModeStorageKey = 'breach_mode_v1';
 
 // Load real-time breach data from backend aggregator
 async function loadRealBreaches() {
+  const headerEl = document.getElementById('breach-header');
   const subtitleEl = document.getElementById('breach-subtitle');
   const fallbackCallout = document.getElementById('breach-fallback-callout');
   try {
-    const response = await fetch('/api/breaches');
+    const mode = getBreachMode();
+    const response = await fetch(`/api/breaches?mode=${encodeURIComponent(mode)}`);
     
     if (!response.ok) {
       throw new Error('Breach API failed');
@@ -1836,15 +1845,20 @@ async function loadRealBreaches() {
     
     const breachPayload = await response.json();
     const breachList = breachPayload?.breaches || [];
-    const registryAvailable = breachPayload?.registryAvailable !== false;
+    const responseMode = breachPayload?.mode || mode;
 
+    if (headerEl) {
+      headerEl.textContent = responseMode === 'live'
+        ? 'Incidents & Breach Intelligence (Filtered)'
+        : 'Recent Data Breaches (Verified Dataset)';
+    }
     if (subtitleEl) {
-      subtitleEl.textContent = registryAvailable
-        ? 'Verified incidents'
-        : 'Incidents & Breach Intelligence (Curated)';
+      subtitleEl.textContent = responseMode === 'live'
+        ? 'Confirmed breach, ransomware, and major incident intelligence.'
+        : 'Verified dataset from public breach registries and Wikipedia.';
     }
     if (fallbackCallout) {
-      fallbackCallout.style.display = registryAvailable ? 'none' : 'block';
+      fallbackCallout.style.display = responseMode === 'live' ? 'block' : 'none';
     }
     
     // Filter for recent breaches (2023-2025) and sort by date (newest first)
@@ -1868,7 +1882,8 @@ async function loadRealBreaches() {
       severity: breach.severity || calculateSeverityFromCount(breach.recordsAffected || 0),
       category: breach.category || 'breach',
       sourceName: breach.sourceName || 'Breach Directory',
-      url: breach.url || ''
+      url: breach.url || '',
+      attackType: breach.attackType || 'Unknown'
     }));
     
     // Reset and show first 5
@@ -1878,8 +1893,11 @@ async function loadRealBreaches() {
     
   } catch (error) {
     console.warn('⚠️ Breach API failed, using fallback:', error.message);
+    if (headerEl) {
+      headerEl.textContent = 'Recent Data Breaches (Verified Dataset)';
+    }
     if (subtitleEl) {
-      subtitleEl.textContent = 'Verified incidents';
+      subtitleEl.textContent = 'Verified dataset from public breach registries and Wikipedia.';
     }
     if (fallbackCallout) {
       fallbackCallout.style.display = 'none';
@@ -1895,7 +1913,8 @@ async function loadRealBreaches() {
         severity: breach.severity,
         category: 'breach',
         sourceName: 'Local Fallback',
-        url: ''
+        url: '',
+        attackType: 'Unknown'
       })).sort((a, b) => new Date(b.date) - new Date(a.date));
       
       currentBreachesShown = 5;
@@ -1908,6 +1927,27 @@ async function loadRealBreaches() {
 function loadMoreBreaches() {
   currentBreachesShown += 5;
   displayBreaches(filteredBreaches.slice(0, currentBreachesShown), filteredBreaches.length > currentBreachesShown);
+}
+
+function getBreachMode() {
+  const selectEl = document.getElementById('breach-mode-switch');
+  const stored = localStorage.getItem(breachModeStorageKey);
+  const mode = selectEl?.value || stored || 'verified';
+  if (selectEl) {
+    selectEl.value = mode;
+  }
+  return mode;
+}
+
+function setupBreachMode() {
+  const selectEl = document.getElementById('breach-mode-switch');
+  if (!selectEl) return;
+  const stored = localStorage.getItem(breachModeStorageKey) || 'verified';
+  selectEl.value = stored;
+  selectEl.addEventListener('change', () => {
+    localStorage.setItem(breachModeStorageKey, selectEl.value);
+    loadRealBreaches();
+  });
 }
 
 function updateBreachFilters() {
@@ -1976,7 +2016,11 @@ function displayBreaches(breaches, showLoadMore = false) {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/&/g, '&amp;');
-
+    const recordsLabel = typeof breach.recordsAffected === 'number'
+      ? formatNumber(breach.recordsAffected)
+      : (breach.recordsAffected || 'Unknown');
+    const dataLabel = breach.dataExposed || 'Unknown';
+    const attackTypeLabel = breach.attackType || 'Unknown';
 
     
     html += `<div style="background: rgba(20, 25, 30, 0.95); border-left: 5px solid ${getSeverityColor(breach.severity)}; border-radius: 6px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); position: relative;">
@@ -1995,8 +2039,9 @@ function displayBreaches(breaches, showLoadMore = false) {
       
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
         <div style="font-size: 12px; color: #ff4444; margin-bottom: 8px;">📅 <strong>${breach.date}</strong></div>
-        <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 8px;"><strong style="color: #fff;">Records:</strong> <span style="color: #ff4444;">${formatNumber(breach.recordsAffected)}</span></div>
-        <div style="font-size: 12px; color: rgba(255,255,255,0.8);"><strong style="color: #fff;">Data:</strong> ${breach.dataExposed || 'Not disclosed'}</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 8px;"><strong style="color: #fff;">Records:</strong> <span style="color: #ff4444;">${recordsLabel}</span></div>
+        <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-bottom: 8px;"><strong style="color: #fff;">Attack Type:</strong> ${attackTypeLabel}</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,0.8);"><strong style="color: #fff;">Data:</strong> ${dataLabel}</div>
       </div>
     </div>`;
 
@@ -2024,6 +2069,7 @@ function formatNumber(num) {
 
 // Call on page load
 window.addEventListener('DOMContentLoaded', () => {
+  setupBreachMode();
   setupBreachFilters();
   loadRealBreaches();
 });
