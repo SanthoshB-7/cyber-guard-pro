@@ -1782,7 +1782,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <h2 style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches - Verified Incidents</h2>
 <p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified incidents</p>
 <div id="breach-fallback-callout" style="display: none; margin-bottom: 24px; padding: 10px 12px; border-radius: 8px; background: rgba(255, 153, 51, 0.12); border: 1px solid rgba(255, 153, 51, 0.4); color: rgba(255,255,255,0.9); font-size: 13px;">
-  Primary breach registry unavailable; showing curated news feed.
+  Primary breach registry unavailable; showing curated intelligence feed.
+</div>
+<div class="filter-bar" style="margin-bottom: 16px;">
+  <select class="form-select" id="breach-category-filter" style="flex: 1;">
+    <option value="all" selected>Category: All</option>
+    <option value="ransomware">Ransomware</option>
+    <option value="breach">Breach</option>
+    <option value="incident">Incident</option>
+  </select>
+  <select class="form-select" id="breach-severity-filter" style="flex: 1;">
+    <option value="medium" selected>Severity: ≥ MEDIUM</option>
+    <option value="high">Severity: ≥ HIGH</option>
+    <option value="critical">Severity: CRITICAL only</option>
+    <option value="all">Severity: All</option>
+  </select>
 </div>
 <div style="display: grid; grid-template-columns: 1fr; gap: 12px;" id="real-breaches-grid">
   <!-- Dynamic breach data will load here -->
@@ -1806,6 +1820,7 @@ function getSeverityColor(severity) {
 
 // Global variable to store all breaches for "Load More" functionality
 let allBreachesData = [];
+let filteredBreaches = [];
 let currentBreachesShown = 5;
 
 // Load real-time breach data from backend aggregator
@@ -1821,15 +1836,15 @@ async function loadRealBreaches() {
     
     const breachPayload = await response.json();
     const breachList = breachPayload?.breaches || [];
-    const source = breachPayload?.source;
+    const registryAvailable = breachPayload?.registryAvailable !== false;
 
     if (subtitleEl) {
-      subtitleEl.textContent = source === 'rss'
-        ? 'Breach & incident news feed (fallback)'
-        : 'Verified incidents';
+      subtitleEl.textContent = registryAvailable
+        ? 'Verified incidents'
+        : 'Incidents & Breach Intelligence (Curated)';
     }
     if (fallbackCallout) {
-      fallbackCallout.style.display = source === 'rss' ? 'block' : 'none';
+      fallbackCallout.style.display = registryAvailable ? 'none' : 'block';
     }
     
     // Filter for recent breaches (2023-2025) and sort by date (newest first)
@@ -1850,12 +1865,15 @@ async function loadRealBreaches() {
       recordsAffected: breach.recordsAffected || 0,
       dataExposed: breach.dataExposed,
       description: breach.description || '',
-      severity: breach.severity || calculateSeverityFromCount(breach.recordsAffected || 0)
+      severity: breach.severity || calculateSeverityFromCount(breach.recordsAffected || 0),
+      category: breach.category || 'breach',
+      sourceName: breach.sourceName || 'Breach Directory',
+      url: breach.url || ''
     }));
     
     // Reset and show first 5
     currentBreachesShown = 5;
-    displayBreaches(allBreachesData.slice(0, 5), true);
+    updateBreachFilters();
     console.log('✅ Loaded ' + allBreachesData.length + ' breaches from backend');
     
   } catch (error) {
@@ -1874,11 +1892,14 @@ async function loadRealBreaches() {
         recordsAffected: parseInt(breach.affected.replace(/[^0-9]/g, '')) || 0,
         dataExposed: breach.data_exposed,
         description: breach.description,
-        severity: breach.severity
+        severity: breach.severity,
+        category: 'breach',
+        sourceName: 'Local Fallback',
+        url: ''
       })).sort((a, b) => new Date(b.date) - new Date(a.date));
       
       currentBreachesShown = 5;
-      displayBreaches(allBreachesData.slice(0, 5), true);
+      updateBreachFilters();
       console.log('📦 Using local fallback data');
     }
   }
@@ -1886,9 +1907,56 @@ async function loadRealBreaches() {
 
 function loadMoreBreaches() {
   currentBreachesShown += 5;
-  displayBreaches(allBreachesData.slice(0, currentBreachesShown), allBreachesData.length > currentBreachesShown);
+  displayBreaches(filteredBreaches.slice(0, currentBreachesShown), filteredBreaches.length > currentBreachesShown);
 }
 
+function updateBreachFilters() {
+  const categoryFilter = document.getElementById('breach-category-filter')?.value || 'all';
+  const severityFilter = document.getElementById('breach-severity-filter')?.value || 'medium';
+
+  filteredBreaches = allBreachesData.filter(breach => {
+    const matchesCategory = categoryFilter === 'all' || breach.category === categoryFilter;
+    const matchesSeverity = matchesSeverityFilter(breach.severity, severityFilter);
+    return matchesCategory && matchesSeverity;
+  }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  currentBreachesShown = 5;
+  displayBreaches(filteredBreaches.slice(0, currentBreachesShown), filteredBreaches.length > currentBreachesShown);
+}
+
+function matchesSeverityFilter(severity, filterValue) {
+  if (filterValue === 'all') return true;
+  const severityRank = getSeverityRank(severity);
+  if (filterValue === 'critical') return severityRank >= 4;
+  if (filterValue === 'high') return severityRank >= 3;
+  return severityRank >= 2;
+}
+
+function getSeverityRank(severity) {
+  switch ((severity || '').toUpperCase()) {
+    case 'CRITICAL':
+      return 4;
+    case 'HIGH':
+      return 3;
+    case 'MEDIUM':
+      return 2;
+    case 'LOW':
+      return 1;
+    default:
+      return 1;
+  }
+}
+
+function setupBreachFilters() {
+  const categoryFilter = document.getElementById('breach-category-filter');
+  const severityFilter = document.getElementById('breach-severity-filter');
+  if (categoryFilter) {
+    categoryFilter.addEventListener('change', updateBreachFilters);
+  }
+  if (severityFilter) {
+    severityFilter.addEventListener('change', updateBreachFilters);
+  }
+}
 
 function calculateSeverityFromCount(pwnCount) {
   if (pwnCount > 1000000) return 'CRITICAL';
@@ -1914,7 +1982,13 @@ function displayBreaches(breaches, showLoadMore = false) {
     html += `<div style="background: rgba(20, 25, 30, 0.95); border-left: 5px solid ${getSeverityColor(breach.severity)}; border-radius: 6px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); position: relative;">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
         <div style="flex: 1;">
-          <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #fff; word-wrap: break-word;">${breach.name}</h4>
+          <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #fff; word-wrap: break-word;">
+            ${breach.url ? `<a href="${breach.url}" target="_blank" rel="noopener" style="color: #fff; text-decoration: none;">${breach.name}</a>` : breach.name}
+          </h4>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; margin-top: 6px;">
+            <span style="background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.35); color: #22d3ee; padding: 2px 8px; border-radius: 999px; text-transform: uppercase;">${breach.category || 'breach'}</span>
+            <span style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 999px;">${breach.sourceName || 'Source'}</span>
+          </div>
         </div>
         <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">${breach.severity}</span>
       </div>
@@ -1949,7 +2023,10 @@ function formatNumber(num) {
 }
 
 // Call on page load
-window.addEventListener('DOMContentLoaded', loadRealBreaches);
+window.addEventListener('DOMContentLoaded', () => {
+  setupBreachFilters();
+  loadRealBreaches();
+});
 
 
 
