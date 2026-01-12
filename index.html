@@ -888,6 +888,98 @@ body{
     background: rgba(255, 255, 255, 0.08);
 }
 
+/* EPSS Enhancements */
+.nvd-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-20);
+}
+
+@media (min-width: 1200px) {
+    .nvd-layout {
+        grid-template-columns: minmax(0, 1fr) 280px;
+        align-items: start;
+    }
+}
+
+.epss-insights-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-lg);
+    padding: var(--space-16);
+    box-shadow: var(--shadow-soft);
+}
+
+.epss-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-12);
+    margin-bottom: var(--space-16);
+}
+
+.epss-kpi {
+    background: rgba(34, 211, 238, 0.08);
+    border: 1px solid rgba(34, 211, 238, 0.2);
+    border-radius: var(--radius-md);
+    padding: var(--space-10);
+    text-align: center;
+}
+
+.epss-kpi h4 {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: var(--space-4);
+}
+
+.epss-kpi span {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-teal-accent);
+}
+
+.mini-histogram {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    margin-top: var(--space-8);
+}
+
+.mini-hist-bar {
+    flex: 1;
+    background: linear-gradient(180deg, rgba(139, 92, 246, 0.5), rgba(34, 211, 238, 0.4));
+    border-radius: 4px 4px 0 0;
+    min-height: 6px;
+}
+
+.epss-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    margin-top: var(--space-12);
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.epss-meter {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.epss-meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(34, 211, 238, 0.6), rgba(139, 92, 246, 0.6));
+    border-radius: var(--radius-full);
+    width: 0%;
+}
+
+.epss-muted {
+    color: rgba(255, 255, 255, 0.45);
+}
+
 .cvss-badge {
     padding: var(--space-6) var(--space-12);
     border-radius: var(--radius-sm);
@@ -1648,10 +1740,52 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                             <option value="HIGH">High</option>
                             <option value="MEDIUM">Medium</option>
                         </select>
+                        <select class="form-select" id="nvd-view-mode" onchange="updateCVEViewMode()" style="flex: 1;">
+                            <option value="group" selected="">Group: Severity</option>
+                            <option value="epss">Sort: EPSS (High→Low)</option>
+                            <option value="cvss">Sort: CVSS (High→Low)</option>
+                            <option value="newest">Sort: Newest</option>
+                        </select>
+                        <select class="form-select" id="nvd-group-sort" onchange="updateCVEViewMode()" style="flex: 1;">
+                            <option value="cvss" selected="">Within-group: CVSS</option>
+                            <option value="epss">Within-group: EPSS</option>
+                            <option value="newest">Within-group: Newest</option>
+                        </select>
+                        <select class="form-select" id="nvd-epss-filter" onchange="updateCVEViewMode()" style="flex: 1;">
+                            <option value="all" selected="">EPSS: All</option>
+                            <option value="0.01">EPSS ≥ 1%</option>
+                            <option value="0.1">EPSS ≥ 10%</option>
+                            <option value="0.5">EPSS ≥ 50%</option>
+                        </select>
                         <button class="btn btn-secondary" onclick="exportCVEReport()">📄 Export PDF Report</button>
                     </div>
-                    
-                    <div class="cve-grid" id="nvd-cve-grid"></div>
+
+                    <div class="nvd-layout">
+                        <div class="cve-grid" id="nvd-cve-grid"></div>
+                        <div class="epss-insights-card" id="epss-insights-card">
+                            <h3 style="font-size: 16px; margin-bottom: 12px; color: #22d3ee;">📊 EPSS Insights</h3>
+                            <div class="epss-kpis">
+                                <div class="epss-kpi">
+                                    <h4>Avg EPSS</h4>
+                                    <span id="epss-avg">--</span>
+                                </div>
+                                <div class="epss-kpi">
+                                    <h4>Max EPSS</h4>
+                                    <span id="epss-max">--</span>
+                                </div>
+                                <div class="epss-kpi">
+                                    <h4>≥10%</h4>
+                                    <span id="epss-10">--</span>
+                                </div>
+                                <div class="epss-kpi">
+                                    <h4>≥50%</h4>
+                                    <span id="epss-50">--</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">EPSS Distribution</div>
+                            <div class="mini-histogram" id="epss-histogram"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Section 2: Active Threat Actors from MITRE ATT&CK -->
@@ -2530,6 +2664,11 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
 
         // Load NVD CVEs from backend API
         let nvdCVEsCache = [];
+        const epssCacheKey = 'epss_cache_v1';
+        const epssCacheTtl = 43200000;
+        const cveViewStorageKey = 'nvd_view_mode_v1';
+        const cveGroupSortStorageKey = 'nvd_group_sort_v1';
+        const cveEpssFilterStorageKey = 'nvd_epss_filter_v1';
         
         async function loadNVDCVEs() {
             const grid = document.getElementById('nvd-cve-grid');
@@ -2574,14 +2713,27 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
                         severity: severity,
                         products: products,
                         date_published: vuln.published ? new Date(vuln.published).toLocaleDateString() : 'Unknown',
-                        status: vuln.vulnStatus === 'Analyzed' ? 'Patched' : 'Active'
+                        date_published_raw: vuln.published || null,
+                        status: vuln.vulnStatus === 'Analyzed' ? 'Patched' : 'Active',
+                        epss: null,
+                        epss_percentile: null
                     };
                 });
                 
                 nvdCVEsCache = cves;
                 updateTime.innerHTML = new Date().toLocaleString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'numeric', timeZoneName:'short'});
                 
+                restoreCVEControls();
                 renderNVDCVEs(nvdCVEsCache);
+
+                const epssMap = await fetchEPSSForCves(cves.map(cve => cve.cve_id));
+                if (epssMap && epssMap.size) {
+                    nvdCVEsCache = nvdCVEsCache.map(cve => {
+                        const epssData = epssMap.get(cve.cve_id);
+                        return epssData ? { ...cve, ...epssData } : cve;
+                    });
+                    renderNVDCVEs(nvdCVEsCache);
+                }
             } catch (err) {
                 grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff0040;">Error loading NVD data: ${err.message}<br><br>Note: NVD API has rate limits. Please wait a moment and try refreshing.</div>`;
             }
@@ -2590,40 +2742,265 @@ window.addEventListener('DOMContentLoaded', loadRealBreaches);
         function renderNVDCVEs(cves) {
             const grid = document.getElementById('nvd-cve-grid');
             if (!grid || !cves) return;
-            
-            grid.innerHTML = cves.map(cve => {
-                const severityColor = cve.cvss >= 9 ? '#ff0040' : cve.cvss >= 7 ? '#ff6b00' : '#ffd700';
-                return `
-                    <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.03);">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                            <div>
-                                <div style="font-weight: 600; color: ${severityColor}; margin-bottom: 4px;">${cve.cve_id}</div>
-                                <div style="font-size: 15px; font-weight: 500; margin-bottom: 8px; line-height: 1.4;">${cve.title}</div>
+
+            const viewMode = document.getElementById('nvd-view-mode')?.value || 'group';
+            const groupSort = document.getElementById('nvd-group-sort')?.value || 'cvss';
+            const epssThreshold = getEpssThreshold();
+            const severityFilter = document.getElementById('nvd-severity-filter')?.value || 'all';
+
+            let filtered = cves.filter(cve => {
+                if (severityFilter !== 'all' && cve.severity !== severityFilter) return false;
+                if (epssThreshold > 0) {
+                    const epssPercent = cve.epss != null ? cve.epss * 100 : null;
+                    return epssPercent != null && epssPercent >= epssThreshold;
+                }
+                return true;
+            });
+
+            updateEpssInsights(filtered);
+
+            if (viewMode === 'group') {
+                const groups = ['CRITICAL', 'HIGH', 'MEDIUM'];
+                const groupHtml = groups.map(group => {
+                    const groupItems = filtered.filter(cve => cve.severity === group);
+                    const sortedItems = sortCves(groupItems, groupSort);
+                    if (sortedItems.length === 0) return '';
+                    return `
+                        <div style="margin-bottom: 18px;">
+                            <div style="font-size: 13px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;">${group} Severity</div>
+                            <div class="cve-grid">
+                                ${sortedItems.map(renderCveCard).join('')}
                             </div>
-                            <div class="cvss-badge" style="background: ${severityColor};">${cve.cvss}</div>
                         </div>
-                        <div style="font-size:13px; margin-bottom:8px; color:rgba(255,255,255,0.8);">${cve.description}</div>
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
-                            <span class="info-tag">${cve.severity}</span>
-                            <span class="info-tag">${cve.products}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.6);">
-                            <span>Published: ${cve.date_published}</span>
-                            <span style="color: ${cve.status === 'Patched' ? '#00ff88' : '#ff0040'};">${cve.status}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+                grid.innerHTML = groupHtml || `<div style="text-align:center; padding:40px; color:#ff4444;">No CVEs match the current filters.</div>`;
+            } else {
+                const sorted = sortCves(filtered, viewMode);
+                grid.innerHTML = sorted.length ? sorted.map(renderCveCard).join('') : `<div style="text-align:center; padding:40px; color:#ff4444;">No CVEs match the current filters.</div>`;
+            }
         }
         
         function filterNVDCVEs() {
-            const severity = document.getElementById('nvd-severity-filter').value;
-            if (severity === 'all') {
-                renderNVDCVEs(nvdCVEsCache);
-            } else {
-                const filtered = nvdCVEsCache.filter(cve => cve.severity === severity);
-                renderNVDCVEs(filtered);
+            renderNVDCVEs(nvdCVEsCache);
+        }
+
+        function updateCVEViewMode() {
+            const viewMode = document.getElementById('nvd-view-mode')?.value || 'group';
+            const groupSort = document.getElementById('nvd-group-sort')?.value || 'cvss';
+            const epssFilter = document.getElementById('nvd-epss-filter')?.value || 'all';
+            localStorage.setItem(cveViewStorageKey, viewMode);
+            localStorage.setItem(cveGroupSortStorageKey, groupSort);
+            localStorage.setItem(cveEpssFilterStorageKey, epssFilter);
+
+            const groupSortSelect = document.getElementById('nvd-group-sort');
+            if (groupSortSelect) {
+                groupSortSelect.style.display = viewMode === 'group' ? '' : 'none';
             }
+            renderNVDCVEs(nvdCVEsCache);
+        }
+
+        function restoreCVEControls() {
+            const viewMode = localStorage.getItem(cveViewStorageKey) || 'group';
+            const groupSort = localStorage.getItem(cveGroupSortStorageKey) || 'cvss';
+            const epssFilter = localStorage.getItem(cveEpssFilterStorageKey) || 'all';
+            const viewSelect = document.getElementById('nvd-view-mode');
+            const groupSelect = document.getElementById('nvd-group-sort');
+            const epssSelect = document.getElementById('nvd-epss-filter');
+            if (viewSelect) viewSelect.value = viewMode;
+            if (groupSelect) groupSelect.value = groupSort;
+            if (epssSelect) epssSelect.value = epssFilter;
+            if (groupSelect) groupSelect.style.display = viewMode === 'group' ? '' : 'none';
+        }
+
+        function getEpssThreshold() {
+            const value = document.getElementById('nvd-epss-filter')?.value || 'all';
+            if (value === 'all') return 0;
+            return Number(value) * 100;
+        }
+
+        function sortCves(cves, mode) {
+            const sorted = [...cves];
+            if (mode === 'epss') {
+                sorted.sort((a, b) => (b.epss ?? -1) - (a.epss ?? -1));
+            } else if (mode === 'cvss') {
+                sorted.sort((a, b) => (b.cvss ?? 0) - (a.cvss ?? 0));
+            } else if (mode === 'newest') {
+                sorted.sort((a, b) => new Date(b.date_published_raw || 0) - new Date(a.date_published_raw || 0));
+            }
+            return sorted;
+        }
+
+        function renderCveCard(cve) {
+            const severityColor = cve.cvss >= 9 ? '#ff0040' : cve.cvss >= 7 ? '#ff6b00' : '#ffd700';
+            const epssPercent = cve.epss != null ? (cve.epss * 100) : null;
+            const percentile = cve.epss_percentile != null ? (cve.epss_percentile > 1 ? cve.epss_percentile : cve.epss_percentile * 100) : null;
+            const epssLabel = epssPercent != null
+                ? `EPSS: ${epssPercent.toFixed(1)}% • Percentile: ${percentile != null ? percentile.toFixed(0) : '--'}`
+                : 'EPSS: unavailable';
+            const meterWidth = epssPercent != null ? Math.min(100, Math.max(0, epssPercent)) : 0;
+
+            return `
+                <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                        <div>
+                            <div style="font-weight: 600; color: ${severityColor}; margin-bottom: 4px;">${cve.cve_id}</div>
+                            <div style="font-size: 15px; font-weight: 500; margin-bottom: 8px; line-height: 1.4;">${cve.title}</div>
+                        </div>
+                        <div class="cvss-badge" style="background: ${severityColor};">${cve.cvss}</div>
+                    </div>
+                    <div style="font-size:13px; margin-bottom:8px; color:rgba(255,255,255,0.8);">${cve.description}</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <span class="info-tag">${cve.severity}</span>
+                        <span class="info-tag">${cve.products}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.6);">
+                        <span>Published: ${cve.date_published}</span>
+                        <span style="color: ${cve.status === 'Patched' ? '#00ff88' : '#ff0040'};">${cve.status}</span>
+                    </div>
+                    <div class="epss-row ${epssPercent == null ? 'epss-muted' : ''}">
+                        <span>${epssLabel}</span>
+                        <div class="epss-meter">
+                            <div class="epss-meter-fill" style="width:${meterWidth}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateEpssInsights(cves) {
+            const epssValues = cves.map(cve => cve.epss).filter(val => val != null);
+            const avg = epssValues.length ? epssValues.reduce((sum, val) => sum + val, 0) / epssValues.length : null;
+            const max = epssValues.length ? Math.max(...epssValues) : null;
+            const count10 = epssValues.filter(val => val >= 0.1).length;
+            const count50 = epssValues.filter(val => val >= 0.5).length;
+
+            const avgEl = document.getElementById('epss-avg');
+            const maxEl = document.getElementById('epss-max');
+            const count10El = document.getElementById('epss-10');
+            const count50El = document.getElementById('epss-50');
+            if (avgEl) avgEl.textContent = avg != null ? `${(avg * 100).toFixed(1)}%` : '—';
+            if (maxEl) maxEl.textContent = max != null ? `${(max * 100).toFixed(1)}%` : '—';
+            if (count10El) count10El.textContent = `${count10}`;
+            if (count50El) count50El.textContent = `${count50}`;
+
+            const histogram = document.getElementById('epss-histogram');
+            if (histogram) {
+                const bins = new Array(10).fill(0);
+                epssValues.forEach(val => {
+                    const index = Math.min(9, Math.floor((val * 100) / 10));
+                    bins[index] += 1;
+                });
+                const maxBin = Math.max(...bins, 1);
+                histogram.innerHTML = bins.map(count => {
+                    const height = Math.max(6, Math.round((count / maxBin) * 60));
+                    return `<div class="mini-hist-bar" style="height:${height}px;"></div>`;
+                }).join('');
+            }
+        }
+
+        function getEpssCache() {
+            try {
+                const raw = localStorage.getItem(epssCacheKey);
+                if (!raw) return { timestamp: 0, data: {} };
+                const parsed = JSON.parse(raw);
+                if (Date.now() - parsed.timestamp > epssCacheTtl) {
+                    return { timestamp: 0, data: {} };
+                }
+                return parsed;
+            } catch {
+                return { timestamp: 0, data: {} };
+            }
+        }
+
+        function setEpssCache(data) {
+            localStorage.setItem(epssCacheKey, JSON.stringify({ timestamp: Date.now(), data }));
+        }
+
+        async function fetchEPSSForCves(cveIds) {
+            const cache = getEpssCache();
+            const cachedData = cache.data || {};
+            const missing = cveIds.filter(id => !cachedData[id]);
+            if (missing.length === 0) {
+                return new Map(Object.entries(cachedData));
+            }
+
+            const result = { ...cachedData };
+            try {
+                const chunks = [];
+                for (let i = 0; i < missing.length; i += 50) {
+                    chunks.push(missing.slice(i, i + 50));
+                }
+                for (const chunk of chunks) {
+                    const data = await fetchEpssBatch(chunk);
+                    data.forEach(item => {
+                        result[item.cve] = { epss: item.epss, epss_percentile: item.percentile };
+                    });
+                }
+                setEpssCache(result);
+                return new Map(Object.entries(result));
+            } catch (error) {
+                console.warn('EPSS batch fetch failed, falling back to individual requests.', error);
+            }
+
+            const individualResults = await fetchWithConcurrency(missing, 5, fetchEpssSingle);
+            individualResults.forEach(item => {
+                if (item) {
+                    result[item.cve] = { epss: item.epss, epss_percentile: item.percentile };
+                }
+            });
+            setEpssCache(result);
+            return new Map(Object.entries(result));
+        }
+
+        async function fetchEpssBatch(cveIds) {
+            const url = `https://api.first.org/data/v1/epss?cve=${cveIds.join(',')}`;
+            const data = await fetchWithTimeout(url, 8000);
+            return (data?.data || []).map(item => ({
+                cve: item.cve,
+                epss: Number(item.epss),
+                percentile: Number(item.percentile)
+            }));
+        }
+
+        async function fetchEpssSingle(cveId) {
+            try {
+                const data = await fetchWithTimeout(`https://api.first.org/data/v1/epss?cve=${cveId}`, 8000);
+                const item = data?.data?.[0];
+                if (!item) return null;
+                return { cve: item.cve, epss: Number(item.epss), percentile: Number(item.percentile) };
+            } catch (error) {
+                return null;
+            }
+        }
+
+        async function fetchWithTimeout(url, timeoutMs) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, { signal: controller.signal });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error('EPSS API error');
+                }
+                return data;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function fetchWithConcurrency(items, limit, handler) {
+            const results = [];
+            let index = 0;
+            const workers = new Array(limit).fill(null).map(async () => {
+                while (index < items.length) {
+                    const current = items[index++];
+                    const result = await handler(current);
+                    results.push(result);
+                }
+            });
+            await Promise.all(workers);
+            return results;
         }
         
         function exportCVEReport() {
