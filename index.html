@@ -241,12 +241,19 @@ body{
 }
 
 /* Main Content - MOBILE OPTIMIZED */
+.app-shell {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 .main-content {
     flex: 1;
     padding: 12px;
-    max-width: 1200px;
     width: 100%;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
 }
 
 @media (min-width: 768px) {
@@ -256,13 +263,30 @@ body{
 }
 
 @media (min-width: 1200px) {
-    .main-content {
+    .app-shell {
         max-width: 1380px;
+    }
+
+    .main-content {
+        padding: 24px;
+    }
+
+    .app-shell.has-clipboard {
+        max-width: 1560px;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 18px;
+        align-items: start;
+    }
+
+    .app-shell.has-clipboard .main-content {
+        padding: 24px 0;
     }
 }
 
 @media (min-width: 1600px) {
-    .main-content {
+    .app-shell {
         max-width: 1560px;
     }
 }
@@ -907,6 +931,18 @@ body{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--space-16);
+}
+
+@media (min-width: 1400px) {
+    .cve-grid {
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
+    }
+}
+
+@media (min-width: 1600px) {
+    .cve-grid {
+        grid-template-columns: repeat(4, minmax(260px, 1fr));
+    }
 }
 
 .cve-card {
@@ -1704,17 +1740,11 @@ p, .muted-text, .subtitle{
 </style>
 <style>
 /* === Investigation Clipboard === */
-@media (min-width: 1200px) {
-  .main-content {
-    padding-right: 360px;
-  }
-}
-
 .clipboard-panel {
-  position: fixed;
+  position: sticky;
   top: 132px;
-  right: 24px;
-  width: 320px;
+  width: 100%;
+  max-width: 360px;
   height: calc(100vh - 180px);
   display: none;
   flex-direction: column;
@@ -1724,6 +1754,8 @@ p, .muted-text, .subtitle{
   box-shadow: var(--shadow-premium);
   backdrop-filter: blur(18px);
   z-index: 120;
+  overflow: hidden;
+  align-self: start;
 }
 
 @media (min-width: 1200px) {
@@ -1732,12 +1764,34 @@ p, .muted-text, .subtitle{
   }
 }
 
+.clipboard-panel.is-collapsed {
+  position: fixed;
+  right: 16px;
+  top: 148px;
+  width: 64px;
+  height: auto;
+  padding: 6px;
+  border-radius: 999px;
+  border-color: rgba(34,211,238,0.45);
+  box-shadow: var(--shadow-glow);
+}
+
+.clipboard-panel.is-collapsed .clipboard-header,
+.clipboard-panel.is-collapsed .clipboard-body {
+  display: none;
+}
+
+.clipboard-panel.is-collapsed .clipboard-collapsed-pill {
+  display: flex;
+}
+
 .clipboard-header {
-  padding: 14px 16px;
+  padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .clipboard-title-row {
@@ -1745,6 +1799,12 @@ p, .muted-text, .subtitle{
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.clipboard-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .clipboard-title {
@@ -1760,6 +1820,46 @@ p, .muted-text, .subtitle{
   border: 1px solid rgba(34,211,238,0.35);
   padding: 2px 8px;
   border-radius: 999px;
+}
+
+.clipboard-collapse-toggle {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.85);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.clipboard-collapse-toggle:hover {
+  border-color: rgba(34,211,238,0.5);
+  color: #fff;
+}
+
+.clipboard-collapsed-pill {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 6px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(34,211,238,0.35));
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+}
+
+.clipboard-collapsed-count {
+  color: #e6fbff;
+  font-weight: 700;
 }
 
 .clipboard-actions {
@@ -1791,6 +1891,7 @@ p, .muted-text, .subtitle{
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
 }
 
 .clipboard-group-title {
@@ -1800,6 +1901,66 @@ p, .muted-text, .subtitle{
   color: rgba(255,255,255,0.5);
   margin-bottom: 6px;
   padding-left: 4px;
+}
+
+.clipboard-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clipboard-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+}
+
+.clipboard-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.clipboard-group-count {
+  background: rgba(34,211,238,0.14);
+  border: 1px solid rgba(34,211,238,0.4);
+  color: #e6fbff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  margin-left: auto;
+}
+
+.clipboard-group-chevron {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  transition: transform var(--duration-normal) var(--ease-standard);
+  margin-left: 4px;
+}
+
+.clipboard-group.is-collapsed .clipboard-group-chevron {
+  transform: rotate(-90deg);
+}
+
+.clipboard-group.is-collapsed .clipboard-group-body {
+  display: none;
+}
+
+.clipboard-group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .clipboard-item {
@@ -1816,6 +1977,12 @@ p, .muted-text, .subtitle{
   display: flex;
   justify-content: space-between;
   gap: 8px;
+}
+
+.clipboard-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .clipboard-item-title a {
@@ -1901,6 +2068,22 @@ p, .muted-text, .subtitle{
   color: #ff7a96;
 }
 
+.clipboard-goto {
+  background: rgba(34,211,238,0.12);
+  border: 1px solid rgba(34,211,238,0.35);
+  color: #e6fbff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.clipboard-goto:hover {
+  background: rgba(139,92,246,0.2);
+  border-color: rgba(139,92,246,0.5);
+}
+
 .clipboard-empty {
   text-align: center;
   color: rgba(255,255,255,0.6);
@@ -1984,6 +2167,52 @@ p, .muted-text, .subtitle{
   color: #b6ffe3;
 }
 
+.cve-card {
+  position: relative;
+}
+
+.cve-card.is-pinned {
+  border-color: rgba(0,255,136,0.5);
+  box-shadow: 0 0 0 1px rgba(0,255,136,0.4), var(--shadow-premium);
+}
+
+.card-pin-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,255,136,0.18);
+  border: 1px solid rgba(0,255,136,0.5);
+  color: #b6ffe3;
+  border-radius: 999px;
+  padding: 4px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.cve-card.is-pinned .card-pin-indicator {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.clipboard-highlight {
+  animation: clipboardGlow 1.5s ease;
+}
+
+@keyframes clipboardGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34,211,238,0.0), 0 0 0 0 rgba(139,92,246,0.0);
+  }
+  30% {
+    box-shadow: 0 0 0 3px rgba(34,211,238,0.25), 0 0 24px rgba(139,92,246,0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34,211,238,0.0), 0 0 0 0 rgba(139,92,246,0.0);
+  }
+}
+
 .toast-container {
   position: fixed;
   right: 16px;
@@ -2023,6 +2252,7 @@ p, .muted-text, .subtitle{
             <button class="clipboard-nav-btn" id="clipboard-nav-btn" type="button">📌 Clipboard</button>
         </nav>
 
+        <div class="app-shell" id="app-shell">
         <!-- Main Content -->
         <main class="main-content">
             <!-- Dashboard Tab -->
@@ -2068,8 +2298,10 @@ async function loadCISAKEV() {
         
         grid.innerHTML = (data.vulnerabilities || []).slice(0,15).map(vuln => {
             const severityColor = '#ff0040'; // All CISA KEV are critical
+            const anchorId = `kev:${vuln.cveID}`;
             return `
-                <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.05);">
+                <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.05);" data-clipboard-anchor="${anchorId}">
+                    <button class="card-pin-indicator" type="button" data-clipboard-id="${anchorId}" aria-label="Unpin from clipboard">📌</button>
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                         <div>
                             
@@ -2082,7 +2314,8 @@ async function loadCISAKEV() {
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                             <div class="cvss-badge" style="background: ${severityColor};">EXPLOITED</div>
                             ${getPinButtonMarkup({
-                                id: `kev:${vuln.cveID}`,
+                                id: anchorId,
+                                anchor: anchorId,
                                 type: 'kev',
                                 title: vuln.cveID,
                                 subtitle: `${vuln.vendorProject || 'Unknown'} • ${vuln.product || 'Unknown'}`,
@@ -2385,9 +2618,10 @@ function displayBreaches(breaches, showLoadMore = false) {
       : (breach.recordsAffected || 'Unknown');
     const dataLabel = breach.dataExposed || 'Unknown';
     const attackTypeLabel = breach.attackType || 'Unknown';
+    const breachAnchor = `${(breach.category || 'breach')}:${breach.name}:${breach.date}`;
 
     
-    html += `<div style="background: rgba(20, 25, 30, 0.95); border-left: 5px solid ${getSeverityColor(breach.severity)}; border-radius: 6px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); position: relative;">
+    html += `<div style="background: rgba(20, 25, 30, 0.95); border-left: 5px solid ${getSeverityColor(breach.severity)}; border-radius: 6px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.4); position: relative;" data-clipboard-anchor="${breachAnchor}">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
         <div style="flex: 1;">
           <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #fff; word-wrap: break-word;">
@@ -2401,7 +2635,8 @@ function displayBreaches(breaches, showLoadMore = false) {
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
           <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">${breach.severity}</span>
           ${getPinButtonMarkup({
-              id: `${(breach.category || 'breach')}:${breach.name}:${breach.date}`,
+              id: breachAnchor,
+              anchor: breachAnchor,
               type: (breach.category || 'breach') === 'breach' ? 'breach' : 'incident',
               title: breach.name,
               subtitle: breach.sourceName || 'Breach Directory',
@@ -3218,6 +3453,26 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
 
         </main>
+        <aside class="clipboard-panel" id="clipboard-panel" aria-live="polite">
+            <div class="clipboard-header">
+                <div class="clipboard-title-row">
+                    <div class="clipboard-title">Investigation Clipboard</div>
+                    <div class="clipboard-title-actions">
+                        <span class="clipboard-count" id="clipboard-count">0 pinned</span>
+                        <button class="clipboard-collapse-toggle" id="clipboard-collapse-toggle" type="button" aria-expanded="true">Collapse</button>
+                    </div>
+                </div>
+                <div class="clipboard-actions">
+                    <button class="clipboard-action-btn" type="button" data-clipboard-action="export">Export</button>
+                    <button class="clipboard-action-btn" type="button" data-clipboard-action="clear-closed">Clear Closed</button>
+                </div>
+            </div>
+            <button class="clipboard-collapsed-pill" id="clipboard-collapsed-pill" type="button" aria-label="Expand clipboard">
+                Clipboard · <span class="clipboard-collapsed-count" id="clipboard-collapsed-count">0</span>
+            </button>
+            <div class="clipboard-body" id="clipboard-panel-body"></div>
+        </aside>
+        </div>
     </div>
 
     <div class="modal-backdrop" id="actor-detail-modal" aria-hidden="true">
@@ -3229,20 +3484,6 @@ window.addEventListener('DOMContentLoaded', () => {
             <div id="actor-detail-modal-body"></div>
         </div>
     </div>
-
-    <aside class="clipboard-panel" id="clipboard-panel" aria-live="polite">
-        <div class="clipboard-header">
-            <div class="clipboard-title-row">
-                <div class="clipboard-title">Investigation Clipboard</div>
-                <span class="clipboard-count" id="clipboard-count">0 pinned</span>
-            </div>
-            <div class="clipboard-actions">
-                <button class="clipboard-action-btn" type="button" data-clipboard-action="export">Export</button>
-                <button class="clipboard-action-btn" type="button" data-clipboard-action="clear-closed">Clear Closed</button>
-            </div>
-        </div>
-        <div class="clipboard-body" id="clipboard-panel-body"></div>
-    </aside>
 
     <button class="clipboard-fab" id="clipboard-fab" type="button">
         📌 Clipboard <span class="clipboard-count" id="clipboard-fab-count">0</span>
@@ -3659,6 +3900,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         function renderCveCard(cve) {
             const severityColor = cve.cvss >= 9 ? '#ff0040' : cve.cvss >= 7 ? '#ff6b00' : '#ffd700';
+            const anchorId = `cve:${cve.cve_id}`;
             const epssPercent = cve.epss != null ? (cve.epss * 100) : null;
             const percentile = cve.epss_percentile != null ? (cve.epss_percentile > 1 ? cve.epss_percentile : cve.epss_percentile * 100) : null;
             const epssLabel = epssPercent != null
@@ -3667,7 +3909,8 @@ window.addEventListener('DOMContentLoaded', () => {
             const meterWidth = epssPercent != null ? Math.min(100, Math.max(0, epssPercent)) : 0;
 
             return `
-                <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.03);">
+                <div class="cve-card" style="border-left-color: ${severityColor}; background: rgba(255,0,64,0.03);" data-clipboard-anchor="${anchorId}">
+                    <button class="card-pin-indicator" type="button" data-clipboard-id="${anchorId}" aria-label="Unpin from clipboard">📌</button>
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                         <div>
                             <div style="font-weight: 600; color: ${severityColor}; margin-bottom: 4px;">${cve.cve_id}</div>
@@ -3676,7 +3919,8 @@ window.addEventListener('DOMContentLoaded', () => {
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                             <div class="cvss-badge" style="background: ${severityColor};">${cve.cvss}</div>
                             ${getPinButtonMarkup({
-                                id: `cve:${cve.cve_id}`,
+                                id: anchorId,
+                                anchor: anchorId,
                                 type: 'cve',
                                 title: cve.cve_id,
                                 subtitle: cve.products,
@@ -3969,7 +4213,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const tacticLabel = detail.tactics[0] || 'Unknown';
                     const techLabel = `${detail.externalId} • ${detail.name}`;
                     return `
-                        <div class="tech-item" data-tech="${escapeHtml(techLabel.toLowerCase())}" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                        <div class="tech-item" data-tech="${escapeHtml(techLabel.toLowerCase())}" data-clipboard-anchor="technique:${escapeHtml(detail.externalId)}" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
                             <div>
                                 <a href="https://attack.mitre.org/techniques/${detail.externalId}/" target="_blank" rel="noopener">
                                     <strong>${escapeHtml(detail.externalId)}</strong> ${escapeHtml(detail.name)}
@@ -3978,6 +4222,7 @@ window.addEventListener('DOMContentLoaded', () => {
                             </div>
                             ${getPinButtonMarkup({
                                 id: `technique:${detail.externalId}`,
+                                anchor: `technique:${detail.externalId}`,
                                 type: 'technique',
                                 title: `${detail.externalId} ${detail.name}`,
                                 subtitle: `Tactic: ${tacticLabel}`,
@@ -4168,7 +4413,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 grid.innerHTML = threatActors.map(actor => `
-                    <div class="malware-card actor-card" tabindex="0" role="button" data-actor-id="${actor.id}" style="border: 1px solid rgba(255,0,64,0.3); background: rgba(255,0,64,0.05);">
+                    <div class="malware-card actor-card" tabindex="0" role="button" data-actor-id="${actor.id}" data-clipboard-anchor="actor:${actor.id}" style="border: 1px solid rgba(255,0,64,0.3); background: rgba(255,0,64,0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                             <div>
                                 <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #ff0040;">${actor.name}</div>
@@ -4178,6 +4423,7 @@ window.addEventListener('DOMContentLoaded', () => {
                                 <span class="status-badge" style="background: rgba(255,0,64,0.2); border-color: #ff0040; color: #ff0040;">${actor.status}</span>
                                 ${getPinButtonMarkup({
                                     id: `actor:${actor.id}`,
+                                    anchor: `actor:${actor.id}`,
                                     type: 'actor',
                                     title: actor.name,
                                     subtitle: actor.type,
@@ -4273,12 +4519,14 @@ window.addEventListener('DOMContentLoaded', () => {
             references: (vuln.references || []).slice(0, 5).map(ref => ({ url: ref.url, source: ref.source || 'Unknown' }))
         };
         const color = cve.cvss >= 9 ? '#ff0040' : cve.cvss >= 7 ? '#ff6b00' : '#ffd700';
+        const anchorId = `cve:${cve.cve_id}`;
         resultDiv.innerHTML = `
-            <div class="tool-result" style="border-left-color: ${color};">
+            <div class="tool-result" style="border-left-color: ${color};" data-clipboard-anchor="${anchorId}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h4 style="color: ${color};">${cve.cve_id}</h4>
                     ${getPinButtonMarkup({
-                        id: `cve:${cve.cve_id}`,
+                        id: anchorId,
+                        anchor: anchorId,
                         type: 'cve',
                         title: cve.cve_id,
                         subtitle: cve.products,
@@ -4379,12 +4627,14 @@ async function checkIPReputation(ip) {
         const color = abuseScore >= 90 ? '#ff0040' : abuseScore >= 70 ? '#ff6b00' : '#ffd700';
         const severity = abuseScore >= 90 ? 'CRITICAL' : abuseScore >= 70 ? 'HIGH' : abuseScore >= 40 ? 'MEDIUM' : 'LOW';
         
+        const anchorId = `tool:ip:${ip.trim()}`;
         resultDiv.innerHTML = `
-            <div class="tool-result" style="border-left-color: ${color};">
+            <div class="tool-result" style="border-left-color: ${color};" data-clipboard-anchor="${anchorId}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h4 style="color: ${color};">Threat Level: ${threatLevel}</h4>
                     ${getPinButtonMarkup({
-                        id: `tool:ip:${ip.trim()}`,
+                        id: anchorId,
+                        anchor: anchorId,
                         type: 'tool',
                         title: `IP Reputation: ${ip.trim()}`,
                         subtitle: 'AbuseIPDB Lookup',
@@ -4437,12 +4687,14 @@ async function threatMinerSearch(input) {
             relatedThreats: (tmData.results || []).slice(0, 5),
             status: tmData.status_message || 'No data found'
         };
+        const anchorId = `tool:threatminer:${input}`;
         resultDiv.innerHTML = `
-            <div class="tool-result" style="border-left-color:#22d3ee;">
+            <div class="tool-result" style="border-left-color:#22d3ee;" data-clipboard-anchor="${anchorId}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h4 style="color:#22d3ee;">Threat Intelligence Results</h4>
                     ${getPinButtonMarkup({
-                        id: `tool:threatminer:${input}`,
+                        id: anchorId,
+                        anchor: anchorId,
                         type: 'tool',
                         title: `ThreatMiner: ${input}`,
                         subtitle: 'Threat Intelligence Search',
@@ -4512,12 +4764,14 @@ async function checkMaliciousURL() {
         const color = malicious > 0 ? '#ff0040' : suspicious > 0 ? '#ff6b00' : '#00ff88';
         const severity = malicious > 0 ? 'HIGH' : suspicious > 0 ? 'MEDIUM' : 'LOW';
         
+        const anchorId = `tool:urlscan:${url.trim()}`;
         resultDiv.innerHTML = `
-            <div class="tool-result" style="border-left-color:${color};">
+            <div class="tool-result" style="border-left-color:${color};" data-clipboard-anchor="${anchorId}">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h4 style="color:${color};">${isMalicious ? '⚠️ THREAT DETECTED' : '✓ URL APPEARS SAFE'}</h4>
                     ${getPinButtonMarkup({
-                        id: `tool:urlscan:${url.trim()}`,
+                        id: anchorId,
+                        anchor: anchorId,
                         type: 'tool',
                         title: `URL Scan: ${url.trim()}`,
                         subtitle: 'Malicious URL Detector',
@@ -4726,12 +4980,14 @@ function analyzePassword() {
                 
                 if (matchedCVE) {
                     const color = matchedCVE.cvss >= 9 ? '#ff0040' : matchedCVE.cvss >= 7 ? '#ff6b00' : '#ffd700';
+                    const anchorId = `cve:${matchedCVE.id}`;
                     resultDiv.innerHTML = `
-                        <div class="tool-result" style="border-left-color: ${color};">
+                        <div class="tool-result" style="border-left-color: ${color};" data-clipboard-anchor="${anchorId}">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                 <h4 style="color: ${color};">${matchedCVE.id}</h4>
                                 ${getPinButtonMarkup({
-                                    id: `cve:${matchedCVE.id}`,
+                                    id: anchorId,
+                                    anchor: anchorId,
                                     type: 'cve',
                                     title: matchedCVE.id,
                                     subtitle: matchedCVE.affected,
@@ -5886,8 +6142,14 @@ function analyzePassword() {
 
         // === Investigation Clipboard ===
         const clipboardStorageKey = 'clipboard_v1';
+        const clipboardUiStorageKey = 'clipboard_ui_v1';
         const clipboardVersion = 1;
         const clipboardStatusValues = ['Open', 'Investigating', 'Closed'];
+        const clipboardGroupDefaults = {
+            Open: true,
+            Investigating: true,
+            Closed: false
+        };
         const clipboardTypeLabels = {
             cve: 'CVE',
             kev: 'KEV',
@@ -5898,6 +6160,8 @@ function analyzePassword() {
             tool: 'Tool Result'
         };
         let clipboardState = loadClipboard();
+        let clipboardUiState = loadClipboardUiState();
+        let clipboardGroupState = { ...clipboardGroupDefaults };
         let clipboardInitialized = false;
 
         function getPinButtonMarkup(item, options = {}) {
@@ -5911,6 +6175,53 @@ function analyzePassword() {
                     <span class="pin-label">${label}</span>
                 </button>
             `;
+        }
+
+        function loadClipboardUiState() {
+            try {
+                const raw = localStorage.getItem(clipboardUiStorageKey);
+                if (!raw) return { collapsed: false };
+                const parsed = JSON.parse(raw);
+                return {
+                    collapsed: Boolean(parsed?.collapsed)
+                };
+            } catch (error) {
+                return { collapsed: false };
+            }
+        }
+
+        function saveClipboardUiState() {
+            try {
+                localStorage.setItem(clipboardUiStorageKey, JSON.stringify({
+                    collapsed: Boolean(clipboardUiState.collapsed)
+                }));
+            } catch (error) {
+                showToast('Clipboard UI preferences unavailable');
+            }
+        }
+
+        function applyClipboardUiState() {
+            const panel = document.getElementById('clipboard-panel');
+            const appShell = document.getElementById('app-shell');
+            const collapsed = Boolean(clipboardUiState.collapsed);
+            if (panel) {
+                panel.classList.toggle('is-collapsed', collapsed);
+            }
+            if (appShell) {
+                appShell.classList.toggle('has-clipboard', !collapsed);
+            }
+            document.body.classList.toggle('clipboard-collapsed', collapsed);
+            const toggleBtn = document.getElementById('clipboard-collapse-toggle');
+            if (toggleBtn) {
+                toggleBtn.textContent = collapsed ? 'Expand' : 'Collapse';
+                toggleBtn.setAttribute('aria-expanded', String(!collapsed));
+            }
+        }
+
+        function setClipboardCollapsed(nextValue) {
+            clipboardUiState.collapsed = Boolean(nextValue);
+            saveClipboardUiState();
+            applyClipboardUiState();
         }
 
         function loadClipboard() {
@@ -5931,8 +6242,10 @@ function analyzePassword() {
         function normalizeClipboardItem(item) {
             if (!item || typeof item.id !== 'string') return null;
             const type = typeof item.type === 'string' && item.type.trim() ? item.type : 'item';
+            const anchor = typeof item.anchor === 'string' && item.anchor.trim() ? item.anchor : item.id;
             return {
                 id: item.id,
+                anchor: anchor,
                 type: type,
                 title: String(item.title || 'Untitled'),
                 subtitle: String(item.subtitle || ''),
@@ -5959,6 +6272,7 @@ function analyzePassword() {
             if (!normalized) return false;
             const existing = clipboardState.items.find(item => item.id === normalized.id);
             if (existing) {
+                existing.anchor = normalized.anchor;
                 existing.title = normalized.title;
                 existing.subtitle = normalized.subtitle;
                 existing.url = normalized.url;
@@ -6003,6 +6317,7 @@ function analyzePassword() {
             if (clipboardState.items.length !== before) {
                 saveClipboard(clipboardState);
                 renderClipboard();
+                updatePinButtons();
                 showToast('Closed items cleared');
             } else {
                 showToast('No closed items to clear');
@@ -6027,9 +6342,15 @@ function analyzePassword() {
             if (!items.length) {
                 return `<div class="clipboard-empty">No pinned items yet. Pin CVEs and vulnerabilities to build your investigation.</div>`;
             }
-            return `
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    ${items.map(item => `
+            const groups = clipboardStatusValues.map(status => ({
+                status,
+                items: items.filter(item => item.status === status)
+            }));
+            return groups.map(group => {
+                const isExpanded = clipboardGroupState[group.status] !== false;
+                const count = group.items.length;
+                const itemsMarkup = count
+                    ? group.items.map(item => `
                         <div class="clipboard-item" data-clipboard-id="${item.id}">
                             <div class="clipboard-item-header">
                                 <div class="clipboard-item-title">
@@ -6038,7 +6359,10 @@ function analyzePassword() {
                                     </div>
                                     ${item.subtitle ? `<div class="clipboard-item-subtitle">${escapeHtml(item.subtitle)}</div>` : ''}
                                 </div>
-                                <button class="clipboard-remove" type="button" aria-label="Remove pinned item">×</button>
+                                <div class="clipboard-item-actions">
+                                    <button class="clipboard-goto" type="button" data-clipboard-go="${escapeHtml(item.anchor || item.id)}">Go to</button>
+                                    <button class="clipboard-remove" type="button" aria-label="Remove pinned item">×</button>
+                                </div>
                             </div>
                             <div class="clipboard-meta">
                                 ${formatMetaChips(item)}
@@ -6055,9 +6379,23 @@ function analyzePassword() {
                                 <textarea class="clipboard-notes-input" placeholder="Add investigation notes..." data-clipboard-notes>${escapeHtml(item.notes)}</textarea>
                             </div>
                         </div>
-                    `).join('')}
-                </div>
-            `;
+                    `).join('')
+                    : `<div class="clipboard-empty">No ${group.status.toLowerCase()} items.</div>`;
+                return `
+                    <div class="clipboard-group ${isExpanded ? '' : 'is-collapsed'}" data-clipboard-group="${group.status}">
+                        <div class="clipboard-group-header">
+                            <button class="clipboard-group-toggle" type="button" data-clipboard-group-toggle="${group.status}">
+                                <span>${group.status}</span>
+                                <span class="clipboard-group-count">${count}</span>
+                                <span class="clipboard-group-chevron">▾</span>
+                            </button>
+                        </div>
+                        <div class="clipboard-group-body">
+                            ${itemsMarkup}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderClipboard() {
@@ -6068,9 +6406,11 @@ function analyzePassword() {
             const countEl = document.getElementById('clipboard-count');
             const fabCount = document.getElementById('clipboard-fab-count');
             const modalCount = document.getElementById('clipboard-modal-count');
+            const collapsedCount = document.getElementById('clipboard-collapsed-count');
             if (countEl) countEl.textContent = countLabel;
             if (fabCount) fabCount.textContent = String(count);
             if (modalCount) modalCount.textContent = countLabel;
+            if (collapsedCount) collapsedCount.textContent = String(count);
 
             const html = renderClipboardItems(clipboardState.items);
             if (panelBody) panelBody.innerHTML = html;
@@ -6089,6 +6429,11 @@ function analyzePassword() {
                     label.textContent = isPinned ? 'Pinned' : 'Pin';
                 }
             });
+            document.querySelectorAll('[data-clipboard-anchor]').forEach(card => {
+                const anchor = card.dataset.clipboardAnchor;
+                if (!anchor) return;
+                card.classList.toggle('is-pinned', pinnedIds.has(anchor));
+            });
         }
 
         function showToast(message) {
@@ -6101,6 +6446,21 @@ function analyzePassword() {
             setTimeout(() => {
                 toast.remove();
             }, 2000);
+        }
+
+        function scrollToClipboardAnchor(anchor) {
+            if (!anchor) return;
+            const safeAnchor = (window.CSS && CSS.escape) ? CSS.escape(anchor) : anchor;
+            const target = document.querySelector(`[data-clipboard-anchor="${safeAnchor}"]`);
+            if (!target) {
+                showToast('Pinned item is not visible on this view');
+                return;
+            }
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('clipboard-highlight');
+            setTimeout(() => {
+                target.classList.remove('clipboard-highlight');
+            }, 1500);
         }
 
         function handlePinClick(event) {
@@ -6172,6 +6532,38 @@ function analyzePassword() {
                     handlePinClick(event);
                     return;
                 }
+                const cardPin = event.target.closest('.card-pin-indicator');
+                if (cardPin) {
+                    const id = cardPin.dataset.clipboardId;
+                    if (id) {
+                        removeClipboardItem(id);
+                        renderClipboard();
+                        updatePinButtons();
+                        showToast('Removed from clipboard');
+                    }
+                    return;
+                }
+                const groupToggle = event.target.closest('[data-clipboard-group-toggle]');
+                if (groupToggle) {
+                    const group = groupToggle.getAttribute('data-clipboard-group-toggle');
+                    if (group) {
+                        clipboardGroupState[group] = !clipboardGroupState[group];
+                        renderClipboard();
+                    }
+                    return;
+                }
+                const goToBtn = event.target.closest('[data-clipboard-go]');
+                if (goToBtn) {
+                    const anchor = goToBtn.getAttribute('data-clipboard-go');
+                    const modal = document.getElementById('clipboard-modal');
+                    if (modal?.classList.contains('active')) {
+                        closeClipboardModal();
+                        setTimeout(() => scrollToClipboardAnchor(anchor), 80);
+                    } else {
+                        scrollToClipboardAnchor(anchor);
+                    }
+                    return;
+                }
                 const actionBtn = event.target.closest('[data-clipboard-action]');
                 if (actionBtn) {
                     const action = actionBtn.getAttribute('data-clipboard-action');
@@ -6215,11 +6607,23 @@ function analyzePassword() {
             const fab = document.getElementById('clipboard-fab');
             const modal = document.getElementById('clipboard-modal');
             const navBtn = document.getElementById('clipboard-nav-btn');
+            const collapseToggle = document.getElementById('clipboard-collapse-toggle');
+            const collapsedPill = document.getElementById('clipboard-collapsed-pill');
             if (fab && modal) {
                 fab.addEventListener('click', openClipboardModal);
             }
             if (navBtn) {
                 navBtn.addEventListener('click', openClipboardModal);
+            }
+            if (collapseToggle) {
+                collapseToggle.addEventListener('click', () => {
+                    setClipboardCollapsed(!clipboardUiState.collapsed);
+                });
+            }
+            if (collapsedPill) {
+                collapsedPill.addEventListener('click', () => {
+                    setClipboardCollapsed(false);
+                });
             }
             if (modal) {
                 const closeBtn = modal.querySelector('.modal-close');
@@ -6243,6 +6647,7 @@ function analyzePassword() {
         document.addEventListener('DOMContentLoaded', () => {
             initApp();
             loadSavedAPIKey();
+            applyClipboardUiState();
             renderClipboard();
             updatePinButtons();
             setupClipboardInteractions();
