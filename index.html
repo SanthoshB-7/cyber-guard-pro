@@ -436,6 +436,236 @@ body{
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.news-card--intel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.news-card.is-new {
+    border-color: rgba(255, 176, 32, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 176, 32, 0.25), var(--shadow-md);
+}
+
+.news-alert-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 176, 32, 0.15);
+    color: #ffb020;
+    border: 1px solid rgba(255, 176, 32, 0.4);
+}
+
+.news-severity {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+.news-severity.critical { background: rgba(255, 0, 64, 0.18); color: #ff4d7d; border: 1px solid rgba(255, 0, 64, 0.45); }
+.news-severity.high { background: rgba(255, 107, 0, 0.18); color: #ff9a57; border: 1px solid rgba(255, 107, 0, 0.45); }
+.news-severity.medium { background: rgba(255, 215, 0, 0.18); color: #ffd86b; border: 1px solid rgba(255, 215, 0, 0.45); }
+.news-severity.low { background: rgba(34, 211, 238, 0.15); color: #6fe8ff; border: 1px solid rgba(34, 211, 238, 0.4); }
+
+.news-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    align-items: center;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.news-source-pill {
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    background: rgba(34, 211, 238, 0.12);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.news-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    margin-top: var(--space-8);
+}
+
+.news-cve-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+}
+
+.news-cve-chip {
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    background: rgba(139, 92, 246, 0.12);
+    color: #c4b5fd;
+    border-radius: var(--radius-full);
+    padding: 4px 10px;
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+}
+
+.news-cve-chip:hover {
+    border-color: rgba(139, 92, 246, 0.7);
+    color: var(--color-white);
+}
+
+.news-cluster {
+    margin-top: var(--space-8);
+    padding: var(--space-10);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.news-cluster summary {
+    cursor: pointer;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.news-cluster-list {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-6);
+    font-size: var(--font-size-xs);
+}
+
+.news-cluster-item a {
+    color: #6fe8ff;
+    text-decoration: none;
+}
+
+.news-brief {
+    padding: var(--space-20);
+}
+
+.news-brief-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    margin-bottom: var(--space-16);
+}
+
+.news-brief-grid {
+    display: grid;
+    gap: var(--space-16);
+}
+
+@media (min-width: 900px) {
+    .news-brief-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.news-brief-section {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: var(--space-16);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.news-brief-section h4 {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-8);
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.news-brief-item {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-8);
+    margin-bottom: var(--space-10);
+    font-size: var(--font-size-sm);
+}
+
+.news-brief-item:last-child {
+    margin-bottom: 0;
+}
+
+.news-brief-item a {
+    color: var(--color-white);
+    text-decoration: none;
+}
+
+.news-brief-meta {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.news-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+}
+
+.news-category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+}
+
+.news-category-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-full);
+    padding: 6px 14px;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.news-category-btn.active,
+.news-category-btn:hover {
+    border-color: rgba(34, 211, 238, 0.6);
+    color: var(--color-white);
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
+}
+
+.news-filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-12);
+    align-items: center;
+}
+
+.news-search-input {
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--color-white);
+}
+
+.news-feed-meta {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: var(--space-8);
+}
+
+.news-empty {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
 /* Form Elements */
 .form-group {
     margin-bottom: var(--space-24);
@@ -3214,86 +3444,67 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 <!-- News Feed Sub-Tab -->
                 <div class="learning-subtab active" id="learning-news-content">
-                    <div class="news-grid" id="news-grid">
-                <div class="news-card">
-                    <span class="news-badge badge-blue">Framework</span>
-                    <h3>NIST Cybersecurity Framework 2.0 Released</h3>
-                    <p>New governance function added to CSF 2.0, expanding from 5 to 6 core functions</p>
-                    <div class="news-meta">
-                        <span>Nov 28, 2025</span>
-                        <span>NIST.gov</span>
+                    <div class="premium-card news-brief" id="news-brief">
+                        <div class="news-brief-header">
+                            <div>
+                                <h3 style="margin-bottom: 6px; font-size: 20px;">Today’s Brief</h3>
+                                <p style="font-size: 13px; color: rgba(255,255,255,0.7);">Top high-impact advisories, incidents, and vulnerabilities since your last visit.</p>
+                            </div>
+                            <div class="news-brief-meta" id="news-brief-updated">Updated --</div>
+                        </div>
+                        <div class="news-brief-grid">
+                            <div class="news-brief-section" id="news-brief-priority-section">
+                                <h4>Priority Alerts</h4>
+                                <div id="news-brief-priority"></div>
+                            </div>
+                            <div class="news-brief-section" id="news-brief-cve-section">
+                                <h4>Critical CVEs</h4>
+                                <div id="news-brief-cves"></div>
+                            </div>
+                            <div class="news-brief-section" id="news-brief-incident-section">
+                                <h4>Active Incidents</h4>
+                                <div id="news-brief-incidents"></div>
+                            </div>
+                        </div>
                     </div>
-                    <a href="https://www.nist.gov/cyberframework" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                </div>
-            
-                <div class="news-card">
-                    <span class="news-badge badge-purple">Security</span>
-                    <h3>Microsoft Teams CVE-2025-53783 Patches</h3>
-                    <p>Critical buffer overflow vulnerability patched for Microsoft Teams</p>
-                    <div class="news-meta">
-                        <span>Nov 26, 2025</span>
-                        <span>Microsoft Security</span>
+
+                    <div class="premium-card news-controls">
+                        <div class="news-category-tabs" id="news-category-tabs">
+                            <button class="news-category-btn active" data-category="all">All</button>
+                            <button class="news-category-btn" data-category="advisories">Advisories</button>
+                            <button class="news-category-btn" data-category="breaches">Breaches/Ransomware</button>
+                            <button class="news-category-btn" data-category="incidents">Incidents</button>
+                            <button class="news-category-btn" data-category="vulns">Vulns</button>
+                        </div>
+                        <div class="news-filter-row">
+                            <div>
+                                <label class="form-label" for="news-severity-filter">Severity</label>
+                                <select class="form-select" id="news-severity-filter">
+                                    <option value="LOW">Low+</option>
+                                    <option value="MEDIUM" selected>Medium+</option>
+                                    <option value="HIGH">High+</option>
+                                    <option value="CRITICAL">Critical</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" for="news-time-filter">Time Range</label>
+                                <select class="form-select" id="news-time-filter">
+                                    <option value="24h">24h</option>
+                                    <option value="7d" selected>7d</option>
+                                    <option value="30d">30d</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label" for="news-search">Search</label>
+                                <input class="news-search-input" id="news-search" type="text" placeholder="Search intel, CVEs, or vendors">
+                            </div>
+                        </div>
                     </div>
-                    <a href="https://msrc.microsoft.com/" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                </div>
-            
-                <div class="news-card">
-                    <span class="news-badge badge-green">Compliance</span>
-                    <h3>ISO 27001:2022 Audit Guidelines Updated</h3>
-                    <p>ISACA releases updated guidance for ISO 27001 certification audits</p>
-                    <div class="news-meta">
-                        <span>Nov 24, 2025</span>
-                        <span>ISACA</span>
-                    </div>
-                    <a href="https://www.iso.org/isoiec-27001-information-security.html" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                </div>
-            
-                <div class="news-card">
-                    <span class="news-badge badge-orange">Architecture</span>
-                    <h3>Zero Trust Architecture Implementation Roadmap</h3>
-                    <p>Microsoft releases step-by-step guide for zero trust security model</p>
-                    <div class="news-meta">
-                        <span>Nov 22, 2025</span>
-                        <span>Microsoft Security</span>
-                    </div>
-                    <a href="https://learn.microsoft.com/en-us/security/zero-trust/" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                </div>
-            
-                <div class="news-card">
-                    <span class="news-badge badge-pink">Risk</span>
-                    <h3>Third-Party Vendor Risk Management Framework</h3>
-                    <p>CISA releases comprehensive guide for vendor security assessment</p>
-                    <div class="news-meta">
-                        <span>Nov 20, 2025</span>
-                        <span>CISA</span>
-                    </div>
-                    <a href="https://www.cisa.gov/resources-tools/resources/vendor-management-guidance" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                </div>
-            
-                <div class="news-card">
-                    <span class="news-badge badge-cyan">Automation</span>
-                    <h3>GRC Automation Trends for 2026</h3>
-                    <p>AI and RPA transforming compliance automation - latest tools and strategies</p>
-                    <div class="news-meta">
-                        <span>Nov 18, 2025</span>
-                        <span>Gartner</span>
-                    </div>
-                    <a href="https://www.gartner.com/" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                </div>
-            </div>
-                    <button class="btn btn-secondary btn-full" onclick="loadMoreNews()">Load More Articles</button>
+
+                    <div class="news-feed-meta" id="news-feed-meta">Loading intel feed...</div>
+                    <div class="news-grid" id="news-grid"></div>
+                    <div class="news-empty" id="news-empty" style="display:none;">No stories match your filters. Try widening the time range or severity.</div>
+                    <button class="btn btn-secondary btn-full" onclick="refreshNewsFeed()">Refresh Feed</button>
                 </div>
 
                 <!-- Deep Research Sub-Tab -->
@@ -3948,82 +4159,152 @@ window.addEventListener('DOMContentLoaded', () => {
         ];
 
         // News Data (fallback list)
-        const newsItems = [
+        const newsFallbackItems = [
             {
-                category: "Framework",
-                title: "NIST Cybersecurity Framework 2.0 Released",
-                description: "New governance function added to CSF 2.0, expanding from 5 to 6 core functions",
-                date: "Nov 28, 2025",
-                source: "NIST.gov",
-                badgeColor: "blue",
-                link: "https://www.nist.gov/cyberframework"
+                id: 'fallback-1',
+                title: 'CISA issues alert on active exploitation of enterprise VPNs',
+                url: 'https://www.cisa.gov/news-events/alerts',
+                dateISO: new Date().toISOString(),
+                sourceName: 'CISA',
+                sourceType: 'official',
+                summary: 'CISA warns of active exploitation affecting multiple VPN vendors; apply patches and update MFA policies.',
+                tags: ['advisory', 'vulnerability'],
+                severity: 'HIGH',
+                cves: []
             },
             {
-                category: "Security",
-                title: "Microsoft Teams CVE-2025-53783 Patches",
-                description: "Critical buffer overflow vulnerability patched for Microsoft Teams",
-                date: "Nov 26, 2025",
-                source: "Microsoft Security",
-                badgeColor: "purple",
-                link: "https://msrc.microsoft.com"
+                id: 'fallback-2',
+                title: 'Major ransomware group targets healthcare providers',
+                url: 'https://www.bleepingcomputer.com/feed/',
+                dateISO: new Date().toISOString(),
+                sourceName: 'BleepingComputer',
+                sourceType: 'news',
+                summary: 'Campaign highlights credential theft and lateral movement techniques; review segmentation and backups.',
+                tags: ['ransomware', 'breach'],
+                severity: 'HIGH',
+                cves: []
             },
             {
-                category: "Compliance",
-                title: "ISO 27001:2022 Audit Guidelines Updated",
-                description: "ISACA releases updated guidance for ISO 27001 certification audits",
-                date: "Nov 24, 2025",
-                source: "ISACA",
-                badgeColor: "green",
-                link: "https://www.iso.org/isoiec-27001-information-security.html"
-            },
-            {
-                category: "Architecture",
-                title: "Zero Trust Architecture Implementation Roadmap",
-                description: "Microsoft releases step-by-step guide for zero trust security model",
-                date: "Nov 22, 2025",
-                source: "Microsoft Security",
-                badgeColor: "orange",
-                link: "https://learn.microsoft.com/en-us/security/zero-trust/"
-            },
-            {
-                category: "Risk",
-                title: "Third-Party Vendor Risk Management Framework",
-                description: "CISA releases comprehensive guide for vendor security assessment",
-                date: "Nov 20, 2025",
-                source: "CISA",
-                badgeColor: "pink",
-                link: "https://www.cisa.gov/resources-tools/resources/vendor-management-guidance"
-            },
-            {
-                category: "Automation",
-                title: "GRC Automation Trends for 2026",
-                description: "AI and RPA transforming compliance automation - latest tools and strategies",
-                date: "Nov 18, 2025",
-                source: "Gartner",
-                badgeColor: "cyan",
-                link: "https://www.gartner.com"
+                id: 'fallback-3',
+                title: 'Cloud service incident impacts auth workflows',
+                url: 'https://status.cloud.google.com/incidents.rss',
+                dateISO: new Date().toISOString(),
+                sourceName: 'Google Cloud Status',
+                sourceType: 'status',
+                summary: 'Service degradation reported in identity services; monitor status page and update incident comms.',
+                tags: ['incident'],
+                severity: 'MEDIUM',
+                cves: []
             }
         ];
 
-        let liveNewsItems = [];
+        const newsSeverityRank = { LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4 };
+        const newsState = {
+            items: [],
+            filtered: [],
+            category: 'all',
+            severity: 'MEDIUM',
+            timeRange: '7d',
+            search: ''
+        };
+        const newsLastVisitKey = 'news_last_visit_v1';
+
         async function fetchLatestNews() {
+            const newsGrid = document.getElementById('news-grid');
+            if (newsGrid) {
+                newsGrid.innerHTML = '<div style="text-align:center; padding:40px; color:#22d3ee;"><span class="spinner" style="width:32px; height:32px;"></span><br><br>Loading intel feed...</div>';
+            }
             try {
                 const res = await fetch('/api/news');
                 if (!res.ok) {
-                    liveNewsItems = [];
+                    newsState.items = [...newsFallbackItems];
                     return;
                 }
                 const data = await res.json();
-                liveNewsItems = (data.items || []).filter(item => item.link && item.link !== '#');
+                const incoming = Array.isArray(data.items) ? data.items : [];
+                newsState.items = incoming.length ? incoming.map(normalizeNewsItem) : [...newsFallbackItems];
             } catch (error) {
                 console.warn('News fetch failed, using fallback.', error);
-                liveNewsItems = [];
+                newsState.items = [...newsFallbackItems];
             }
+        }
+
+        function normalizeNewsItem(item) {
+            return {
+                id: item.id || `news-${Math.random().toString(36).slice(2)}`,
+                title: item.title || 'Security update',
+                url: item.url || item.link || '#',
+                dateISO: item.dateISO || new Date().toISOString(),
+                sourceName: item.sourceName || item.source || 'Unknown',
+                sourceType: item.sourceType || 'news',
+                summary: item.summary || item.description || '',
+                tags: item.tags || [],
+                severity: item.severity || 'LOW',
+                cves: item.cves || [],
+                clusterItems: item.clusterItems || []
+            };
+        }
+
+        function getLastVisitTimestamp() {
+            const raw = localStorage.getItem(newsLastVisitKey);
+            const value = Number(raw);
+            return Number.isNaN(value) ? null : value;
+        }
+
+        function setLastVisitTimestamp() {
+            localStorage.setItem(newsLastVisitKey, String(Date.now()));
+        }
+
+        function formatNewsDate(iso) {
+            if (!iso) return 'Recent';
+            const date = new Date(iso);
+            if (Number.isNaN(date.getTime())) return 'Recent';
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function isWithinRange(dateISO, range) {
+            const value = new Date(dateISO).getTime();
+            if (Number.isNaN(value)) return false;
+            const now = Date.now();
+            const ranges = { '24h': 1, '7d': 7, '30d': 30 };
+            const days = ranges[range] || 7;
+            return value >= now - days * 24 * 60 * 60 * 1000;
+        }
+
+        function matchesCategory(item, category) {
+            if (category === 'all') return true;
+            if (category === 'advisories') return item.sourceType === 'official' || item.tags.includes('advisory');
+            if (category === 'breaches') return item.tags.includes('breach') || item.tags.includes('ransomware');
+            if (category === 'incidents') return item.sourceType === 'status' || item.tags.includes('incident');
+            if (category === 'vulns') return item.tags.includes('vulnerability') || item.cves.length > 0;
+            return true;
+        }
+
+        function matchesSearch(item, query) {
+            if (!query) return true;
+            const haystack = [item.title, item.summary, item.sourceName, ...(item.tags || []), ...(item.cves || [])]
+                .join(' ')
+                .toLowerCase();
+            return haystack.includes(query);
+        }
+
+        function applyNewsFilters() {
+            const minSeverity = newsSeverityRank[newsState.severity] || 1;
+            const query = newsState.search.trim().toLowerCase();
+            const filtered = newsState.items.filter(item => {
+                const itemSeverity = newsSeverityRank[item.severity] || 1;
+                return itemSeverity >= minSeverity &&
+                    isWithinRange(item.dateISO, newsState.timeRange) &&
+                    matchesCategory(item, newsState.category) &&
+                    matchesSearch(item, query);
+            });
+            newsState.filtered = filtered;
         }
 
         // Initialize App
         function initApp() {
             renderNews();
+            setupNewsFilters();
             setupTabNavigation();
             setupFileUpload();
             renderBreaches();
@@ -5614,42 +5895,257 @@ function analyzePassword() {
             alert('Filters applied! (This is a demo - filters would refine the threat data)');
         }
 
-        // Render News Items (populates the Learning Hub News Grid) - NOW WITH CLICKABLE LINKS
-        function populateNewsGrid(itemsToRender = null) {
+        // Render News Items (populates the Learning Hub News Grid)
+        function populateNewsGrid(itemsToRender = null, lastVisit = null) {
             const newsGrid = document.getElementById('news-grid');
+            const emptyState = document.getElementById('news-empty');
             if (!newsGrid) return;
 
-            const items = itemsToRender && itemsToRender.length ? itemsToRender : newsItems;
-            newsGrid.innerHTML = items.map(item => `
-                <div class="news-card">
-                    <span class="news-badge badge-${item.badgeColor}">${item.category}</span>
-                    <h3>${item.title}</h3>
-                    <p>${item.description}</p>
-                    <div class="news-meta">
-                        <span>${item.date}</span>
-                        <span>${item.source}</span>
+            const items = itemsToRender && itemsToRender.length ? itemsToRender : [];
+            if (!items.length) {
+                newsGrid.innerHTML = '';
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+
+            if (emptyState) emptyState.style.display = 'none';
+            newsGrid.innerHTML = items.map(item => {
+                const isNew = lastVisit ? new Date(item.dateISO).getTime() > lastVisit : false;
+                const severityClass = item.severity ? item.severity.toLowerCase() : 'low';
+                const cveChips = (item.cves || []).map(cve => `
+                    <button class="news-cve-chip" type="button" data-cve-chip="${cve}">${cve}</button>
+                `).join('');
+                const clusterMarkup = item.clusterItems && item.clusterItems.length ? `
+                    <details class="news-cluster">
+                        <summary>More sources (${item.clusterItems.length})</summary>
+                        <div class="news-cluster-list">
+                            ${item.clusterItems.map(clusterItem => `
+                                <div class="news-cluster-item">
+                                    <a href="${clusterItem.url}" target="_blank" rel="noopener">${clusterItem.sourceName}</a>
+                                    <span>• ${formatNewsDate(clusterItem.dateISO)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </details>
+                ` : '';
+
+                return `
+                    <div class="news-card news-card--intel ${isNew ? 'is-new' : ''}" data-clipboard-anchor="news:${item.id}">
+                        <div class="news-meta-row">
+                            ${isNew ? '<span class="news-alert-pill">New</span>' : ''}
+                            <span class="news-severity ${severityClass}">${item.severity}</span>
+                            <span class="news-source-pill">${item.sourceName}</span>
+                            <span>${formatNewsDate(item.dateISO)}</span>
+                        </div>
+                        <h3>${item.title}</h3>
+                        <p>${item.summary || 'Summary unavailable.'}</p>
+                        ${cveChips ? `<div class="news-cve-chips">${cveChips}</div>` : ''}
+                        ${clusterMarkup}
+                        <div class="news-actions">
+                            <a href="${item.url}" target="_blank" rel="noopener" class="news-link">Read Full Article →</a>
+                            ${getLibrarySaveMarkup({
+                                id: `news:${item.id}`,
+                                type: item.sourceType === 'status' ? 'incident' : 'news',
+                                title: item.title,
+                                url: item.url,
+                                source: item.sourceName,
+                                date: formatNewsDate(item.dateISO),
+                                summary: item.summary,
+                                tags: item.tags
+                            })}
+                            ${getPinButtonMarkup({
+                                id: `news:${item.id}`,
+                                anchor: `news:${item.id}`,
+                                type: item.sourceType === 'status' ? 'incident' : 'news',
+                                title: item.title,
+                                subtitle: item.sourceName,
+                                url: item.url,
+                                severity: item.severity,
+                                meta: {
+                                    source: item.sourceName,
+                                    date: item.dateISO,
+                                    cves: item.cves
+                                }
+                            }, { compact: true })}
+                        </div>
                     </div>
-                    <a href="${item.link}" target="_blank" class="news-link">
-                        Read Full Article →
-                    </a>
-                    ${getLibrarySaveMarkup({
-                        id: `news:${item.link || item.title}:${item.date}`,
-                        type: 'news',
-                        title: item.title,
-                        url: item.link,
-                        source: item.source,
-                        date: item.date,
-                        summary: item.description,
-                        tags: []
-                    })}
-                </div>
-            `).join('');
+                `;
+            }).join('');
+            updatePinButtons();
         }
-        
-        // Legacy function kept for compatibility
+
+        function renderNewsBrief(items) {
+            const updatedEl = document.getElementById('news-brief-updated');
+            const priorityEl = document.getElementById('news-brief-priority');
+            const cveEl = document.getElementById('news-brief-cves');
+            const incidentEl = document.getElementById('news-brief-incidents');
+            const cveSection = document.getElementById('news-brief-cve-section');
+
+            if (updatedEl) {
+                updatedEl.textContent = `Updated ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+            }
+
+            const priorityItems = items.filter(item => (newsSeverityRank[item.severity] || 1) >= newsSeverityRank.HIGH).slice(0, 3);
+            const incidentItems = items.filter(item => item.sourceType === 'status' || item.tags.includes('incident')).slice(0, 1);
+
+            if (priorityEl) {
+                priorityEl.innerHTML = priorityItems.length ? priorityItems.map(item => `
+                    <div class="news-brief-item">
+                        <div>
+                            <a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>
+                            <div class="news-brief-meta">${item.sourceName}</div>
+                        </div>
+                        ${getPinButtonMarkup({
+                            id: `brief:${item.id}`,
+                            anchor: `news:${item.id}`,
+                            type: 'news',
+                            title: item.title,
+                            subtitle: item.sourceName,
+                            url: item.url,
+                            severity: item.severity
+                        }, { compact: true, label: 'Pin' })}
+                    </div>
+                `).join('') : '<div class="news-brief-meta">No high-severity items in range.</div>';
+            }
+
+            if (incidentEl) {
+                incidentEl.innerHTML = incidentItems.length ? incidentItems.map(item => `
+                    <div class="news-brief-item">
+                        <div>
+                            <a href="${item.url}" target="_blank" rel="noopener">${item.title}</a>
+                            <div class="news-brief-meta">${item.sourceName}</div>
+                        </div>
+                        ${getPinButtonMarkup({
+                            id: `brief-incident:${item.id}`,
+                            anchor: `news:${item.id}`,
+                            type: 'incident',
+                            title: item.title,
+                            subtitle: item.sourceName,
+                            url: item.url,
+                            severity: item.severity
+                        }, { compact: true, label: 'Pin' })}
+                    </div>
+                `).join('') : '<div class="news-brief-meta">No active incidents in range.</div>';
+            }
+
+            if (cveEl && cveSection) {
+                const criticalCves = Array.isArray(nvdCVEsCache)
+                    ? nvdCVEsCache.filter(cve => cve.severity === 'CRITICAL').slice(0, 3)
+                    : [];
+                if (criticalCves.length) {
+                    cveSection.style.display = '';
+                    cveEl.innerHTML = criticalCves.map(cve => `
+                        <div class="news-brief-item">
+                            <div>
+                                <a href="https://nvd.nist.gov/vuln/detail/${cve.cve_id}" target="_blank" rel="noopener">${cve.cve_id}</a>
+                                <div class="news-brief-meta">${cve.title}</div>
+                            </div>
+                            ${getPinButtonMarkup({
+                                id: `brief-cve:${cve.cve_id}`,
+                                anchor: `cve:${cve.cve_id}`,
+                                type: 'cve',
+                                title: cve.cve_id,
+                                subtitle: cve.title,
+                                url: `https://nvd.nist.gov/vuln/detail/${cve.cve_id}`,
+                                severity: cve.severity
+                            }, { compact: true, label: 'Pin' })}
+                        </div>
+                    `).join('');
+                } else {
+                    cveSection.style.display = 'none';
+                }
+            }
+        }
+
         async function renderNews() {
             await fetchLatestNews();
-            populateNewsGrid(liveNewsItems);
+            applyNewsFilters();
+            renderNewsBrief(newsState.filtered);
+            const lastVisit = getLastVisitTimestamp();
+            populateNewsGrid(newsState.filtered, lastVisit);
+            setLastVisitTimestamp();
+            const meta = document.getElementById('news-feed-meta');
+            if (meta) {
+                meta.textContent = `Showing ${newsState.filtered.length} stories • ${newsState.items.length} total • ${newsState.timeRange.toUpperCase()} range`;
+            }
+        }
+
+        function updateNewsView() {
+            applyNewsFilters();
+            renderNewsBrief(newsState.filtered);
+            const lastVisit = getLastVisitTimestamp();
+            populateNewsGrid(newsState.filtered, lastVisit);
+            const meta = document.getElementById('news-feed-meta');
+            if (meta) {
+                meta.textContent = `Showing ${newsState.filtered.length} stories • ${newsState.items.length} total • ${newsState.timeRange.toUpperCase()} range`;
+            }
+        }
+
+        function setupNewsFilters() {
+            const categoryTabs = document.getElementById('news-category-tabs');
+            if (categoryTabs) {
+                categoryTabs.addEventListener('click', event => {
+                    const btn = event.target.closest('.news-category-btn');
+                    if (!btn) return;
+                    newsState.category = btn.dataset.category || 'all';
+                    categoryTabs.querySelectorAll('.news-category-btn').forEach(button => {
+                        button.classList.toggle('active', button === btn);
+                    });
+                    updateNewsView();
+                });
+            }
+
+            const severitySelect = document.getElementById('news-severity-filter');
+            if (severitySelect) {
+                severitySelect.value = newsState.severity;
+                severitySelect.addEventListener('change', () => {
+                    newsState.severity = severitySelect.value;
+                    updateNewsView();
+                });
+            }
+
+            const timeSelect = document.getElementById('news-time-filter');
+            if (timeSelect) {
+                timeSelect.value = newsState.timeRange;
+                timeSelect.addEventListener('change', () => {
+                    newsState.timeRange = timeSelect.value;
+                    updateNewsView();
+                });
+            }
+
+            const searchInput = document.getElementById('news-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    newsState.search = searchInput.value;
+                    updateNewsView();
+                });
+            }
+
+            document.addEventListener('click', event => {
+                const chip = event.target.closest('[data-cve-chip]');
+                if (!chip) return;
+                const cve = chip.dataset.cveChip;
+                if (cve) {
+                    prefillCveLookup(cve);
+                }
+            });
+        }
+
+        function activateMainTab(tabName) {
+            const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+            if (tabBtn) tabBtn.click();
+        }
+
+        function prefillCveLookup(cveId) {
+            activateMainTab('threats');
+            setTimeout(() => {
+                const input = document.getElementById('cve-input');
+                if (input) {
+                    input.value = cveId;
+                    input.focus();
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 200);
         }
 
         // Tab Navigation
@@ -5675,17 +6171,23 @@ function analyzePassword() {
             });
         }
 
-        // Load More News
+        function refreshNewsFeed() {
+            const btn = event?.target;
+            if (btn) {
+                btn.innerHTML = '<span class="spinner"></span> Refreshing...';
+                btn.classList.add('loading');
+            }
+            renderNews().finally(() => {
+                if (btn) {
+                    btn.innerHTML = 'Refresh Feed';
+                    btn.classList.remove('loading');
+                }
+            });
+        }
+
+        // Load More News (legacy)
         function loadMoreNews() {
-            const btn = event.target;
-            btn.innerHTML = '<span class="spinner"></span> Loading...';
-            btn.classList.add('loading');
-            
-            setTimeout(() => {
-                btn.innerHTML = 'Load More Articles';
-                btn.classList.remove('loading');
-                alert('News feeds refreshed. New items will appear as sources update.');
-            }, 1500);
+            refreshNewsFeed();
         }
 
         // Perform Research with Perplexity API
@@ -6538,8 +7040,7 @@ function analyzePassword() {
             document.getElementById('learning-library-btn').addEventListener('click', function(){activateLearningSubTab('library');});
             document.getElementById('learning-databank-btn').addEventListener('click', function(){activateLearningSubTab('databank');});
             
-            // On load, populate news grid and show news tab
-            populateNewsGrid();
+            // On load, show news tab
             activateLearningSubTab('news');
         }
 
