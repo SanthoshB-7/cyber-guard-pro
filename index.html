@@ -1703,6 +1703,140 @@ body{
     transform: translateX(4px);
     box-shadow: 0 4px 12px rgba(34,211,238,0.3);
 }
+
+.library-save-btn,
+.library-action-btn {
+    padding: 6px 12px;
+    border-radius: var(--radius-base);
+    border: 1px solid rgba(34,211,238,0.35);
+    background: rgba(34,211,238,0.12);
+    color: var(--color-teal-accent);
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-standard);
+}
+
+.library-save-btn:hover,
+.library-action-btn:hover {
+    background: rgba(34,211,238,0.2);
+    border-color: rgba(34,211,238,0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(34,211,238,0.15);
+}
+
+.library-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.library-toolbar .form-input {
+    flex: 1;
+    min-width: 220px;
+}
+
+.library-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.library-tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.library-chip {
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-standard);
+}
+
+.library-chip.active {
+    background: rgba(34,211,238,0.25);
+    color: var(--color-teal-accent);
+    border-color: rgba(34,211,238,0.5);
+}
+
+.library-items {
+    display: grid;
+    gap: 12px;
+}
+
+.library-item {
+    background: rgba(18, 24, 32, 0.9);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.library-item-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.library-item-summary {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+}
+
+.library-item-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+}
+
+.library-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.library-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.library-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+}
+
+.library-empty {
+    text-align: center;
+    padding: 28px 12px;
+    color: rgba(255,255,255,0.65);
+    border: 1px dashed rgba(255,255,255,0.2);
+    border-radius: var(--radius-lg);
+    margin-top: 12px;
+}
+
+.library-select input {
+    width: 18px;
+    height: 18px;
+}
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
@@ -2453,6 +2587,16 @@ async function loadCISAKEV() {
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                             <div class="cvss-badge" style="background: ${severityColor};">EXPLOITED</div>
+                            ${getLibrarySaveMarkup({
+                                id: `kev:${vuln.cveID}`,
+                                type: 'kev',
+                                title: `${vuln.cveID} ${vuln.vulnerabilityName}`,
+                                url: 'https://www.cisa.gov/known-exploited-vulnerabilities-catalog',
+                                source: 'CISA KEV',
+                                date: vuln.dateAdded || 'Unknown',
+                                summary: vuln.shortDescription || vuln.vulnerabilityName || '',
+                                tags: []
+                            }, { label: 'Save' })}
                             ${getPinButtonMarkup({
                                 id: anchorId,
                                 anchor: anchorId,
@@ -2774,6 +2918,16 @@ function displayBreaches(breaches, showLoadMore = false) {
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
           <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">${breach.severity}</span>
+          ${getLibrarySaveMarkup({
+              id: `${(breach.category || 'breach')}:${breach.name}:${breach.date}`,
+              type: breach.category || 'breach',
+              title: breach.name,
+              url: breach.url || '',
+              source: breach.sourceName || 'Breach Directory',
+              date: breach.date,
+              summary: breach.description || '',
+              tags: []
+          }, { label: 'Save' })}
           ${getPinButtonMarkup({
               id: breachAnchor,
               anchor: breachAnchor,
@@ -3054,6 +3208,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     <button id="learning-research-btn" class="learning-subtab-btn" data-subtab="research">🔬 Research</button>
                     <button id="learning-youtube-btn" class="learning-subtab-btn" data-subtab="youtube">📺 YouTube</button>
                     <button id="learning-docs-btn" class="learning-subtab-btn" data-subtab="document">📄 Documents</button>
+                    <button id="learning-library-btn" class="learning-subtab-btn" data-subtab="library">📂 Library</button>
                     <button id="learning-databank-btn" class="learning-subtab-btn" data-subtab="databank">📚 Data Bank</button>
                 </div>
 
@@ -3585,6 +3740,30 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
 
+                <!-- Library Sub-Tab -->
+                <div class="learning-subtab" id="learning-library-content">
+                    <div class="premium-card">
+                        <h2 style="margin-bottom: 8px; font-size: 24px;">📂 Saved Library</h2>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                            Collect research highlights, threat intel, and CVEs into a weekly brief.
+                        </p>
+                        <div class="library-toolbar">
+                            <input type="text" class="form-input" id="library-search" placeholder="Search saved items (title, summary, tags)">
+                            <div class="library-controls">
+                                <select class="form-select" id="library-sort">
+                                    <option value="saved">Newest saved</option>
+                                    <option value="date">Date</option>
+                                    <option value="type">Type</option>
+                                </select>
+                                <button class="library-action-btn" id="library-export" type="button">📤 Export Weekly Brief</button>
+                            </div>
+                        </div>
+                        <div class="library-tag-filters" id="library-tag-filters"></div>
+                        <div class="library-items" id="library-items"></div>
+                        <div class="library-empty" id="library-empty">No saved items yet. Save from News/CVEs/Breaches.</div>
+                    </div>
+                </div>
+
                 <!-- Data Bank Sub-Tab -->
                 <div class="learning-subtab" id="learning-databank-content">
                     <div class="premium-card">
@@ -3849,6 +4028,7 @@ window.addEventListener('DOMContentLoaded', () => {
             setupFileUpload();
             renderBreaches();
             setupLearningHubTabs();
+            setupLibrary();
             setupActorDetailModal();
         }
         
@@ -4073,6 +4253,16 @@ window.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                             <div class="cvss-badge" style="background: ${severityColor};">${cve.cvss}</div>
+                            ${getLibrarySaveMarkup({
+                                id: `cve:${cve.cve_id}`,
+                                type: 'cve',
+                                title: `${cve.cve_id} ${cve.title}`,
+                                url: `https://nvd.nist.gov/vuln/detail/${cve.cve_id}`,
+                                source: 'NVD',
+                                date: cve.date_published,
+                                summary: cve.description,
+                                tags: []
+                            }, { label: 'Save' })}
                             ${getPinButtonMarkup({
                                 id: anchorId,
                                 anchor: anchorId,
@@ -4523,18 +4713,30 @@ window.addEventListener('DOMContentLoaded', () => {
                                 </a>
                                 <span class="tech-chip">${escapeHtml(tacticLabel)}</span>
                             </div>
-                            ${getPinButtonMarkup({
-                                id: `technique:${detail.externalId}`,
-                                anchor: `technique:${detail.externalId}`,
-                                type: 'technique',
-                                title: `${detail.externalId} ${detail.name}`,
-                                subtitle: `Tactic: ${tacticLabel}`,
-                                url: `https://attack.mitre.org/techniques/${detail.externalId}/`,
-                                severity: null,
-                                meta: {
-                                    tactic: tacticLabel
-                                }
-                            }, { compact: true })}
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                ${getLibrarySaveMarkup({
+                                    id: `technique:${detail.externalId}`,
+                                    type: 'technique',
+                                    title: `${detail.externalId} ${detail.name}`,
+                                    url: `https://attack.mitre.org/techniques/${detail.externalId}/`,
+                                    source: 'MITRE ATT&CK',
+                                    date: '',
+                                    summary: `Tactic: ${tacticLabel}`,
+                                    tags: [tacticLabel]
+                                }, { label: 'Save technique' })}
+                                ${getPinButtonMarkup({
+                                    id: `technique:${detail.externalId}`,
+                                    anchor: `technique:${detail.externalId}`,
+                                    type: 'technique',
+                                    title: `${detail.externalId} ${detail.name}`,
+                                    subtitle: `Tactic: ${tacticLabel}`,
+                                    url: `https://attack.mitre.org/techniques/${detail.externalId}/`,
+                                    severity: null,
+                                    meta: {
+                                        tactic: tacticLabel
+                                    }
+                                }, { compact: true })}
+                            </div>
                         </div>
                     `;
                 }).join('')
@@ -4574,6 +4776,18 @@ window.addEventListener('DOMContentLoaded', () => {
                     ${aliasMarkup}
                     <div class="detail-description" data-description>${description}</div>
                     <button class="detail-toggle" type="button">Show more</button>
+                    <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${getLibrarySaveMarkup({
+                            id: `actor:${actor.id || actor.name}`,
+                            type: 'actor',
+                            title: actor.name || 'Unknown Actor',
+                            url: externalLink,
+                            source: 'MITRE ATT&CK',
+                            date: '',
+                            summary: actor.description || '',
+                            tags: []
+                        }, { label: 'Save actor' })}
+                    </div>
                     <div class="detail-search" style="margin-top: 12px;">
                         <input type="text" placeholder="Search techniques..." aria-label="Search techniques" data-tech-search>
                     </div>
@@ -5418,6 +5632,16 @@ function analyzePassword() {
                     <a href="${item.link}" target="_blank" class="news-link">
                         Read Full Article →
                     </a>
+                    ${getLibrarySaveMarkup({
+                        id: `news:${item.link || item.title}:${item.date}`,
+                        type: 'news',
+                        title: item.title,
+                        url: item.link,
+                        source: item.source,
+                        date: item.date,
+                        summary: item.description,
+                        tags: []
+                    })}
                 </div>
             `).join('');
         }
@@ -6005,6 +6229,7 @@ function analyzePassword() {
                 'research': 'learning-research-content',
                 'youtube': 'learning-youtube-content',
                 'document': 'learning-docs-content',
+                'library': 'learning-library-content',
                 'databank': 'learning-databank-content'
             };
             
@@ -6031,6 +6256,7 @@ function analyzePassword() {
                 'research': 'learning-research-btn',
                 'youtube': 'learning-youtube-btn',
                 'document': 'learning-docs-btn',
+                'library': 'learning-library-btn',
                 'databank': 'learning-databank-btn'
             };
             
@@ -6304,11 +6530,12 @@ function analyzePassword() {
 
         // Fix: Learning Hub Tab - Subtab/section init
         function setupLearningHubTabs() {
-            // Attach listeners to all 5 subtab buttons immediately
+            // Attach listeners to all 6 subtab buttons immediately
             document.getElementById('learning-news-btn').addEventListener('click', function(){activateLearningSubTab('news');});
             document.getElementById('learning-research-btn').addEventListener('click', function(){activateLearningSubTab('research');});
             document.getElementById('learning-youtube-btn').addEventListener('click', function(){activateLearningSubTab('youtube');});
             document.getElementById('learning-docs-btn').addEventListener('click', function(){activateLearningSubTab('document');});
+            document.getElementById('learning-library-btn').addEventListener('click', function(){activateLearningSubTab('library');});
             document.getElementById('learning-databank-btn').addEventListener('click', function(){activateLearningSubTab('databank');});
             
             // On load, populate news grid and show news tab
@@ -6440,6 +6667,308 @@ function analyzePassword() {
                 alert('✓ Content copied to clipboard!');
             }).catch(() => {
                 alert('Failed to copy to clipboard');
+            });
+        }
+
+        // === Saved Library ===
+        const libraryStorageKey = 'library_v1';
+        const libraryTypeLabels = {
+            news: 'News',
+            breach: 'Breach',
+            incident: 'Incident',
+            cve: 'CVE',
+            kev: 'KEV',
+            actor: 'Threat Actor',
+            technique: 'Technique'
+        };
+        const libraryState = {
+            items: [],
+            filteredItems: [],
+            activeTag: 'all',
+            search: '',
+            sort: 'saved',
+            selectedIds: new Set()
+        };
+
+        function getLibrarySaveMarkup(item, options = {}) {
+            if (!item || !item.id) return '';
+            const encoded = encodeURIComponent(JSON.stringify(item));
+            const label = options.label || 'Save';
+            return `
+                <button class="library-save-btn" type="button" data-library-save="true" data-library="${escapeHtml(encoded)}">
+                    ${label}
+                </button>
+            `;
+        }
+
+        function loadLibrary() {
+            try {
+                const raw = localStorage.getItem(libraryStorageKey);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function persistLibrary() {
+            localStorage.setItem(libraryStorageKey, JSON.stringify(libraryState.items));
+        }
+
+        function normalizeLibraryTags(tags) {
+            return (tags || [])
+                .map(tag => String(tag).trim())
+                .filter(Boolean);
+        }
+
+        function addLibraryItem(rawItem) {
+            if (!rawItem || !rawItem.id) return;
+            const normalizedTags = normalizeLibraryTags(rawItem.tags || []);
+            const existingIndex = libraryState.items.findIndex(item => item.id === rawItem.id);
+            if (existingIndex >= 0) {
+                const existing = libraryState.items[existingIndex];
+                libraryState.items[existingIndex] = {
+                    ...existing,
+                    ...rawItem,
+                    tags: normalizedTags.length ? normalizedTags : existing.tags || [],
+                    savedAt: existing.savedAt || rawItem.savedAt
+                };
+                persistLibrary();
+                renderLibrary();
+                showToast('Already saved in Library');
+                return;
+            }
+
+            const item = {
+                ...rawItem,
+                tags: normalizedTags,
+                savedAt: rawItem.savedAt || new Date().toISOString()
+            };
+            libraryState.items = [item, ...libraryState.items];
+            persistLibrary();
+            renderLibrary();
+            showToast('Saved to Library');
+        }
+
+        function removeLibraryItem(id) {
+            libraryState.items = libraryState.items.filter(item => item.id !== id);
+            libraryState.selectedIds.delete(id);
+            persistLibrary();
+            renderLibrary();
+            showToast('Removed from Library');
+        }
+
+        function updateLibraryTags(id, tags) {
+            const index = libraryState.items.findIndex(item => item.id === id);
+            if (index < 0) return;
+            libraryState.items[index] = {
+                ...libraryState.items[index],
+                tags: normalizeLibraryTags(tags)
+            };
+            persistLibrary();
+            renderLibrary();
+            showToast('Tags updated');
+        }
+
+        function getLibraryTypeLabel(type) {
+            return libraryTypeLabels[type] || 'Item';
+        }
+
+        function matchesLibrarySearch(item, query) {
+            if (!query) return true;
+            const haystack = [
+                item.title,
+                item.summary,
+                ...(item.tags || [])
+            ].join(' ').toLowerCase();
+            return haystack.includes(query);
+        }
+
+        function sortLibraryItems(items) {
+            const sorted = [...items];
+            if (libraryState.sort === 'date') {
+                sorted.sort((a, b) => new Date(b.date || b.savedAt || 0) - new Date(a.date || a.savedAt || 0));
+            } else if (libraryState.sort === 'type') {
+                sorted.sort((a, b) => {
+                    const typeCompare = (a.type || '').localeCompare(b.type || '');
+                    return typeCompare !== 0 ? typeCompare : (a.title || '').localeCompare(b.title || '');
+                });
+            } else {
+                sorted.sort((a, b) => new Date(b.savedAt || 0) - new Date(a.savedAt || 0));
+            }
+            return sorted;
+        }
+
+        function renderLibraryTagFilters() {
+            const container = document.getElementById('library-tag-filters');
+            if (!container) return;
+            const tagCounts = {};
+            libraryState.items.forEach(item => {
+                (item.tags || []).forEach(tag => {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                });
+            });
+            const tags = Object.keys(tagCounts).sort((a, b) => a.localeCompare(b));
+            const chips = [
+                `<button class="library-chip ${libraryState.activeTag === 'all' ? 'active' : ''}" data-library-tag="all">All (${libraryState.items.length})</button>`,
+                ...tags.map(tag => `
+                    <button class="library-chip ${libraryState.activeTag === tag ? 'active' : ''}" data-library-tag="${escapeHtml(tag)}">
+                        ${escapeHtml(tag)} (${tagCounts[tag]})
+                    </button>
+                `)
+            ];
+            container.innerHTML = chips.join('');
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('library-items');
+            const emptyState = document.getElementById('library-empty');
+            if (!container || !emptyState) return;
+            renderLibraryTagFilters();
+
+            const query = libraryState.search.trim().toLowerCase();
+            const filtered = libraryState.items.filter(item => {
+                if (libraryState.activeTag !== 'all' && !(item.tags || []).includes(libraryState.activeTag)) {
+                    return false;
+                }
+                return matchesLibrarySearch(item, query);
+            });
+
+            const sorted = sortLibraryItems(filtered);
+            libraryState.filteredItems = sorted;
+
+            if (!sorted.length) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            emptyState.style.display = 'none';
+
+            container.innerHTML = sorted.map(item => `
+                <div class="library-item" data-library-id="${escapeHtml(item.id)}">
+                    <label class="library-select">
+                        <input type="checkbox" data-library-select="${escapeHtml(item.id)}" ${libraryState.selectedIds.has(item.id) ? 'checked' : ''}>
+                    </label>
+                    <div>
+                        <div class="library-item-title">${escapeHtml(item.title)}</div>
+                        <div class="library-item-meta">${getLibraryTypeLabel(item.type)} • ${escapeHtml(item.source || 'Source')} • ${escapeHtml(item.date || 'Date N/A')}</div>
+                        <div class="library-item-summary">${escapeHtml(item.summary || 'No summary available.')}</div>
+                        <div class="library-item-actions">
+                            ${item.url ? `<a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>` : ''}
+                            <button class="library-action-btn" type="button" data-library-edit-tags="${escapeHtml(item.id)}">Edit tags</button>
+                            <button class="library-action-btn" type="button" data-library-remove="${escapeHtml(item.id)}">Remove</button>
+                        </div>
+                        <div class="library-tags">
+                            ${(item.tags && item.tags.length)
+                                ? item.tags.map(tag => `<span class="library-tag">${escapeHtml(tag)}</span>`).join('')
+                                : '<span class="library-tag">No tags</span>'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function exportLibraryBrief() {
+            const selectedInView = libraryState.filteredItems.filter(item => libraryState.selectedIds.has(item.id));
+            const exportItems = selectedInView.length ? selectedInView : libraryState.filteredItems;
+            if (!exportItems.length) {
+                showToast('No saved items to export');
+                return;
+            }
+            const payload = {
+                title: 'Weekly Brief',
+                generatedAt: new Date().toISOString(),
+                items: exportItems.map(item => ({
+                    title: item.title,
+                    date: item.date || item.savedAt,
+                    category: getLibraryTypeLabel(item.type),
+                    link: item.url || ''
+                }))
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `weekly-brief-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('Weekly brief exported');
+        }
+
+        function setupLibrary() {
+            libraryState.items = loadLibrary();
+            renderLibrary();
+
+            const searchInput = document.getElementById('library-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    libraryState.search = searchInput.value;
+                    renderLibrary();
+                });
+            }
+
+            const sortSelect = document.getElementById('library-sort');
+            if (sortSelect) {
+                sortSelect.value = libraryState.sort;
+                sortSelect.addEventListener('change', () => {
+                    libraryState.sort = sortSelect.value;
+                    renderLibrary();
+                });
+            }
+
+            const exportBtn = document.getElementById('library-export');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportLibraryBrief);
+            }
+
+            document.addEventListener('click', event => {
+                const saveBtn = event.target.closest('[data-library-save]');
+                if (saveBtn) {
+                    const payloadRaw = saveBtn.dataset.library;
+                    try {
+                        const payload = JSON.parse(decodeURIComponent(payloadRaw));
+                        addLibraryItem(payload);
+                    } catch (error) {
+                        showToast('Unable to save item');
+                    }
+                    return;
+                }
+
+                const tagBtn = event.target.closest('[data-library-tag]');
+                if (tagBtn) {
+                    const tag = tagBtn.dataset.libraryTag;
+                    libraryState.activeTag = tag || 'all';
+                    renderLibrary();
+                    return;
+                }
+
+                const editBtn = event.target.closest('[data-library-edit-tags]');
+                if (editBtn) {
+                    const id = editBtn.dataset.libraryEditTags;
+                    const current = libraryState.items.find(item => item.id === id);
+                    const value = prompt('Edit tags (comma-separated)', (current?.tags || []).join(', '));
+                    if (value !== null) {
+                        updateLibraryTags(id, value.split(','));
+                    }
+                    return;
+                }
+
+                const removeBtn = event.target.closest('[data-library-remove]');
+                if (removeBtn) {
+                    removeLibraryItem(removeBtn.dataset.libraryRemove);
+                }
+            });
+
+            document.addEventListener('change', event => {
+                if (event.target.matches('[data-library-select]')) {
+                    const id = event.target.dataset.librarySelect;
+                    if (event.target.checked) {
+                        libraryState.selectedIds.add(id);
+                    } else {
+                        libraryState.selectedIds.delete(id);
+                    }
+                }
             });
         }
 
