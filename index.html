@@ -1082,6 +1082,137 @@ body{
     color: rgba(255, 255, 255, 0.45);
 }
 
+@media (min-width: 1200px) {
+    body.clipboard-open .nvd-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1600px) {
+    body.clipboard-collapsed .nvd-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    body.clipboard-open .nvd-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.fix-first-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-lg);
+    padding: var(--space-16);
+    margin-bottom: var(--space-20);
+    box-shadow: var(--shadow-soft);
+}
+
+.fix-first-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-12);
+    margin-bottom: var(--space-12);
+}
+
+.fix-first-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.fix-first-mode {
+    min-width: 160px;
+    font-size: 12px;
+    padding: 8px 12px;
+}
+
+.fix-first-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fix-first-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(10, 14, 20, 0.6);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.fix-first-item:hover {
+    border-color: rgba(34,211,238,0.35);
+    box-shadow: 0 10px 30px rgba(34,211,238,0.08);
+    transform: translateY(-1px);
+}
+
+.fix-first-rank {
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: rgba(34,211,238,0.18);
+    border: 1px solid rgba(34,211,238,0.4);
+    color: #e8faff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.fix-first-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.fix-first-id {
+    font-size: 12px;
+    font-weight: 600;
+    color: #22d3ee;
+}
+
+.fix-first-title-text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 2px;
+    line-height: 1.3;
+}
+
+.fix-first-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.fix-first-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.08);
+}
+
+.fix-first-badge.kev {
+    border-color: rgba(255,0,64,0.5);
+    color: #ff7a9c;
+    background: rgba(255,0,64,0.12);
+}
+
+.fix-first-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
 .cvss-badge {
     padding: var(--space-6) var(--space-12);
     border-radius: var(--radius-sm);
@@ -1753,7 +1884,7 @@ p, .muted-text, .subtitle{
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-premium);
   backdrop-filter: blur(18px);
-  z-index: 120;
+  z-index: 2;
   overflow: hidden;
   align-self: start;
 }
@@ -2198,7 +2329,9 @@ p, .muted-text, .subtitle{
 }
 
 .clipboard-highlight {
-  animation: clipboardGlow 1.5s ease;
+  animation: clipboardGlow 1.2s ease;
+  outline: 2px solid rgba(34,211,238,0.35);
+  outline-offset: 2px;
 }
 
 @keyframes clipboardGlow {
@@ -2273,6 +2406,10 @@ p, .muted-text, .subtitle{
 </div>
 
 <script>
+let cisaKevCache = [];
+let fixFirstSourceCache = [];
+const fixFirstModeKey = 'fixfirst_mode_v1';
+
 // Load CISA KEV data on page load
 async function loadCISAKEV() {
     const grid = document.getElementById('cisa-kev-grid');
@@ -2293,7 +2430,10 @@ async function loadCISAKEV() {
             grid.innerHTML = '<div style="text-align:center; padding:40px; color:#ff4444;">No vulnerabilities found</div>';
             return;
         }
-        
+
+        cisaKevCache = data.vulnerabilities || [];
+        renderFixFirstQueue(fixFirstSourceCache);
+
         updateTime.innerHTML = new Date().toLocaleString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'numeric', timeZoneName:'short'});
         
         grid.innerHTML = (data.vulnerabilities || []).slice(0,15).map(vuln => {
@@ -2743,9 +2883,22 @@ window.addEventListener('DOMContentLoaded', () => {
                         <button class="btn btn-secondary" onclick="exportCVEReport()">📄 Export PDF Report</button>
                     </div>
 
+                    <div class="fix-first-card" id="fix-first-card">
+                        <div class="fix-first-header">
+                            <div class="fix-first-title">⚡ Fix-First Queue (Top 5)</div>
+                            <select class="form-select fix-first-mode" id="fix-first-mode" aria-label="Fix-first priority mode">
+                                <option value="combined">Priority: Combined</option>
+                                <option value="epss">Priority: EPSS only</option>
+                                <option value="cvss">Priority: CVSS only</option>
+                                <option value="kev">Priority: KEV only</option>
+                            </select>
+                        </div>
+                        <div class="fix-first-list" id="fix-first-list"></div>
+                    </div>
+
                     <div class="wide-layout">
                         <div class="main-col">
-                            <div class="cve-grid" id="nvd-cve-grid"></div>
+                            <div class="cve-grid nvd-grid" id="nvd-cve-grid"></div>
                         </div>
                         <div class="side-col">
                             <div class="epss-insights-card" id="epss-insights-card">
@@ -3824,6 +3977,8 @@ window.addEventListener('DOMContentLoaded', () => {
             });
 
             updateEpssInsights(filtered);
+            fixFirstSourceCache = filtered;
+            renderFixFirstQueue(filtered);
 
             if (viewMode === 'group') {
                 const groups = ['CRITICAL', 'HIGH', 'MEDIUM'];
@@ -3834,7 +3989,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     return `
                         <div style="margin-bottom: 18px;">
                             <div style="font-size: 13px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;">${group} Severity</div>
-                            <div class="cve-grid">
+                            <div class="cve-grid nvd-grid">
                                 ${sortedItems.map(renderCveCard).join('')}
                             </div>
                         </div>
@@ -3986,6 +4141,154 @@ window.addEventListener('DOMContentLoaded', () => {
                     const height = Math.max(6, Math.round((count / maxBin) * 60));
                     return `<div class="mini-hist-bar" style="height:${height}px;"></div>`;
                 }).join('');
+            }
+        }
+
+        function getFixFirstMode() {
+            const allowed = ['combined', 'epss', 'cvss', 'kev'];
+            const stored = localStorage.getItem(fixFirstModeKey);
+            return allowed.includes(stored) ? stored : 'combined';
+        }
+
+        function getKevIdSet() {
+            return new Set((cisaKevCache || []).map(item => item.cveID || item.cve || item.cveId).filter(Boolean));
+        }
+
+        function getRecencyBoost(publishedDate) {
+            if (!publishedDate) return 0;
+            const published = new Date(publishedDate);
+            if (Number.isNaN(published.getTime())) return 0;
+            const days = (Date.now() - published.getTime()) / 86400000;
+            if (days <= 7) return 10;
+            if (days <= 30) return 8;
+            if (days <= 60) return 6;
+            if (days <= 90) return 4;
+            if (days <= 180) return 2;
+            return 0;
+        }
+
+        function buildFixFirstItems(cves) {
+            const kevSet = getKevIdSet();
+            return (cves || []).map(cve => {
+                const epssPercent = cve.epss != null ? (cve.epss * 100) : null;
+                return {
+                    cveId: cve.cve_id,
+                    title: cve.title || 'No title',
+                    vendorProduct: cve.products || 'Unknown',
+                    cvss: Number(cve.cvss) || 0,
+                    epssPercent,
+                    isKEV: kevSet.has(cve.cve_id),
+                    publishedDate: cve.date_published_raw || cve.date_published || null
+                };
+            });
+        }
+
+        function getFixFirstScore(item, mode) {
+            const epssValue = item.epssPercent || 0;
+            const cvssValue = item.cvss || 0;
+            const recencyBoost = getRecencyBoost(item.publishedDate);
+            if (mode === 'epss') return epssValue * 1.5;
+            if (mode === 'cvss') return cvssValue * 4;
+            if (mode === 'kev') return item.isKEV ? 100 : 0;
+            let score = 0;
+            if (item.isKEV) score += 100;
+            score += epssValue * 1.5;
+            score += cvssValue * 4;
+            score += recencyBoost;
+            return score;
+        }
+
+        function renderFixFirstQueue(cves) {
+            const list = document.getElementById('fix-first-list');
+            const modeSelect = document.getElementById('fix-first-mode');
+            if (!list) return;
+            const mode = modeSelect?.value || getFixFirstMode();
+            const items = buildFixFirstItems(cves).map(item => ({
+                ...item,
+                score: getFixFirstScore(item, mode),
+                recencyBoost: getRecencyBoost(item.publishedDate)
+            }));
+
+            const sorted = items.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                if (b.recencyBoost !== a.recencyBoost) return b.recencyBoost - a.recencyBoost;
+                if ((b.epssPercent || 0) !== (a.epssPercent || 0)) return (b.epssPercent || 0) - (a.epssPercent || 0);
+                if ((b.cvss || 0) !== (a.cvss || 0)) return (b.cvss || 0) - (a.cvss || 0);
+                return new Date(b.publishedDate || 0) - new Date(a.publishedDate || 0);
+            }).slice(0, 5);
+
+            if (!sorted.length) {
+                list.innerHTML = '<div style="font-size: 12px; color: rgba(255,255,255,0.6); padding: 8px;">No CVEs available for the current filters.</div>';
+                return;
+            }
+
+            list.innerHTML = sorted.map((item, index) => {
+                const anchorId = `cve:${item.cveId}`;
+                const epssLabel = item.epssPercent != null ? `${item.epssPercent.toFixed(1)}%` : '--';
+                const cvssLabel = item.cvss ? item.cvss.toFixed(1) : '--';
+                const title = escapeHtml(item.title.length > 90 ? `${item.title.slice(0, 87)}...` : item.title);
+                const pinMarkup = getPinButtonMarkup({
+                    id: anchorId,
+                    anchor: anchorId,
+                    type: 'cve',
+                    title: item.cveId,
+                    subtitle: item.vendorProduct,
+                    url: `https://nvd.nist.gov/vuln/detail/${item.cveId}`,
+                    severity: null,
+                    meta: {
+                        cveId: item.cveId,
+                        title: item.title,
+                        product: item.vendorProduct,
+                        cvss: item.cvss,
+                        epss: item.epssPercent != null ? `${item.epssPercent.toFixed(1)}%` : 'Unknown',
+                        isKEV: item.isKEV ? 'Yes' : 'No'
+                    }
+                }, { compact: true });
+
+                return `
+                    <div class="fix-first-item" data-fixfirst-go="${anchorId}" tabindex="0" role="button" aria-label="Go to ${item.cveId}">
+                        <div class="fix-first-rank">${index + 1}</div>
+                        <div class="fix-first-content">
+                            <div class="fix-first-id">${item.cveId}</div>
+                            <div class="fix-first-title-text">${title}</div>
+                            <div class="fix-first-meta">
+                                ${item.isKEV ? '<span class="fix-first-badge kev">KEV</span>' : ''}
+                                <span class="fix-first-badge">EPSS ${epssLabel}</span>
+                                <span class="fix-first-badge">CVSS ${cvssLabel}</span>
+                            </div>
+                        </div>
+                        <div class="fix-first-actions">${pinMarkup}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupFixFirstQueue() {
+            const modeSelect = document.getElementById('fix-first-mode');
+            if (modeSelect) {
+                modeSelect.value = getFixFirstMode();
+                modeSelect.addEventListener('change', () => {
+                    localStorage.setItem(fixFirstModeKey, modeSelect.value);
+                    renderFixFirstQueue(fixFirstSourceCache);
+                });
+            }
+            const list = document.getElementById('fix-first-list');
+            if (list) {
+                list.addEventListener('click', event => {
+                    if (event.target.closest('.pin-btn')) return;
+                    const row = event.target.closest('.fix-first-item');
+                    if (row?.dataset.fixfirstGo) {
+                        scrollToClipboardAnchor(row.dataset.fixfirstGo);
+                    }
+                });
+                list.addEventListener('keydown', event => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    const row = event.target.closest('.fix-first-item');
+                    if (row?.dataset.fixfirstGo) {
+                        event.preventDefault();
+                        scrollToClipboardAnchor(row.dataset.fixfirstGo);
+                    }
+                });
             }
         }
 
@@ -6163,6 +6466,8 @@ function analyzePassword() {
         let clipboardUiState = loadClipboardUiState();
         let clipboardGroupState = { ...clipboardGroupDefaults };
         let clipboardInitialized = false;
+        let clipboardAutoCollapsed = false;
+        let clipboardManualOverride = false;
 
         function getPinButtonMarkup(item, options = {}) {
             if (!item || !item.id) return '';
@@ -6203,7 +6508,7 @@ function analyzePassword() {
         function applyClipboardUiState() {
             const panel = document.getElementById('clipboard-panel');
             const appShell = document.getElementById('app-shell');
-            const collapsed = Boolean(clipboardUiState.collapsed);
+            const collapsed = Boolean(clipboardUiState.collapsed || clipboardAutoCollapsed);
             if (panel) {
                 panel.classList.toggle('is-collapsed', collapsed);
             }
@@ -6211,6 +6516,7 @@ function analyzePassword() {
                 appShell.classList.toggle('has-clipboard', !collapsed);
             }
             document.body.classList.toggle('clipboard-collapsed', collapsed);
+            document.body.classList.toggle('clipboard-open', !collapsed);
             const toggleBtn = document.getElementById('clipboard-collapse-toggle');
             if (toggleBtn) {
                 toggleBtn.textContent = collapsed ? 'Expand' : 'Collapse';
@@ -6220,7 +6526,26 @@ function analyzePassword() {
 
         function setClipboardCollapsed(nextValue) {
             clipboardUiState.collapsed = Boolean(nextValue);
+            clipboardManualOverride = true;
+            clipboardAutoCollapsed = false;
             saveClipboardUiState();
+            applyClipboardUiState();
+        }
+
+        function updateClipboardAutoCollapse() {
+            const isNarrow = window.innerWidth < 1250;
+            if (!isNarrow) {
+                clipboardAutoCollapsed = false;
+                clipboardManualOverride = false;
+                applyClipboardUiState();
+                return;
+            }
+            if (clipboardManualOverride) {
+                clipboardAutoCollapsed = false;
+                applyClipboardUiState();
+                return;
+            }
+            clipboardAutoCollapsed = !clipboardUiState.collapsed;
             applyClipboardUiState();
         }
 
@@ -6460,7 +6785,7 @@ function analyzePassword() {
             target.classList.add('clipboard-highlight');
             setTimeout(() => {
                 target.classList.remove('clipboard-highlight');
-            }, 1500);
+            }, 1200);
         }
 
         function handlePinClick(event) {
@@ -6648,9 +6973,12 @@ function analyzePassword() {
             initApp();
             loadSavedAPIKey();
             applyClipboardUiState();
+            updateClipboardAutoCollapse();
             renderClipboard();
             updatePinButtons();
             setupClipboardInteractions();
+            setupFixFirstQueue();
+            window.addEventListener('resize', updateClipboardAutoCollapse);
         });
     </script>
 
