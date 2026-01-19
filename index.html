@@ -1678,6 +1678,295 @@ p, .muted-text, .subtitle{
   }
 }
 </style>
+<style>
+/* === Investigation Clipboard === */
+@media (min-width: 1200px) {
+  .main-content {
+    padding-right: 360px;
+  }
+}
+
+.clipboard-panel {
+  position: fixed;
+  top: 132px;
+  right: 24px;
+  width: 320px;
+  height: calc(100vh - 180px);
+  display: none;
+  flex-direction: column;
+  background: rgba(12, 16, 26, 0.92);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-premium);
+  backdrop-filter: blur(18px);
+  z-index: 120;
+}
+
+@media (min-width: 1200px) {
+  .clipboard-panel {
+    display: flex;
+  }
+}
+
+.clipboard-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clipboard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.clipboard-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.clipboard-count {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  background: rgba(34,211,238,0.12);
+  border: 1px solid rgba(34,211,238,0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.clipboard-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.clipboard-action-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.clipboard-action-btn:hover {
+  border-color: rgba(34,211,238,0.5);
+  box-shadow: 0 8px 24px rgba(34,211,238,0.16);
+}
+
+.clipboard-body {
+  padding: 12px 12px 16px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.clipboard-group-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+.clipboard-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clipboard-item-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.clipboard-item-title a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.clipboard-item-title a:hover {
+  text-decoration: underline;
+}
+
+.clipboard-item-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+
+.clipboard-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.clipboard-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.05);
+}
+
+.clipboard-chip.severity {
+  background: rgba(255,0,64,0.16);
+  border-color: rgba(255,0,64,0.4);
+  color: #ff7a96;
+}
+
+.clipboard-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.clipboard-status {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.clipboard-notes {
+  display: none;
+}
+
+.clipboard-notes.active {
+  display: block;
+}
+
+.clipboard-notes textarea {
+  width: 100%;
+  min-height: 70px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 8px;
+  font-size: 12px;
+  resize: vertical;
+}
+
+.clipboard-remove {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.clipboard-remove:hover {
+  color: #ff7a96;
+}
+
+.clipboard-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  padding: 12px 6px;
+}
+
+.clipboard-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 18px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.9) 0%, rgba(34,211,238,0.9) 100%);
+  border: 1px solid rgba(34,211,238,0.6);
+  color: #05070c;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 140;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(34,211,238,0.18);
+}
+
+@media (min-width: 1200px) {
+  .clipboard-fab {
+    display: none;
+  }
+}
+
+.clipboard-fab .clipboard-count {
+  background: rgba(5,7,12,0.75);
+  color: #fff;
+  border-color: rgba(255,255,255,0.2);
+}
+
+.clipboard-modal .clipboard-body {
+  max-height: 60vh;
+}
+
+.pin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34,211,238,0.12);
+  border: 1px solid rgba(34,211,238,0.35);
+  color: #e6fbff;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.pin-btn:hover {
+  background: rgba(139,92,246,0.18);
+  border-color: rgba(139,92,246,0.4);
+}
+
+.pin-btn--compact .pin-label {
+  display: none;
+}
+
+.pin-btn.is-pinned {
+  background: rgba(0,255,136,0.2);
+  border-color: rgba(0,255,136,0.5);
+  color: #b6ffe3;
+}
+
+.toast-container {
+  position: fixed;
+  right: 16px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+}
+
+.toast {
+  background: rgba(15, 20, 30, 0.95);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  box-shadow: var(--shadow-soft);
+}
+</style>
 </head>
 <body>
     <div class="app-container">
@@ -1752,7 +2041,23 @@ async function loadCISAKEV() {
                             <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">${vuln.vulnerabilityName}</div>
                             
                         </div>
-                        <div class="cvss-badge" style="background: ${severityColor};">EXPLOITED</div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                            <div class="cvss-badge" style="background: ${severityColor};">EXPLOITED</div>
+                            ${getPinButtonMarkup({
+                                id: `kev:${vuln.cveID}`,
+                                type: 'kev',
+                                title: vuln.cveID,
+                                subtitle: `${vuln.vendorProject || 'Unknown'} • ${vuln.product || 'Unknown'}`,
+                                url: 'https://www.cisa.gov/known-exploited-vulnerabilities-catalog',
+                                severity: 'CRITICAL',
+                                meta: {
+                                    vendor: vuln.vendorProject || 'Unknown',
+                                    product: vuln.product || 'Unknown',
+                                    added: vuln.dateAdded || 'Unknown',
+                                    due: vuln.dueDate || 'N/A'
+                                }
+                            }, { compact: true })}
+                        </div>
                     </div>
                     <div style="font-size:13px; margin-bottom:8px; color:#ff4444;"><strong>Vendor:</strong> ${vuln.vendorProject || 'Unknown'}</div>
                     <div style="font-size:13px; margin-bottom:8px; color:#fff;"><strong>Product:</strong> ${vuln.product || 'Unknown'}</div>
@@ -1764,6 +2069,7 @@ async function loadCISAKEV() {
                 </div>
             `;
         }).join('');
+        updatePinButtons();
     } catch (err) {
         grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff0040;">Error loading CISA data: ${err.message}<br><br>Please refresh and try again.</div>`;
     }
@@ -2049,7 +2355,23 @@ function displayBreaches(breaches, showLoadMore = false) {
             <span style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 999px;">${breach.sourceName || 'Source'}</span>
           </div>
         </div>
-        <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">${breach.severity}</span>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+          <span style="background: ${getSeverityColor(breach.severity)}; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">${breach.severity}</span>
+          ${getPinButtonMarkup({
+              id: `${(breach.category || 'breach')}:${breach.name}:${breach.date}`,
+              type: (breach.category || 'breach') === 'breach' ? 'breach' : 'incident',
+              title: breach.name,
+              subtitle: breach.sourceName || 'Breach Directory',
+              url: breach.url || '',
+              severity: breach.severity ? breach.severity.toUpperCase() : null,
+              meta: {
+                date: breach.date || 'Unknown',
+                records: recordsLabel,
+                attack: attackTypeLabel,
+                data: dataLabel
+              }
+          }, { compact: true })}
+        </div>
       </div>
       
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
@@ -2071,6 +2393,7 @@ function displayBreaches(breaches, showLoadMore = false) {
   }
   
   container.innerHTML = html;
+  updatePinButtons();
 }
 
 
@@ -2864,6 +3187,40 @@ window.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 
+    <aside class="clipboard-panel" id="clipboard-panel" aria-live="polite">
+        <div class="clipboard-header">
+            <div class="clipboard-title-row">
+                <div class="clipboard-title">Investigation Clipboard</div>
+                <span class="clipboard-count" id="clipboard-count">0 pinned</span>
+            </div>
+            <div class="clipboard-actions">
+                <button class="clipboard-action-btn" type="button" data-clipboard-action="export">Export PDF</button>
+                <button class="clipboard-action-btn" type="button" data-clipboard-action="clear-closed">Clear Closed</button>
+            </div>
+        </div>
+        <div class="clipboard-body" id="clipboard-panel-body"></div>
+    </aside>
+
+    <button class="clipboard-fab" id="clipboard-fab" type="button">
+        📌 Clipboard <span class="clipboard-count" id="clipboard-fab-count">0</span>
+    </button>
+
+    <div class="modal-backdrop" id="clipboard-modal" aria-hidden="true">
+        <div class="modal clipboard-modal" role="dialog" aria-modal="true" aria-labelledby="clipboard-modal-title">
+            <div class="modal-header">
+                <h3 id="clipboard-modal-title" style="font-size: 18px; color: #22d3ee;">Investigation Clipboard</h3>
+                <button class="modal-close" type="button" aria-label="Close clipboard">Close</button>
+            </div>
+            <div class="clipboard-actions" style="margin-bottom: 12px;">
+                <button class="clipboard-action-btn" type="button" data-clipboard-action="export">Export PDF</button>
+                <button class="clipboard-action-btn" type="button" data-clipboard-action="clear-closed">Clear Closed</button>
+            </div>
+            <div class="clipboard-body" id="clipboard-modal-body"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
     <script>
         // App State
         const appState = {
@@ -3201,6 +3558,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 const sorted = sortCves(filtered, viewMode);
                 grid.innerHTML = sorted.length ? sorted.map(renderCveCard).join('') : `<div style="text-align:center; padding:40px; color:#ff4444;">No CVEs match the current filters.</div>`;
             }
+            updatePinButtons();
         }
         
         function filterNVDCVEs() {
@@ -3269,7 +3627,22 @@ window.addEventListener('DOMContentLoaded', () => {
                             <div style="font-weight: 600; color: ${severityColor}; margin-bottom: 4px;">${cve.cve_id}</div>
                             <div style="font-size: 15px; font-weight: 500; margin-bottom: 8px; line-height: 1.4;">${cve.title}</div>
                         </div>
-                        <div class="cvss-badge" style="background: ${severityColor};">${cve.cvss}</div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                            <div class="cvss-badge" style="background: ${severityColor};">${cve.cvss}</div>
+                            ${getPinButtonMarkup({
+                                id: `cve:${cve.cve_id}`,
+                                type: 'cve',
+                                title: cve.cve_id,
+                                subtitle: cve.products,
+                                url: `https://nvd.nist.gov/vuln/detail/${cve.cve_id}`,
+                                severity: cve.severity ? cve.severity.toUpperCase() : null,
+                                meta: {
+                                    cvss: cve.cvss,
+                                    epss: epssPercent != null ? `${epssPercent.toFixed(1)}%` : null,
+                                    published: cve.date_published
+                                }
+                            }, { compact: true })}
+                        </div>
                     </div>
                     <div style="font-size:13px; margin-bottom:8px; color:rgba(255,255,255,0.8);">${cve.description}</div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
@@ -3545,11 +3918,24 @@ window.addEventListener('DOMContentLoaded', () => {
                     const tacticLabel = detail.tactics[0] || 'Unknown';
                     const techLabel = `${detail.externalId} • ${detail.name}`;
                     return `
-                        <div class="tech-item" data-tech="${escapeHtml(techLabel.toLowerCase())}">
-                            <a href="https://attack.mitre.org/techniques/${detail.externalId}/" target="_blank" rel="noopener">
-                                <strong>${escapeHtml(detail.externalId)}</strong> ${escapeHtml(detail.name)}
-                            </a>
-                            <span class="tech-chip">${escapeHtml(tacticLabel)}</span>
+                        <div class="tech-item" data-tech="${escapeHtml(techLabel.toLowerCase())}" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                            <div>
+                                <a href="https://attack.mitre.org/techniques/${detail.externalId}/" target="_blank" rel="noopener">
+                                    <strong>${escapeHtml(detail.externalId)}</strong> ${escapeHtml(detail.name)}
+                                </a>
+                                <span class="tech-chip">${escapeHtml(tacticLabel)}</span>
+                            </div>
+                            ${getPinButtonMarkup({
+                                id: `technique:${detail.externalId}`,
+                                type: 'technique',
+                                title: `${detail.externalId} ${detail.name}`,
+                                subtitle: `Tactic: ${tacticLabel}`,
+                                url: `https://attack.mitre.org/techniques/${detail.externalId}/`,
+                                severity: null,
+                                meta: {
+                                    tactic: tacticLabel
+                                }
+                            }, { compact: true })}
                         </div>
                     `;
                 }).join('')
@@ -3639,6 +4025,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const markup = buildActorDetailMarkup(actor);
             container.innerHTML = markup;
             bindActorDetailInteractions(container, actor.description || '');
+            updatePinButtons();
         }
 
         function openActorModal(actor) {
@@ -3736,7 +4123,21 @@ window.addEventListener('DOMContentLoaded', () => {
                                 <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px; color: #ff0040;">${actor.name}</div>
                                 <div style="font-size: 14px; color: rgba(255,255,255,0.7);">${actor.type}</div>
                             </div>
-                            <span class="status-badge" style="background: rgba(255,0,64,0.2); border-color: #ff0040; color: #ff0040;">${actor.status}</span>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                                <span class="status-badge" style="background: rgba(255,0,64,0.2); border-color: #ff0040; color: #ff0040;">${actor.status}</span>
+                                ${getPinButtonMarkup({
+                                    id: `actor:${actor.id}`,
+                                    type: 'actor',
+                                    title: actor.name,
+                                    subtitle: actor.type,
+                                    url: '',
+                                    severity: null,
+                                    meta: {
+                                        targets: actor.targets,
+                                        regions: actor.regions
+                                    }
+                                }, { compact: true })}
+                            </div>
                         </div>
                         <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-bottom: 8px; line-height: 1.5;">${actor.description}</div>
                         <div style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6;">
@@ -3746,9 +4147,11 @@ window.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 `).join('');
+                updatePinButtons();
 
                 if (!actorCardListenerBound) {
                     grid.addEventListener('click', event => {
+                        if (event.target.closest('.pin-btn')) return;
                         const card = event.target.closest('.actor-card');
                         if (!card) return;
                         openActorDetails(card.dataset.actorId);
@@ -3821,7 +4224,21 @@ window.addEventListener('DOMContentLoaded', () => {
         const color = cve.cvss >= 9 ? '#ff0040' : cve.cvss >= 7 ? '#ff6b00' : '#ffd700';
         resultDiv.innerHTML = `
             <div class="tool-result" style="border-left-color: ${color};">
-                <h4 style="color: ${color}; margin-bottom: 12px;">${cve.cve_id}</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="color: ${color};">${cve.cve_id}</h4>
+                    ${getPinButtonMarkup({
+                        id: `cve:${cve.cve_id}`,
+                        type: 'cve',
+                        title: cve.cve_id,
+                        subtitle: cve.products,
+                        url: `https://nvd.nist.gov/vuln/detail/${cve.cve_id}`,
+                        severity: cve.severity ? cve.severity.toUpperCase() : null,
+                        meta: {
+                            cvss: cve.cvss,
+                            published: cve.date_published
+                        }
+                    }, { compact: true })}
+                </div>
                 <div style="font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.8);">
                     <strong>${cve.title}</strong><br><br>
                     <strong>CVSS Score:</strong> ${cve.cvss} (${cve.severity})<br>
@@ -3836,6 +4253,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+        updatePinButtons();
     } catch (err) {
         resultDiv.innerHTML = `<div class="tool-result"><p style="color:#ff0040;">${err.message}</p></div>`;
     } finally {
@@ -3908,12 +4326,26 @@ async function checkIPReputation(ip) {
         const abuseScore = data.abuseScore || 0;
         const threatLevel = abuseScore >= 90 ? 'Critical' : abuseScore >= 70 ? 'High' : abuseScore >= 40 ? 'Medium' : 'Low';
         const color = abuseScore >= 90 ? '#ff0040' : abuseScore >= 70 ? '#ff6b00' : '#ffd700';
+        const severity = abuseScore >= 90 ? 'CRITICAL' : abuseScore >= 70 ? 'HIGH' : abuseScore >= 40 ? 'MEDIUM' : 'LOW';
         
         resultDiv.innerHTML = `
             <div class="tool-result" style="border-left-color: ${color};">
-                <h4 style="color: ${color}; margin-bottom: 12px;">
-                    Threat Level: ${threatLevel}
-                </h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="color: ${color};">Threat Level: ${threatLevel}</h4>
+                    ${getPinButtonMarkup({
+                        id: `tool:ip:${ip.trim()}`,
+                        type: 'tool',
+                        title: `IP Reputation: ${ip.trim()}`,
+                        subtitle: 'AbuseIPDB Lookup',
+                        url: '',
+                        severity: severity,
+                        meta: {
+                            abuseScore: abuseScore,
+                            totalReports: data.totalReports || 0,
+                            isp: data.isp || 'Unknown'
+                        }
+                    }, { compact: true })}
+                </div>
                 <div style="font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.8);">
                     <strong>IP:</strong> ${ip.trim()}<br>
                     <strong>Abuse Score:</strong> ${abuseScore}/100<br>
@@ -3925,6 +4357,7 @@ async function checkIPReputation(ip) {
                 </div>
             </div>
         `;
+        updatePinButtons();
     } catch (err) {
         resultDiv.innerHTML = `<div class="tool-result"><p style="color:#ff0040;">⚠️ ${err.message}</p><p style="font-size:12px; margin-top:8px;">Note: Backend API keys must be configured in Vercel environment variables.</p></div>`;
     } finally {
@@ -3955,7 +4388,21 @@ async function threatMinerSearch(input) {
         };
         resultDiv.innerHTML = `
             <div class="tool-result" style="border-left-color:#22d3ee;">
-                <h4 style="color:#22d3ee; margin-bottom: 12px;">Threat Intelligence Results</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="color:#22d3ee;">Threat Intelligence Results</h4>
+                    ${getPinButtonMarkup({
+                        id: `tool:threatminer:${input}`,
+                        type: 'tool',
+                        title: `ThreatMiner: ${input}`,
+                        subtitle: 'Threat Intelligence Search',
+                        url: '',
+                        severity: null,
+                        meta: {
+                            connections: data.connections,
+                            status: data.status
+                        }
+                    }, { compact: true })}
+                </div>
                 <div style="font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.8);">
                     <strong>Input:</strong> ${input}<br>
                     <strong>Connections:</strong> ${data.connections}<br>
@@ -3964,6 +4411,7 @@ async function threatMinerSearch(input) {
                 </div>
             </div>
         `;
+        updatePinButtons();
     } catch (err) {
         resultDiv.innerHTML = `<div class="tool-result"><p style="color:#ff0040;">${err.message}</p></div>`;
     } finally {
@@ -4011,10 +4459,26 @@ async function checkMaliciousURL() {
         const total = malicious + suspicious + (stats.harmless || 0) + (stats.undetected || 0);
         const isMalicious = malicious > 0 || suspicious > 0;
         const color = malicious > 0 ? '#ff0040' : suspicious > 0 ? '#ff6b00' : '#00ff88';
+        const severity = malicious > 0 ? 'HIGH' : suspicious > 0 ? 'MEDIUM' : 'LOW';
         
         resultDiv.innerHTML = `
             <div class="tool-result" style="border-left-color:${color};">
-                <h4 style="color:${color}; margin-bottom: 12px;">${isMalicious ? '⚠️ THREAT DETECTED' : '✓ URL APPEARS SAFE'}</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="color:${color};">${isMalicious ? '⚠️ THREAT DETECTED' : '✓ URL APPEARS SAFE'}</h4>
+                    ${getPinButtonMarkup({
+                        id: `tool:urlscan:${url.trim()}`,
+                        type: 'tool',
+                        title: `URL Scan: ${url.trim()}`,
+                        subtitle: 'Malicious URL Detector',
+                        url: url.trim(),
+                        severity: severity,
+                        meta: {
+                            detectionRate: `${malicious + suspicious}/${total}`,
+                            malicious: malicious,
+                            suspicious: suspicious
+                        }
+                    }, { compact: true })}
+                </div>
                 <div style="font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8);">
                     <strong>URL:</strong> ${url.trim()}<br>
                     <strong>Detection Rate:</strong> ${malicious + suspicious}/${total} vendors flagged this URL<br>
@@ -4025,6 +4489,7 @@ async function checkMaliciousURL() {
                 </div>
             </div>
         `;
+        updatePinButtons();
     } catch (err) {
         resultDiv.innerHTML = `<div class="tool-result"><p style="color:#ff0040;">⚠️ ${err.message}</p><p style="font-size:12px; margin-top:8px;">Note: Backend API keys must be configured in Vercel environment variables.</p></div>`;
     } finally {
@@ -4212,7 +4677,21 @@ function analyzePassword() {
                     const color = matchedCVE.cvss >= 9 ? '#ff0040' : matchedCVE.cvss >= 7 ? '#ff6b00' : '#ffd700';
                     resultDiv.innerHTML = `
                         <div class="tool-result" style="border-left-color: ${color};">
-                            <h4 style="color: ${color}; margin-bottom: 12px;">${matchedCVE.id}</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h4 style="color: ${color};">${matchedCVE.id}</h4>
+                                ${getPinButtonMarkup({
+                                    id: `cve:${matchedCVE.id}`,
+                                    type: 'cve',
+                                    title: matchedCVE.id,
+                                    subtitle: matchedCVE.affected,
+                                    url: `https://nvd.nist.gov/vuln/detail/${matchedCVE.id}`,
+                                    severity: matchedCVE.severity ? matchedCVE.severity.toUpperCase() : null,
+                                    meta: {
+                                        cvss: matchedCVE.cvss,
+                                        published: matchedCVE.date
+                                    }
+                                }, { compact: true })}
+                            </div>
                             <div style="font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.8);">
                                 <strong>${matchedCVE.title}</strong><br><br>
                                 <strong>CVSS Score:</strong> ${matchedCVE.cvss} (${matchedCVE.severity})<br>
@@ -4225,6 +4704,7 @@ function analyzePassword() {
                             </div>
                         </div>
                     `;
+                    updatePinButtons();
                 } else {
                     resultDiv.innerHTML = `
                         <div class="tool-result">
@@ -5353,10 +5833,404 @@ function analyzePassword() {
             });
         }
 
+        // === Investigation Clipboard ===
+        const clipboardStorageKey = 'clipboard_v1';
+        const clipboardVersion = 1;
+        const clipboardTypeLabels = {
+            cve: 'CVE',
+            kev: 'KEV',
+            breach: 'Breach',
+            incident: 'Incident',
+            actor: 'Threat Actor',
+            technique: 'Technique',
+            tool: 'Tool Result'
+        };
+        const clipboardTypeOrder = ['cve', 'kev', 'breach', 'incident', 'actor', 'technique', 'tool'];
+        let clipboardState = loadClipboardState();
+        let clipboardInitialized = false;
+
+        function getPinButtonMarkup(item, options = {}) {
+            if (!item || !item.id) return '';
+            const encoded = encodeURIComponent(JSON.stringify(item));
+            const compactClass = options.compact ? 'pin-btn--compact' : '';
+            const label = options.label || 'Pin';
+            return `
+                <button class="pin-btn ${compactClass}" type="button" data-clipboard-id="${escapeHtml(item.id)}" data-clipboard="${encoded}" aria-label="Pin to investigation clipboard">
+                    <span class="pin-icon">📌</span>
+                    <span class="pin-label">${label}</span>
+                </button>
+            `;
+        }
+
+        function loadClipboardState() {
+            try {
+                const raw = localStorage.getItem(clipboardStorageKey);
+                if (!raw) return { version: clipboardVersion, items: [] };
+                const parsed = JSON.parse(raw);
+                if (!parsed || parsed.version !== clipboardVersion || !Array.isArray(parsed.items)) {
+                    return { version: clipboardVersion, items: [] };
+                }
+                const sanitized = parsed.items.map(normalizeClipboardItem).filter(Boolean);
+                return { version: clipboardVersion, items: sanitized };
+            } catch (error) {
+                return { version: clipboardVersion, items: [] };
+            }
+        }
+
+        function normalizeClipboardItem(item) {
+            if (!item || typeof item.id !== 'string') return null;
+            const type = clipboardTypeLabels[item.type] ? item.type : 'tool';
+            return {
+                id: item.id,
+                type: type,
+                title: String(item.title || 'Untitled'),
+                subtitle: String(item.subtitle || ''),
+                url: String(item.url || ''),
+                severity: item.severity || null,
+                meta: typeof item.meta === 'object' && item.meta ? item.meta : {},
+                status: ['Open', 'Investigating', 'Closed'].includes(item.status) ? item.status : 'Open',
+                notes: String(item.notes || ''),
+                tags: Array.isArray(item.tags) ? item.tags : [],
+                pinnedAt: item.pinnedAt || new Date().toISOString()
+            };
+        }
+
+        function saveClipboardState() {
+            try {
+                localStorage.setItem(clipboardStorageKey, JSON.stringify(clipboardState));
+            } catch (error) {
+                showToast('Clipboard storage unavailable', 'warning');
+            }
+        }
+
+        function addClipboardItem(payload) {
+            const normalized = normalizeClipboardItem(payload);
+            if (!normalized) return false;
+            const existing = clipboardState.items.find(item => item.id === normalized.id);
+            if (existing) {
+                existing.title = normalized.title;
+                existing.subtitle = normalized.subtitle;
+                existing.url = normalized.url;
+                existing.severity = normalized.severity;
+                existing.meta = normalized.meta;
+                existing.type = normalized.type;
+                saveClipboardState();
+                return false;
+            }
+            normalized.status = 'Open';
+            normalized.notes = '';
+            normalized.tags = [];
+            normalized.pinnedAt = new Date().toISOString();
+            clipboardState.items.unshift(normalized);
+            saveClipboardState();
+            return true;
+        }
+
+        function removeClipboardItem(id) {
+            clipboardState.items = clipboardState.items.filter(item => item.id !== id);
+            saveClipboardState();
+        }
+
+        function updateClipboardStatus(id, status) {
+            const item = clipboardState.items.find(entry => entry.id === id);
+            if (item && ['Open', 'Investigating', 'Closed'].includes(status)) {
+                item.status = status;
+                saveClipboardState();
+            }
+        }
+
+        function updateClipboardNotes(id, notes) {
+            const item = clipboardState.items.find(entry => entry.id === id);
+            if (item) {
+                item.notes = notes;
+                saveClipboardState();
+            }
+        }
+
+        function clearClosedItems() {
+            const before = clipboardState.items.length;
+            clipboardState.items = clipboardState.items.filter(item => item.status !== 'Closed');
+            if (clipboardState.items.length !== before) {
+                saveClipboardState();
+                renderClipboard();
+                showToast('Closed items cleared');
+            } else {
+                showToast('No closed items to clear');
+            }
+        }
+
+        function formatMetaChips(item) {
+            const chips = [];
+            if (item.severity) {
+                chips.push(`<span class="clipboard-chip severity">${escapeHtml(item.severity)}</span>`);
+            }
+            const entries = Object.entries(item.meta || {}).filter(([, value]) => value != null && value !== '');
+            entries.slice(0, 4).forEach(([key, value]) => {
+                const label = `${key}: ${value}`;
+                chips.push(`<span class="clipboard-chip">${escapeHtml(label)}</span>`);
+            });
+            return chips.join('');
+        }
+
+        function renderClipboardItems(items) {
+            if (!items.length) {
+                return `<div class="clipboard-empty">No pinned items yet. Pin CVEs, breaches, actors, or tool results to build your investigation.</div>`;
+            }
+            const grouped = clipboardTypeOrder.map(type => ({
+                type,
+                items: items.filter(item => item.type === type)
+            })).filter(group => group.items.length);
+
+            return grouped.map(group => `
+                <div>
+                    <div class="clipboard-group-title">${clipboardTypeLabels[group.type] || group.type}</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        ${group.items.map(item => `
+                            <div class="clipboard-item" data-clipboard-id="${item.id}">
+                                <div class="clipboard-item-header">
+                                    <div class="clipboard-item-title">
+                                        <div style="font-weight: 600;">
+                                            ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.title)}</a>` : escapeHtml(item.title)}
+                                        </div>
+                                        ${item.subtitle ? `<div class="clipboard-item-subtitle">${escapeHtml(item.subtitle)}</div>` : ''}
+                                    </div>
+                                    <button class="clipboard-remove" type="button" aria-label="Remove pinned item">×</button>
+                                </div>
+                                <div class="clipboard-meta">
+                                    ${formatMetaChips(item)}
+                                </div>
+                                <div class="clipboard-controls">
+                                    <label style="font-size: 11px; color: rgba(255,255,255,0.6);">Status</label>
+                                    <select class="clipboard-status" data-clipboard-status>
+                                        ${['Open', 'Investigating', 'Closed'].map(status => `
+                                            <option value="${status}" ${item.status === status ? 'selected' : ''}>${status}</option>
+                                        `).join('')}
+                                    </select>
+                                    <button class="clipboard-action-btn" type="button" data-clipboard-notes-toggle>
+                                        ${item.notes ? 'Edit Notes' : 'Add Notes'}
+                                    </button>
+                                </div>
+                                <div class="clipboard-notes ${item.notes ? 'active' : ''}">
+                                    <textarea class="clipboard-notes-input" placeholder="Add investigation notes..." data-clipboard-notes>${escapeHtml(item.notes)}</textarea>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderClipboard() {
+            const panelBody = document.getElementById('clipboard-panel-body');
+            const modalBody = document.getElementById('clipboard-modal-body');
+            const count = clipboardState.items.length;
+            const countLabel = `${count} pinned`;
+            const countEl = document.getElementById('clipboard-count');
+            const fabCount = document.getElementById('clipboard-fab-count');
+            if (countEl) countEl.textContent = countLabel;
+            if (fabCount) fabCount.textContent = String(count);
+
+            const html = renderClipboardItems(clipboardState.items);
+            if (panelBody) panelBody.innerHTML = html;
+            if (modalBody) modalBody.innerHTML = html;
+        }
+
+        function updatePinButtons() {
+            const pinnedIds = new Set(clipboardState.items.map(item => item.id));
+            document.querySelectorAll('.pin-btn').forEach(btn => {
+                const id = btn.dataset.clipboardId;
+                const label = btn.querySelector('.pin-label');
+                if (!id) return;
+                const isPinned = pinnedIds.has(id);
+                btn.classList.toggle('is-pinned', isPinned);
+                if (label) {
+                    label.textContent = isPinned ? 'Pinned' : 'Pin';
+                }
+            });
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 2400);
+        }
+
+        function handlePinClick(event) {
+            const button = event.target.closest('.pin-btn');
+            if (!button) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const payloadRaw = button.dataset.clipboard;
+            let payload;
+            try {
+                payload = JSON.parse(decodeURIComponent(payloadRaw));
+            } catch (error) {
+                showToast('Unable to pin item');
+                return;
+            }
+
+            const existing = clipboardState.items.find(item => item.id === payload.id);
+            if (existing) {
+                removeClipboardItem(payload.id);
+                renderClipboard();
+                updatePinButtons();
+                showToast('Removed from clipboard');
+                return;
+            }
+
+            addClipboardItem(payload);
+            renderClipboard();
+            updatePinButtons();
+            showToast('Pinned to clipboard');
+        }
+
+        function exportClipboardPdf() {
+            if (!clipboardState.items.length) {
+                showToast('No pinned items to export');
+                return;
+            }
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                showToast('PDF export unavailable');
+                return;
+            }
+            const doc = new window.jspdf.jsPDF();
+            let y = 16;
+            doc.setFontSize(16);
+            doc.text('Investigation Clipboard', 14, y);
+            y += 8;
+            doc.setFontSize(10);
+            doc.text(`Exported: ${new Date().toLocaleString()}`, 14, y);
+            y += 8;
+            clipboardState.items.forEach((item, index) => {
+                const metaText = Object.entries(item.meta || {})
+                    .filter(([, value]) => value != null && value !== '')
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(' • ');
+                const lines = [
+                    `${index + 1}. [${clipboardTypeLabels[item.type] || item.type}] ${item.title}`,
+                    `Status: ${item.status}${item.severity ? ` • Severity: ${item.severity}` : ''}`,
+                    item.subtitle ? `Subtitle: ${item.subtitle}` : '',
+                    metaText ? `Meta: ${metaText}` : '',
+                    item.notes ? `Notes: ${item.notes}` : ''
+                ].filter(Boolean);
+
+                lines.forEach(line => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 16;
+                    }
+                    doc.text(line, 14, y);
+                    y += 6;
+                });
+                y += 4;
+            });
+            doc.save(`investigation-clipboard-${Date.now()}.pdf`);
+            showToast('Clipboard PDF exported');
+        }
+
+        function setupClipboardInteractions() {
+            if (clipboardInitialized) return;
+            clipboardInitialized = true;
+
+            document.addEventListener('click', event => {
+                if (event.target.closest('.pin-btn')) {
+                    handlePinClick(event);
+                    return;
+                }
+                const actionBtn = event.target.closest('[data-clipboard-action]');
+                if (actionBtn) {
+                    const action = actionBtn.getAttribute('data-clipboard-action');
+                    if (action === 'export') exportClipboardPdf();
+                    if (action === 'clear-closed') clearClosedItems();
+                    return;
+                }
+                const removeBtn = event.target.closest('.clipboard-remove');
+                if (removeBtn) {
+                    const item = removeBtn.closest('.clipboard-item');
+                    if (item?.dataset.clipboardId) {
+                        removeClipboardItem(item.dataset.clipboardId);
+                        renderClipboard();
+                        updatePinButtons();
+                        showToast('Removed from clipboard');
+                    }
+                    return;
+                }
+                const notesToggle = event.target.closest('[data-clipboard-notes-toggle]');
+                if (notesToggle) {
+                    const item = notesToggle.closest('.clipboard-item');
+                    const notes = item?.querySelector('.clipboard-notes');
+                    if (notes) {
+                        notes.classList.toggle('active');
+                    }
+                }
+            });
+
+            document.addEventListener('change', event => {
+                if (event.target.matches('[data-clipboard-status]')) {
+                    const item = event.target.closest('.clipboard-item');
+                    if (item?.dataset.clipboardId) {
+                        updateClipboardStatus(item.dataset.clipboardId, event.target.value);
+                        renderClipboard();
+                        updatePinButtons();
+                    }
+                }
+            });
+
+            document.addEventListener('input', event => {
+                if (event.target.matches('[data-clipboard-notes]')) {
+                    const item = event.target.closest('.clipboard-item');
+                    if (item?.dataset.clipboardId) {
+                        updateClipboardNotes(item.dataset.clipboardId, event.target.value);
+                    }
+                }
+            });
+
+            const fab = document.getElementById('clipboard-fab');
+            const modal = document.getElementById('clipboard-modal');
+            if (fab && modal) {
+                fab.addEventListener('click', () => {
+                    modal.classList.add('active');
+                    modal.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
+                });
+                const closeBtn = modal.querySelector('.modal-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        modal.classList.remove('active');
+                        modal.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                    });
+                }
+                modal.addEventListener('click', event => {
+                    if (event.target === modal) {
+                        modal.classList.remove('active');
+                        modal.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                    }
+                });
+                document.addEventListener('keydown', event => {
+                    if (event.key === 'Escape' && modal.classList.contains('active')) {
+                        modal.classList.remove('active');
+                        modal.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+        }
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             initApp();
             loadSavedAPIKey();
+            renderClipboard();
+            updatePinButtons();
+            setupClipboardInteractions();
         });
     </script>
 
