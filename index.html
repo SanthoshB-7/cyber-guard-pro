@@ -2434,6 +2434,18 @@ body{
     margin-bottom: 14px;
 }
 
+.risk-interactive-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0f1419;
+    background: rgba(34, 211, 238, 0.9);
+}
+
 .risk-builder-toggle {
     display: flex;
     gap: 8px;
@@ -8796,11 +8808,19 @@ function analyzePassword() {
         function loadRiskMatrixConfig() {
             try {
                 const raw = localStorage.getItem(riskMatrixStorageKey);
-                if (!raw) return getDefaultRiskMatrixConfig(3);
+                if (!raw) {
+                    const defaults = getDefaultRiskMatrixConfig(3);
+                    localStorage.setItem(riskMatrixStorageKey, JSON.stringify(defaults));
+                    return defaults;
+                }
                 const parsed = JSON.parse(raw);
-                return normalizeRiskMatrixConfig(parsed);
+                const normalized = normalizeRiskMatrixConfig(parsed);
+                localStorage.setItem(riskMatrixStorageKey, JSON.stringify(normalized));
+                return normalized;
             } catch (error) {
-                return getDefaultRiskMatrixConfig(3);
+                const defaults = getDefaultRiskMatrixConfig(3);
+                localStorage.setItem(riskMatrixStorageKey, JSON.stringify(defaults));
+                return defaults;
             }
         }
 
@@ -8811,19 +8831,34 @@ function analyzePassword() {
         function loadRiskRegister() {
             try {
                 const raw = localStorage.getItem(riskRegisterStorageKey);
-                if (!raw) return { version: 1, items: [], updatedAt: null };
+                if (!raw) {
+                    const defaults = { version: 1, items: [], updatedAt: null };
+                    localStorage.setItem(riskRegisterStorageKey, JSON.stringify(defaults));
+                    return defaults;
+                }
                 const parsed = JSON.parse(raw);
                 if (!parsed || typeof parsed !== 'object') {
-                    return { version: 1, items: [], updatedAt: null };
+                    const defaults = { version: 1, items: [], updatedAt: null };
+                    localStorage.setItem(riskRegisterStorageKey, JSON.stringify(defaults));
+                    return defaults;
                 }
-                return {
+                const normalized = {
                     version: 1,
                     items: Array.isArray(parsed.items) ? parsed.items : [],
                     updatedAt: parsed.updatedAt || null
                 };
+                localStorage.setItem(riskRegisterStorageKey, JSON.stringify(normalized));
+                return normalized;
             } catch (error) {
-                return { version: 1, items: [], updatedAt: null };
+                const defaults = { version: 1, items: [], updatedAt: null };
+                localStorage.setItem(riskRegisterStorageKey, JSON.stringify(defaults));
+                return defaults;
             }
+        }
+
+        function initializeRiskMatrixAndRegister() {
+            riskMatrixState = loadRiskMatrixConfig();
+            riskRegisterState = loadRiskRegister();
         }
 
         function saveRiskRegister() {
@@ -8918,6 +8953,7 @@ function analyzePassword() {
                             <h3 style="color:#ffb020; margin-bottom:4px;">Risk Matrix Builder</h3>
                             <div style="font-size:13px; color: rgba(255,255,255,0.7);">Customize likelihood, impact, and rating tiers for offline scoring.</div>
                         </div>
+                        <span class="risk-interactive-badge">Interactive (Saved locally)</span>
                         <div class="risk-builder-toggle">${sizeOptions}</div>
                     </div>
                     <div class="risk-builder-labels">
@@ -9707,6 +9743,9 @@ function analyzePassword() {
             const activeBtn = document.querySelector(`[data-databank="${section}"]`);
             if (activeBtn) {
                 activeBtn.classList.add('active');
+            }
+            if (section === 'risk') {
+                initializeRiskMatrixAndRegister();
             }
             renderDataBankSection(section, dataBankState.search);
         }
