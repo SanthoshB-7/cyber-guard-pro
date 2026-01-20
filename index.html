@@ -2178,6 +2178,247 @@ body{
     width: 18px;
     height: 18px;
 }
+
+.databank-search-wrapper {
+    position: relative;
+}
+
+.databank-search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(12, 16, 24, 0.98);
+    border: 1px solid rgba(34, 211, 238, 0.2);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-glow);
+    max-height: 320px;
+    overflow-y: auto;
+    display: none;
+    z-index: 50;
+}
+
+.databank-search-results.active {
+    display: block;
+}
+
+.databank-search-result {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.2s var(--ease-standard);
+}
+
+.databank-search-result:last-child {
+    border-bottom: none;
+}
+
+.databank-search-result:hover {
+    background: rgba(34, 211, 238, 0.08);
+}
+
+.databank-result-icon {
+    min-width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(34, 211, 238, 0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.databank-result-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.databank-result-snippet {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+}
+
+.databank-result-type {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.databank-mini-rows {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.databank-mini-row {
+    background: rgba(12, 16, 24, 0.8);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+}
+
+.databank-mini-header {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 10px;
+}
+
+.databank-mini-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.databank-mini-empty {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+}
+
+.databank-mini-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(34,211,238,0.3);
+    background: rgba(34,211,238,0.12);
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-standard);
+}
+
+.databank-mini-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.databank-chip-type {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+}
+
+.databank-fav-btn {
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.6);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-standard);
+}
+
+.databank-fav-btn.is-active {
+    color: #ffb020;
+    border-color: rgba(255,176,32,0.6);
+    background: rgba(255,176,32,0.15);
+}
+
+.databank-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.databank-detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.databank-detail-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.databank-detail-section {
+    background: rgba(12, 16, 24, 0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+}
+
+.databank-detail-section h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+}
+
+.databank-detail-section ul {
+    padding-left: 16px;
+    margin: 0;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+}
+
+.databank-detail-section li {
+    margin-bottom: 6px;
+}
+
+.databank-guide-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.databank-guide-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.databank-guide-toggle,
+.databank-detail-btn {
+    border: 1px solid rgba(34,211,238,0.3);
+    background: rgba(34,211,238,0.1);
+    color: #22d3ee;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.databank-guide-body {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: none;
+}
+
+.databank-guide-body.active {
+    display: block;
+}
+
+.databank-guide-step {
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+}
+
+.databank-guide-step strong {
+    color: #fff;
+}
+
+.databank-highlight {
+    outline: 2px solid rgba(34,211,238,0.8);
+    box-shadow: 0 0 22px rgba(34,211,238,0.3);
+    transition: outline 0.2s var(--ease-standard);
+}
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
@@ -4099,7 +4340,22 @@ window.addEventListener('DOMContentLoaded', () => {
                             <span>📚</span> Cybersecurity &amp; GRC Data Bank
                         </h2>
                         <div class="form-group" style="margin-bottom: 24px;">
-                            <input type="text" class="form-input" id="databank-search" placeholder="🔎 Quick Search (e.g., NIST, Risk Matrix, Access Control ...)" oninput="filterDataBank()">
+                            <div class="databank-search-wrapper">
+                                <input type="text" class="form-input" id="databank-search" placeholder="🔎 Quick Search (e.g., NIST, Risk Matrix, Access Control ...)">
+                                <div class="databank-search-results" id="databank-search-results" role="listbox" aria-label="Data Bank search results"></div>
+                            </div>
+                        </div>
+                        <div class="databank-mini-rows">
+                            <div class="databank-mini-row">
+                                <div class="databank-mini-header">⭐ Favorites</div>
+                                <div class="databank-mini-list" id="databank-favorites"></div>
+                                <div class="databank-mini-empty" id="databank-favorites-empty">No favorites yet. Star items to pin them here.</div>
+                            </div>
+                            <div class="databank-mini-row">
+                                <div class="databank-mini-header">🕘 Recently viewed</div>
+                                <div class="databank-mini-list" id="databank-recent"></div>
+                                <div class="databank-mini-empty" id="databank-recent-empty">Items you open will appear here.</div>
+                            </div>
                         </div>
                         <div class="nav-tabs" style="position: static; top: auto; background: transparent; backdrop-filter: none; border: none; padding: 0; gap: 8px; margin-bottom: 18px;">
                             <button class="tab-btn active" data-databank="frameworks" onclick="switchDataBankSection(&#39;frameworks&#39;)">🛡️ Frameworks &amp; Standards</button>
@@ -4142,6 +4398,16 @@ window.addEventListener('DOMContentLoaded', () => {
                 <button class="modal-close" type="button" aria-label="Close actor details">Close</button>
             </div>
             <div id="actor-detail-modal-body"></div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="databank-detail-modal" aria-hidden="true">
+        <div class="modal databank-modal" role="dialog" aria-modal="true" aria-labelledby="databank-detail-modal-title">
+            <div class="modal-header">
+                <h3 id="databank-detail-modal-title" style="font-size: 18px; color: #22d3ee;">Data Bank Details</h3>
+                <button class="modal-close" type="button" aria-label="Close databank details">Close</button>
+            </div>
+            <div id="databank-detail-modal-body"></div>
         </div>
     </div>
 
@@ -4430,6 +4696,7 @@ window.addEventListener('DOMContentLoaded', () => {
             setupLearningHubTabs();
             setupLibrary();
             setupActorDetailModal();
+            setupDataBank();
         }
         
         // Load Threat Intel data when user opens Threat Intel tab
@@ -7092,7 +7359,7 @@ function analyzePassword() {
                 
                 // Initialize Data Bank if needed
                 if (tabName === 'databank') {
-                    switchDataBankSection('frameworks');
+                    switchDataBankSection(dataBankState.activeSection || 'frameworks');
                 }
             }
 
@@ -7120,262 +7387,1718 @@ function analyzePassword() {
         }
 
         // Data Bank: Section Switcher & Rendering
-        // Master app data (from JSON)
-        const dataBankFrameworks = [
-            {
-                name: "NIST Cybersecurity Framework 2.0",
-                version: "2.0",
-                functions: 6,
-                categories: 23,
-                subcategories: 108,
-                link: "https://www.nist.gov/cyberframework",
-                description: "Flexible, voluntary framework for managing cybersecurity risks",
-                best_for: "All organizations, especially critical infrastructure",
-                functions_list: ["Govern", "Identify", "Protect", "Detect", "Respond", "Recover"]
-            },
-            {
-                name: "NIST SP 800-53 Revision 5",
-                version: "5",
-                controls: 1077,
-                families: 20,
-                link: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final",
-                description: "Comprehensive security controls for federal agencies",
-                best_for: "Federal agencies and government contractors"
-            },
-            {
-                name: "ISO 27001:2022",
-                version: "2022",
-                controls: 93,
-                domains: 4,
-                link: "https://www.iso.org/standard/27001",
-                description: "International standard for information security management",
-                best_for: "Organizations seeking global certification"
-            },
-            {
-                name: "CIS Controls v8",
-                version: "8",
-                controls: 18,
-                safeguards: 153,
-                description: "Prescriptive, actionable best practices",
-                best_for: "SMBs and organizations with limited resources"
+        const dataBankData = {
+            frameworks: [
+                {
+                    id: "nist-csf-2-0",
+                    type: "framework",
+                    name: "NIST Cybersecurity Framework 2.0",
+                    version: "2.0",
+                    functions: 6,
+                    categories: 23,
+                    subcategories: 108,
+                    link: "https://www.nist.gov/cyberframework",
+                    description: "Flexible, voluntary framework for managing cybersecurity risks",
+                    best_for: "All organizations, especially critical infrastructure",
+                    functions_list: ["Govern", "Identify", "Protect", "Detect", "Respond", "Recover"],
+                    what_it_is: "A risk-based framework that helps organizations manage, reduce, and communicate cybersecurity risk.",
+                    who_its_for: "Executives, CISOs, risk owners, and teams building an enterprise-wide security program.",
+                    structure_summary: "Organized into 6 Functions, 23 Categories, and 108 Subcategories with Profiles and Tiers.",
+                    checklist: [
+                        "Define the organizational scope and critical services",
+                        "Complete a baseline risk assessment",
+                        "Map current controls to CSF Categories",
+                        "Establish a target profile aligned to business goals",
+                        "Prioritize gaps based on risk tolerance",
+                        "Assign owners and timelines for remediation",
+                        "Document metrics and desired outcomes",
+                        "Align policies to CSF governance expectations",
+                        "Validate third-party dependencies",
+                        "Schedule quarterly program reviews"
+                    ],
+                    evidence_examples: [
+                        "CSF profile mapping worksheet",
+                        "Risk register with prioritized actions",
+                        "Program roadmap and ownership matrix",
+                        "Executive steering committee minutes"
+                    ],
+                    official_links: [
+                        { label: "NIST CSF Portal", url: "https://www.nist.gov/cyberframework" },
+                        { label: "CSF 2.0 Implementation Resources", url: "https://www.nist.gov/cyberframework/framework-implementation" }
+                    ]
+                },
+                {
+                    id: "nist-800-53-r5",
+                    type: "framework",
+                    name: "NIST SP 800-53 Revision 5",
+                    version: "5",
+                    controls: 1077,
+                    families: 20,
+                    link: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final",
+                    description: "Comprehensive security controls for federal agencies",
+                    best_for: "Federal agencies and government contractors",
+                    what_it_is: "A catalog of security and privacy controls to protect federal information systems.",
+                    who_its_for: "Federal programs, regulated industries, and organizations aligning to FedRAMP or CMMC.",
+                    structure_summary: "20 control families and 1000+ controls with baselines for low, moderate, and high systems.",
+                    checklist: [
+                        "Select applicable baselines (Low/Moderate/High)",
+                        "Tailor controls based on system risk",
+                        "Define control implementation statements",
+                        "Identify inherited vs. system-specific controls",
+                        "Validate control ownership and evidence sources",
+                        "Create SSP with implementation details",
+                        "Execute assessment procedures",
+                        "Track POA&M items with due dates",
+                        "Review continuous monitoring cadence"
+                    ],
+                    evidence_examples: [
+                        "System Security Plan (SSP)",
+                        "POA&M tracker",
+                        "Assessment report and control test results",
+                        "Continuous monitoring dashboard"
+                    ],
+                    official_links: [
+                        { label: "NIST SP 800-53 Rev 5", url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final" }
+                    ]
+                },
+                {
+                    id: "iso-27001-2022",
+                    type: "framework",
+                    name: "ISO 27001:2022",
+                    version: "2022",
+                    controls: 93,
+                    domains: 4,
+                    link: "https://www.iso.org/standard/27001",
+                    description: "International standard for information security management",
+                    best_for: "Organizations seeking global certification",
+                    what_it_is: "A certifiable ISMS standard focused on governance, risk management, and continual improvement.",
+                    who_its_for: "Organizations pursuing ISO certification or aligning to international compliance requirements.",
+                    structure_summary: "Annex A includes 93 controls across 4 themes: Organizational, People, Physical, and Technological.",
+                    checklist: [
+                        "Define ISMS scope and boundaries",
+                        "Perform ISMS risk assessment",
+                        "Draft Statement of Applicability",
+                        "Implement Annex A controls",
+                        "Train stakeholders and assign roles",
+                        "Document ISMS policies and procedures",
+                        "Run internal audit cycle",
+                        "Complete management review",
+                        "Prepare for external certification audit"
+                    ],
+                    evidence_examples: [
+                        "Statement of Applicability (SoA)",
+                        "ISMS risk assessment reports",
+                        "Internal audit results",
+                        "Management review minutes"
+                    ],
+                    official_links: [
+                        { label: "ISO 27001 Standard", url: "https://www.iso.org/standard/27001" }
+                    ]
+                },
+                {
+                    id: "cis-controls-v8",
+                    type: "framework",
+                    name: "CIS Controls v8",
+                    version: "8",
+                    controls: 18,
+                    safeguards: 153,
+                    link: "https://www.cisecurity.org/controls",
+                    description: "Prescriptive, actionable best practices",
+                    best_for: "SMBs and organizations with limited resources",
+                    what_it_is: "A prioritized set of defensive actions organized into 18 controls and 153 safeguards.",
+                    who_its_for: "Security teams that need a practical, stepwise implementation roadmap.",
+                    structure_summary: "18 Controls grouped into Implementation Groups (IG1–IG3) with 153 safeguards.",
+                    checklist: [
+                        "Inventory hardware and software assets",
+                        "Secure configuration baselines",
+                        "Establish identity and access management",
+                        "Prioritize IG1 safeguards",
+                        "Harden endpoints and servers",
+                        "Implement centralized logging",
+                        "Secure backups and recovery plans",
+                        "Test incident response playbooks"
+                    ],
+                    evidence_examples: [
+                        "Asset inventory records",
+                        "Configuration baseline documentation",
+                        "Endpoint protection dashboards",
+                        "Backup verification logs"
+                    ],
+                    official_links: [
+                        { label: "CIS Controls Overview", url: "https://www.cisecurity.org/controls" }
+                    ]
+                }
+            ],
+            controlFamilies: [
+                {
+                    id: "ac-access-control",
+                    type: "control",
+                    code: "AC",
+                    name: "Access Control",
+                    description: "Controls for limiting access to systems and data",
+                    key_controls: ["Least Privilege", "Multi-Factor Authentication", "Access Reviews"],
+                    purpose: "Ensure only authorized users and systems can access sensitive resources.",
+                    key_controls_detail: [
+                        { name: "Least Privilege", description: "Grant only the minimum access needed for job functions." },
+                        { name: "Multi-Factor Authentication", description: "Require multiple verification factors for privileged access." },
+                        { name: "Access Reviews", description: "Periodically validate that access remains appropriate." }
+                    ],
+                    implementation_examples: [
+                        "Role-based access control with approval workflows",
+                        "Just-in-time admin access for sensitive systems",
+                        "Quarterly access certification campaigns"
+                    ],
+                    evidence: [
+                        "Access review logs and attestation reports",
+                        "MFA enforcement configuration screenshots",
+                        "Role matrix and provisioning tickets"
+                    ],
+                    audit_questions: [
+                        "How are privileged accounts approved and reviewed?",
+                        "What evidence shows MFA is enforced for sensitive systems?",
+                        "How often are access rights revalidated?"
+                    ]
+                },
+                {
+                    id: "at-awareness-training",
+                    type: "control",
+                    code: "AT",
+                    name: "Awareness and Training",
+                    description: "Security awareness and training programs",
+                    key_controls: ["Security Training", "Phishing Awareness", "Role-Based Training"],
+                    purpose: "Build organizational security literacy and reduce user-driven risk.",
+                    key_controls_detail: [
+                        { name: "Security Training", description: "Baseline training for all employees and contractors." },
+                        { name: "Phishing Awareness", description: "Ongoing phishing simulations and response coaching." },
+                        { name: "Role-Based Training", description: "Targeted content for privileged or high-risk roles." }
+                    ],
+                    implementation_examples: [
+                        "Quarterly phishing simulations with coaching",
+                        "Annual security training for all staff",
+                        "Secure coding sessions for engineering teams"
+                    ],
+                    evidence: [
+                        "Training completion reports",
+                        "Phishing simulation metrics",
+                        "Role-based curriculum documents"
+                    ],
+                    audit_questions: [
+                        "How do you measure training effectiveness?",
+                        "Which roles receive additional training?",
+                        "What happens when a user fails a phishing test?"
+                    ]
+                },
+                {
+                    id: "au-audit-accountability",
+                    type: "control",
+                    code: "AU",
+                    name: "Audit and Accountability",
+                    description: "Audit logging and monitoring capabilities",
+                    key_controls: ["Audit Logging", "Log Retention", "Log Analysis"],
+                    purpose: "Provide traceability of events and detect suspicious behavior.",
+                    key_controls_detail: [
+                        { name: "Audit Logging", description: "Enable logging for authentication, admin actions, and critical events." },
+                        { name: "Log Retention", description: "Retain logs in accordance with legal and policy requirements." },
+                        { name: "Log Analysis", description: "Review logs regularly or via automated detection." }
+                    ],
+                    implementation_examples: [
+                        "Central SIEM with log normalization",
+                        "Alerting for anomalous logins",
+                        "Immutable storage for sensitive logs"
+                    ],
+                    evidence: [
+                        "Log retention policy",
+                        "SIEM alert reports",
+                        "Sample audit logs with timestamps"
+                    ],
+                    audit_questions: [
+                        "What events are logged for privileged activity?",
+                        "How long are logs retained?",
+                        "How are alerts reviewed and closed?"
+                    ]
+                },
+                {
+                    id: "ca-security-assessment",
+                    type: "control",
+                    code: "CA",
+                    name: "Security Assessment and Authorization",
+                    description: "Security assessments and system authorization",
+                    key_controls: ["Security Assessment", "Continuous Monitoring", "Plan of Action"],
+                    purpose: "Validate system security posture and authorize operation.",
+                    key_controls_detail: [
+                        { name: "Security Assessment", description: "Independent assessments of control effectiveness." },
+                        { name: "Continuous Monitoring", description: "Ongoing evaluation of security posture." },
+                        { name: "Plan of Action", description: "Track remediation activities and risk acceptance." }
+                    ],
+                    implementation_examples: [
+                        "Annual control assessments",
+                        "Continuous monitoring dashboards",
+                        "POA&M management workflows"
+                    ],
+                    evidence: [
+                        "Assessment reports",
+                        "POA&M logs",
+                        "Monitoring metrics"
+                    ],
+                    audit_questions: [
+                        "How are assessments scheduled and tracked?",
+                        "What remediation evidence is maintained?",
+                        "How is authorization to operate documented?"
+                    ]
+                },
+                {
+                    id: "cm-configuration-management",
+                    type: "control",
+                    code: "CM",
+                    name: "Configuration Management",
+                    description: "Management of system configurations",
+                    key_controls: ["Baseline Configuration", "Change Management", "Inventory"],
+                    purpose: "Maintain secure baselines and control system changes.",
+                    key_controls_detail: [
+                        { name: "Baseline Configuration", description: "Define secure configurations for systems and services." },
+                        { name: "Change Management", description: "Control and document configuration changes." },
+                        { name: "Inventory", description: "Maintain accurate configuration inventories." }
+                    ],
+                    implementation_examples: [
+                        "CIS benchmark baselines",
+                        "Change approval boards",
+                        "Automated configuration drift alerts"
+                    ],
+                    evidence: [
+                        "Baseline configuration documents",
+                        "Change tickets and approvals",
+                        "Configuration inventory exports"
+                    ],
+                    audit_questions: [
+                        "How are configuration changes approved?",
+                        "What evidence shows baselines are enforced?",
+                        "How is drift detected and corrected?"
+                    ]
+                },
+                {
+                    id: "cp-contingency-planning",
+                    type: "control",
+                    code: "CP",
+                    name: "Contingency Planning",
+                    description: "Plans for business continuity and disaster recovery",
+                    key_controls: ["Backup", "Recovery Planning", "Incident Response"],
+                    purpose: "Ensure operational resilience during disruptions.",
+                    key_controls_detail: [
+                        { name: "Backup", description: "Maintain backups for critical systems and data." },
+                        { name: "Recovery Planning", description: "Define recovery procedures and RTO/RPO targets." },
+                        { name: "Incident Response", description: "Coordinate recovery with incident response teams." }
+                    ],
+                    implementation_examples: [
+                        "Quarterly disaster recovery tests",
+                        "Immutable backup storage",
+                        "Runbooks for critical services"
+                    ],
+                    evidence: [
+                        "Backup logs and restore tests",
+                        "Business impact analysis",
+                        "DR test reports"
+                    ],
+                    audit_questions: [
+                        "How often are backups tested?",
+                        "What are the RTO/RPO targets?",
+                        "How is recovery communicated to stakeholders?"
+                    ]
+                },
+                {
+                    id: "ia-identification-authentication",
+                    type: "control",
+                    code: "IA",
+                    name: "Identification and Authentication",
+                    description: "User identification and authentication mechanisms",
+                    key_controls: ["User Authentication", "Credential Management", "MFA"],
+                    purpose: "Verify identity and prevent unauthorized access.",
+                    key_controls_detail: [
+                        { name: "User Authentication", description: "Ensure users are uniquely identified." },
+                        { name: "Credential Management", description: "Protect secrets, passwords, and keys." },
+                        { name: "MFA", description: "Add additional factors for critical access." }
+                    ],
+                    implementation_examples: [
+                        "SSO with conditional access",
+                        "Privileged account password vault",
+                        "MFA for VPN and admin consoles"
+                    ],
+                    evidence: [
+                        "Authentication logs",
+                        "Password policy documentation",
+                        "MFA enrollment reports"
+                    ],
+                    audit_questions: [
+                        "How are passwords and secrets protected?",
+                        "Is MFA enforced for all privileged access?",
+                        "How are identity anomalies detected?"
+                    ]
+                },
+                {
+                    id: "ir-incident-response",
+                    type: "control",
+                    code: "IR",
+                    name: "Incident Response",
+                    description: "Procedures for detecting and responding to incidents",
+                    key_controls: ["Incident Handling", "Incident Analysis", "Evidence Handling"],
+                    purpose: "Respond quickly and effectively to security incidents.",
+                    key_controls_detail: [
+                        { name: "Incident Handling", description: "Define roles and response procedures." },
+                        { name: "Incident Analysis", description: "Analyze root causes and impact." },
+                        { name: "Evidence Handling", description: "Preserve evidence for investigations." }
+                    ],
+                    implementation_examples: [
+                        "24/7 incident triage rotations",
+                        "Forensic evidence collection playbooks",
+                        "Post-incident reviews"
+                    ],
+                    evidence: [
+                        "Incident response plan",
+                        "Incident reports",
+                        "Evidence chain-of-custody records"
+                    ],
+                    audit_questions: [
+                        "How are incidents classified and escalated?",
+                        "What evidence shows response readiness?",
+                        "How are lessons learned captured?"
+                    ]
+                },
+                {
+                    id: "ma-maintenance",
+                    type: "control",
+                    code: "MA",
+                    name: "Maintenance",
+                    description: "Maintenance of systems and security tools",
+                    key_controls: ["Maintenance Procedures", "Tools Update", "Maintenance Tracking"],
+                    purpose: "Ensure systems are maintained securely and reliably.",
+                    key_controls_detail: [
+                        { name: "Maintenance Procedures", description: "Standardize maintenance activities and approvals." },
+                        { name: "Tools Update", description: "Keep maintenance tools patched and secure." },
+                        { name: "Maintenance Tracking", description: "Track and audit maintenance actions." }
+                    ],
+                    implementation_examples: [
+                        "Scheduled patch windows",
+                        "Tool access restricted to authorized staff",
+                        "Maintenance ticketing workflows"
+                    ],
+                    evidence: [
+                        "Maintenance schedules",
+                        "Patch logs",
+                        "Maintenance approval records"
+                    ],
+                    audit_questions: [
+                        "Who approves maintenance activities?",
+                        "How is tool access controlled?",
+                        "Where are maintenance logs stored?"
+                    ]
+                },
+                {
+                    id: "mp-media-protection",
+                    type: "control",
+                    code: "MP",
+                    name: "Media Protection",
+                    description: "Protection of physical and digital media",
+                    key_controls: ["Media Sanitization", "Media Transport", "Media Storage"],
+                    purpose: "Protect sensitive data stored on physical or digital media.",
+                    key_controls_detail: [
+                        { name: "Media Sanitization", description: "Securely erase or destroy sensitive media." },
+                        { name: "Media Transport", description: "Control transport of removable media." },
+                        { name: "Media Storage", description: "Secure storage for sensitive media." }
+                    ],
+                    implementation_examples: [
+                        "Certified destruction for retired disks",
+                        "Encrypted removable media policies",
+                        "Locked storage cabinets"
+                    ],
+                    evidence: [
+                        "Media disposal certificates",
+                        "Media transport logs",
+                        "Storage access records"
+                    ],
+                    audit_questions: [
+                        "How is sensitive media destroyed?",
+                        "Who is authorized to transport media?",
+                        "Where is media stored and monitored?"
+                    ]
+                },
+                {
+                    id: "pe-physical-environmental",
+                    type: "control",
+                    code: "PE",
+                    name: "Physical and Environmental Protection",
+                    description: "Physical security of facilities and equipment",
+                    key_controls: ["Access Control", "Environmental Controls", "Surveillance"],
+                    purpose: "Protect facilities and critical systems from physical threats.",
+                    key_controls_detail: [
+                        { name: "Access Control", description: "Restrict facility access to authorized personnel." },
+                        { name: "Environmental Controls", description: "Maintain power, cooling, and fire suppression." },
+                        { name: "Surveillance", description: "Monitor facilities and entry points." }
+                    ],
+                    implementation_examples: [
+                        "Badge-controlled data center access",
+                        "Environmental sensor monitoring",
+                        "24/7 CCTV coverage"
+                    ],
+                    evidence: [
+                        "Access logs and badge reports",
+                        "Environmental monitoring reports",
+                        "Surveillance audit logs"
+                    ],
+                    audit_questions: [
+                        "How is physical access authorized and tracked?",
+                        "What environmental monitoring is in place?",
+                        "How is surveillance footage retained?"
+                    ]
+                },
+                {
+                    id: "pl-planning",
+                    type: "control",
+                    code: "PL",
+                    name: "Planning",
+                    description: "Information security planning",
+                    key_controls: ["Security Planning", "Policy Development", "Strategic Planning"],
+                    purpose: "Establish and maintain security plans and policies.",
+                    key_controls_detail: [
+                        { name: "Security Planning", description: "Document and maintain security plans." },
+                        { name: "Policy Development", description: "Create policies aligned to risk appetite." },
+                        { name: "Strategic Planning", description: "Align security objectives with business strategy." }
+                    ],
+                    implementation_examples: [
+                        "Annual security strategy refresh",
+                        "Policy governance committee",
+                        "Risk-based planning workshops"
+                    ],
+                    evidence: [
+                        "Security plan documentation",
+                        "Policy approval records",
+                        "Strategic roadmap artifacts"
+                    ],
+                    audit_questions: [
+                        "How are security plans reviewed?",
+                        "Who approves security policies?",
+                        "How is planning aligned to business goals?"
+                    ]
+                },
+                {
+                    id: "pm-program-management",
+                    type: "control",
+                    code: "PM",
+                    name: "Program Management",
+                    description: "Cybersecurity program management",
+                    key_controls: ["Program Plan", "Risk Strategy", "Enterprise Architecture"],
+                    purpose: "Coordinate security initiatives across the enterprise.",
+                    key_controls_detail: [
+                        { name: "Program Plan", description: "Define program goals, scope, and governance." },
+                        { name: "Risk Strategy", description: "Define risk tolerances and management approach." },
+                        { name: "Enterprise Architecture", description: "Align controls with architecture standards." }
+                    ],
+                    implementation_examples: [
+                        "Security governance charters",
+                        "Enterprise risk strategy documents",
+                        "Architecture review boards"
+                    ],
+                    evidence: [
+                        "Program plans and KPI dashboards",
+                        "Risk strategy documentation",
+                        "Architecture review minutes"
+                    ],
+                    audit_questions: [
+                        "What governance model is used?",
+                        "How is risk strategy communicated?",
+                        "How are security initiatives prioritized?"
+                    ]
+                },
+                {
+                    id: "ps-personnel-security",
+                    type: "control",
+                    code: "PS",
+                    name: "Personnel Security",
+                    description: "Personnel security controls and management",
+                    key_controls: ["Personnel Screening", "Termination", "Contractor Management"],
+                    purpose: "Manage personnel risks throughout the employment lifecycle.",
+                    key_controls_detail: [
+                        { name: "Personnel Screening", description: "Conduct background checks as required." },
+                        { name: "Termination", description: "Revoke access promptly on departure." },
+                        { name: "Contractor Management", description: "Ensure third-party personnel meet security requirements." }
+                    ],
+                    implementation_examples: [
+                        "Background check workflow integration",
+                        "Exit checklist with access removal",
+                        "Contractor onboarding controls"
+                    ],
+                    evidence: [
+                        "Screening records",
+                        "Termination tickets",
+                        "Contractor agreements"
+                    ],
+                    audit_questions: [
+                        "How is access removed upon termination?",
+                        "What screening is performed?",
+                        "How are contractors monitored?"
+                    ]
+                },
+                {
+                    id: "ra-risk-assessment",
+                    type: "control",
+                    code: "RA",
+                    name: "Risk Assessment",
+                    description: "Risk assessment and management",
+                    key_controls: ["Risk Assessment", "Vulnerability Scanning", "Risk Review"],
+                    purpose: "Identify and prioritize risks to support informed decisions.",
+                    key_controls_detail: [
+                        { name: "Risk Assessment", description: "Identify threats, vulnerabilities, and impacts." },
+                        { name: "Vulnerability Scanning", description: "Scan systems on a defined cadence." },
+                        { name: "Risk Review", description: "Review risks with stakeholders and owners." }
+                    ],
+                    implementation_examples: [
+                        "Quarterly enterprise risk reviews",
+                        "Weekly vulnerability scans",
+                        "Risk scoring and prioritization"
+                    ],
+                    evidence: [
+                        "Risk assessment reports",
+                        "Vulnerability scan outputs",
+                        "Risk review meeting notes"
+                    ],
+                    audit_questions: [
+                        "How often are risk assessments performed?",
+                        "How are risks prioritized?",
+                        "Who approves risk acceptance?"
+                    ]
+                },
+                {
+                    id: "sa-system-services-acquisition",
+                    type: "control",
+                    code: "SA",
+                    name: "System and Services Acquisition",
+                    description: "Acquisition and management of systems and services",
+                    key_controls: ["Requirements Definition", "Security Testing", "Supply Chain"],
+                    purpose: "Ensure security requirements are built into acquisition and procurement.",
+                    key_controls_detail: [
+                        { name: "Requirements Definition", description: "Define security requirements for new systems." },
+                        { name: "Security Testing", description: "Validate security before production release." },
+                        { name: "Supply Chain", description: "Manage vendor and supply chain risk." }
+                    ],
+                    implementation_examples: [
+                        "Security requirements in procurement templates",
+                        "Pre-production security testing",
+                        "Vendor risk assessments"
+                    ],
+                    evidence: [
+                        "Procurement checklists",
+                        "Security test results",
+                        "Vendor assessment reports"
+                    ],
+                    audit_questions: [
+                        "How are security requirements communicated to vendors?",
+                        "What testing is required before launch?",
+                        "How is supply chain risk evaluated?"
+                    ]
+                },
+                {
+                    id: "sc-system-communications-protection",
+                    type: "control",
+                    code: "SC",
+                    name: "System and Communications Protection",
+                    description: "Protection of system boundaries and communications",
+                    key_controls: ["Boundary Protection", "Encryption", "DoS Protection"],
+                    purpose: "Protect data in transit and maintain secure boundaries.",
+                    key_controls_detail: [
+                        { name: "Boundary Protection", description: "Manage network segmentation and perimeter controls." },
+                        { name: "Encryption", description: "Encrypt data in transit and at rest." },
+                        { name: "DoS Protection", description: "Mitigate denial-of-service threats." }
+                    ],
+                    implementation_examples: [
+                        "Network segmentation with zero trust policies",
+                        "TLS enforcement and key rotation",
+                        "DDoS mitigation services"
+                    ],
+                    evidence: [
+                        "Network architecture diagrams",
+                        "Encryption policies",
+                        "DDoS mitigation reports"
+                    ],
+                    audit_questions: [
+                        "How are network boundaries protected?",
+                        "What encryption standards are used?",
+                        "How are DoS attacks monitored?"
+                    ]
+                },
+                {
+                    id: "si-system-information-integrity",
+                    type: "control",
+                    code: "SI",
+                    name: "System and Information Integrity",
+                    description: "System and information integrity protection",
+                    key_controls: ["Malware Protection", "Software Integrity", "Monitoring"],
+                    purpose: "Protect systems from malicious activity and ensure integrity.",
+                    key_controls_detail: [
+                        { name: "Malware Protection", description: "Deploy anti-malware and endpoint security controls." },
+                        { name: "Software Integrity", description: "Validate software integrity and updates." },
+                        { name: "Monitoring", description: "Continuously monitor for anomalies." }
+                    ],
+                    implementation_examples: [
+                        "Endpoint detection and response tooling",
+                        "Code signing for software releases",
+                        "Continuous monitoring alerts"
+                    ],
+                    evidence: [
+                        "Endpoint protection reports",
+                        "Software integrity verification logs",
+                        "Monitoring alerts and responses"
+                    ],
+                    audit_questions: [
+                        "How is malware detected and remediated?",
+                        "How are software updates validated?",
+                        "How is continuous monitoring handled?"
+                    ]
+                }
+            ],
+            glossary: [
+                {
+                    id: "access-control",
+                    type: "term",
+                    term: "Access Control",
+                    definition: "Policies and mechanisms that restrict system access to authorized users.",
+                    expanded_definition: "Access control governs who can access systems, data, and facilities, ensuring least privilege and proper authentication.",
+                    examples: ["Role-based access control (RBAC)", "Just-in-time administrative access"],
+                    related: ["Least Privilege", "Multi-Factor Authentication", "Zero Trust"]
+                },
+                {
+                    id: "attack-surface",
+                    type: "term",
+                    term: "Attack Surface",
+                    definition: "All possible entry points where a system can be attacked",
+                    expanded_definition: "The attack surface includes all hardware, software, APIs, and user interactions that could be exploited.",
+                    examples: ["Public-facing APIs", "Unpatched servers", "Exposed cloud storage"],
+                    related: ["Threat", "Vulnerability", "Risk"]
+                },
+                {
+                    id: "baseline",
+                    type: "term",
+                    term: "Baseline",
+                    definition: "A documented, approved configuration serving as a reference point",
+                    expanded_definition: "Baselines establish secure configurations that act as a benchmark for auditing and drift detection.",
+                    examples: ["CIS benchmark baseline", "Gold image for servers"],
+                    related: ["Configuration Management", "Change Management"]
+                },
+                {
+                    id: "cvss",
+                    type: "term",
+                    term: "CVSS",
+                    definition: "Common Vulnerability Scoring System - metric for assessing vulnerability severity",
+                    expanded_definition: "CVSS provides a standardized way to rate vulnerabilities on a 0.0–10.0 severity scale.",
+                    examples: ["CVSS 9.8 critical rating", "Base score used for prioritization"],
+                    related: ["Vulnerability", "Risk"]
+                },
+                {
+                    id: "data-classification",
+                    type: "term",
+                    term: "Data Classification",
+                    definition: "Process of organizing data by sensitivity and criticality",
+                    expanded_definition: "Classifying data helps determine security controls based on confidentiality, integrity, and availability needs.",
+                    examples: ["Public / Internal / Confidential tiers", "PII classification labels"],
+                    related: ["Risk", "Governance"]
+                },
+                {
+                    id: "defense-in-depth",
+                    type: "term",
+                    term: "Defense in Depth",
+                    definition: "Multiple layers of security controls to reduce risk",
+                    expanded_definition: "Layered security ensures that if one control fails, others mitigate the threat.",
+                    examples: ["Firewall + MFA + EDR", "Network segmentation plus monitoring"],
+                    related: ["Zero Trust", "Mitigation"]
+                },
+                {
+                    id: "due-diligence",
+                    type: "term",
+                    term: "Due Diligence",
+                    definition: "Investigation into compliance and security practices",
+                    expanded_definition: "Due diligence validates security and compliance posture before approving vendors or initiatives.",
+                    examples: ["Vendor security questionnaires", "M&A security assessments"],
+                    related: ["Risk Assessment", "Governance"]
+                },
+                {
+                    id: "exploit",
+                    type: "term",
+                    term: "Exploit",
+                    definition: "Code or technique used to take advantage of a vulnerability",
+                    expanded_definition: "Exploits leverage weaknesses to gain unauthorized access or disrupt systems.",
+                    examples: ["Remote code execution exploits", "Privilege escalation exploits"],
+                    related: ["Vulnerability", "Threat"]
+                },
+                {
+                    id: "grc",
+                    type: "term",
+                    term: "GRC",
+                    definition: "Governance, Risk, and Compliance management",
+                    expanded_definition: "GRC aligns policy, risk management, and compliance obligations into a unified program.",
+                    examples: ["Policy management workflows", "Risk register updates"],
+                    related: ["Governance", "Compliance", "Risk"]
+                },
+                {
+                    id: "isms",
+                    type: "term",
+                    term: "ISMS",
+                    definition: "Information Security Management System",
+                    expanded_definition: "An ISMS is the structured framework of policies and controls that manage information security risk.",
+                    examples: ["ISO 27001-aligned ISMS", "Security policy library"],
+                    related: ["ISO 27001", "Governance"]
+                },
+                {
+                    id: "zero-trust",
+                    type: "term",
+                    term: "Zero Trust",
+                    definition: "Security model requiring verification for every access request",
+                    expanded_definition: "Zero Trust assumes no implicit trust and requires continuous verification.",
+                    examples: ["Continuous authentication", "Micro-segmentation"],
+                    related: ["Access Control", "Least Privilege"]
+                },
+                {
+                    id: "vulnerability",
+                    type: "term",
+                    term: "Vulnerability",
+                    definition: "Weakness in a system that can be exploited",
+                    expanded_definition: "Vulnerabilities can stem from misconfigurations, software flaws, or process gaps.",
+                    examples: ["Outdated software", "Open S3 buckets"],
+                    related: ["Exploit", "Threat"]
+                },
+                {
+                    id: "threat",
+                    type: "term",
+                    term: "Threat",
+                    definition: "Potential danger that could exploit a vulnerability",
+                    expanded_definition: "Threats include adversaries, malware, or environmental factors that impact security.",
+                    examples: ["Ransomware campaign", "Insider threat"],
+                    related: ["Risk", "Attack Surface"]
+                },
+                {
+                    id: "risk",
+                    type: "term",
+                    term: "Risk",
+                    definition: "Probability of a threat exploiting a vulnerability with impact",
+                    expanded_definition: "Risk combines likelihood and impact to prioritize security actions.",
+                    examples: ["High likelihood phishing risk", "Critical impact downtime risk"],
+                    related: ["Threat", "Mitigation"]
+                },
+                {
+                    id: "mitigation",
+                    type: "term",
+                    term: "Mitigation",
+                    definition: "Actions taken to reduce risk impact or probability",
+                    expanded_definition: "Mitigations include preventive, detective, and corrective controls.",
+                    examples: ["Patching critical vulnerabilities", "Adding monitoring controls"],
+                    related: ["Risk", "Control"]
+                },
+                {
+                    id: "incident",
+                    type: "term",
+                    term: "Incident",
+                    definition: "Security event that compromises information or systems",
+                    expanded_definition: "Incidents require structured response to contain, eradicate, and recover.",
+                    examples: ["Data breach", "Account takeover"],
+                    related: ["Incident Response", "Threat"]
+                }
+            ],
+            riskMatrices: [
+                {
+                    title: "Risk Matrix (Probability vs Impact)",
+                    description: "Assess risk by mapping likelihood and impact levels. Standard grid: Low, Medium, High, Critical.",
+                    table: [
+                        [" ", "Low", "Medium", "High", "Critical"],
+                        ["Low", "Low", "Low", "Medium", "High"],
+                        ["Medium", "Low", "Medium", "High", "Critical"],
+                        ["High", "Medium", "High", "Critical", "Critical"]
+                    ]
+                },
+                {
+                    title: "CVSS Scoring Scale",
+                    description: "CVSS (Common Vulnerability Scoring System) rates vulnerabilities from 0.0–10.0. Severity: Low (0–3.9), Medium (4–6.9), High (7–8.9), Critical (9–10).",
+                    scale: [
+                        { range: "0–3.9", label: "Low", color: "#5dde8c" },
+                        { range: "4–6.9", label: "Medium", color: "#ffd700" },
+                        { range: "7–8.9", label: "High", color: "#ff6b00" },
+                        { range: "9–10", label: "Critical", color: "#ff0040" }
+                    ]
+                },
+                {
+                    title: "Risk Rating Methodology",
+                    description: "Risk = Likelihood x Impact. Matrix scores help prioritize security controls."
+                }
+            ],
+            guides: [
+                {
+                    id: "nist-csf-implementation",
+                    type: "guide",
+                    title: "NIST CSF Implementation Steps",
+                    summary: "A phased plan to align governance, risk, and controls to CSF outcomes.",
+                    steps: [
+                        {
+                            step: "Conduct a cybersecurity risk assessment",
+                            deliverables: ["Risk register", "Asset inventory"],
+                            evidence: ["Assessment report", "Risk scoring worksheet"]
+                        },
+                        {
+                            step: "Map existing controls to NIST CSF categories",
+                            deliverables: ["Control mapping matrix"],
+                            evidence: ["Crosswalk documentation", "System inventory list"]
+                        },
+                        {
+                            step: "Identify gaps and prioritize actions",
+                            deliverables: ["Gap analysis", "Priority backlog"],
+                            evidence: ["Risk acceptance logs"]
+                        },
+                        {
+                            step: "Develop an implementation plan",
+                            deliverables: ["Implementation roadmap", "Budget estimates"],
+                            evidence: ["Project plan approvals"]
+                        },
+                        {
+                            step: "Engage stakeholders across organization",
+                            deliverables: ["Stakeholder communication plan"],
+                            evidence: ["Meeting minutes", "Training rosters"]
+                        },
+                        {
+                            step: "Monitor effectiveness and adjust as needed",
+                            deliverables: ["Metrics dashboard"],
+                            evidence: ["Quarterly review reports"]
+                        }
+                    ]
+                },
+                {
+                    id: "iso-27001-certification",
+                    type: "guide",
+                    title: "ISO 27001 Certification Path",
+                    summary: "Step-by-step path to build and certify an ISMS.",
+                    steps: [
+                        {
+                            step: "Establish ISMS team & scope",
+                            deliverables: ["ISMS charter", "Scope statement"],
+                            evidence: ["Governance approvals"]
+                        },
+                        {
+                            step: "Perform gap analysis",
+                            deliverables: ["Gap analysis report"],
+                            evidence: ["Assessment worksheets"]
+                        },
+                        {
+                            step: "Define policies & procedures",
+                            deliverables: ["ISMS policy library"],
+                            evidence: ["Policy approval records"]
+                        },
+                        {
+                            step: "Implement controls per Annex A",
+                            deliverables: ["Control implementation plan"],
+                            evidence: ["Control evidence packages"]
+                        },
+                        {
+                            step: "Conduct internal audit & management review",
+                            deliverables: ["Internal audit report"],
+                            evidence: ["Management review minutes"]
+                        },
+                        {
+                            step: "Undergo formal certification audit",
+                            deliverables: ["Certification audit plan"],
+                            evidence: ["Audit findings and corrective actions"]
+                        }
+                    ]
+                },
+                {
+                    id: "cis-controls-roadmap",
+                    type: "guide",
+                    title: "CIS Controls Implementation Roadmap",
+                    summary: "Prioritized rollout of CIS safeguards by implementation group.",
+                    steps: [
+                        {
+                            step: "Identify critical assets",
+                            deliverables: ["Asset inventory"],
+                            evidence: ["Asset discovery reports"]
+                        },
+                        {
+                            step: "Apply basic controls (CIS 1–6)",
+                            deliverables: ["IG1 safeguard checklist"],
+                            evidence: ["Configuration baselines"]
+                        },
+                        {
+                            step: "Expand to foundational & organizational controls",
+                            deliverables: ["IG2/IG3 rollout plan"],
+                            evidence: ["Security control testing results"]
+                        },
+                        {
+                            step: "Continuously monitor & improve",
+                            deliverables: ["Metrics dashboard"],
+                            evidence: ["Control effectiveness reports"]
+                        }
+                    ]
+                },
+                {
+                    id: "risk-assessment-methodology",
+                    type: "guide",
+                    title: "Risk Assessment Methodology",
+                    summary: "Structured method to assess likelihood, impact, and treatment options.",
+                    steps: [
+                        {
+                            step: "Asset inventory",
+                            deliverables: ["Asset register"],
+                            evidence: ["CMDB exports"]
+                        },
+                        {
+                            step: "Threat identification",
+                            deliverables: ["Threat catalog"],
+                            evidence: ["Threat modeling notes"]
+                        },
+                        {
+                            step: "Vulnerability assessment",
+                            deliverables: ["Vulnerability report"],
+                            evidence: ["Scanner outputs"]
+                        },
+                        {
+                            step: "Evaluate likelihood & impact",
+                            deliverables: ["Risk scoring matrix"],
+                            evidence: ["Risk scoring worksheets"]
+                        },
+                        {
+                            step: "Prioritize & mitigate risks",
+                            deliverables: ["Risk treatment plan"],
+                            evidence: ["Mitigation tracking logs"]
+                        },
+                        {
+                            step: "Document and review periodically",
+                            deliverables: ["Risk review cadence"],
+                            evidence: ["Review meeting notes"]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const dataBankFavoritesKey = 'databank_favs_v1';
+        const dataBankRecentKey = 'databank_recent_v1';
+        const dataBankTypeMeta = {
+            framework: { icon: "🛡️", label: "Framework" },
+            control: { icon: "🔗", label: "Control Family" },
+            term: { icon: "📖", label: "Term" },
+            guide: { icon: "📝", label: "Guide" }
+        };
+
+        const dataBankState = {
+            activeSection: 'frameworks',
+            search: '',
+            favorites: new Set(loadDataBankFavorites()),
+            recent: loadDataBankRecent()
+        };
+
+        function loadDataBankFavorites() {
+            try {
+                const raw = localStorage.getItem(dataBankFavoritesKey);
+                const parsed = JSON.parse(raw || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
             }
-        ];
+        }
 
-        const dataBankFamilies = [
-            { code:"AC", name:"Access Control", description:"Controls for limiting access to systems and data", key_controls:["Least Privilege", "Multi-Factor Authentication", "Access Reviews"] },
-            { code:"AT", name:"Awareness and Training", description:"Security awareness and training programs", key_controls:["Security Training", "Phishing Awareness", "Role-Based Training"] },
-            { code:"AU", name:"Audit and Accountability", description:"Audit logging and monitoring capabilities", key_controls:["Audit Logging", "Log Retention", "Log Analysis"] },
-            { code:"CA", name:"Security Assessment and Authorization", description:"Security assessments and system authorization", key_controls:["Security Assessment", "Continuous Monitoring", "Plan of Action"] },
-            { code:"CM", name:"Configuration Management", description:"Management of system configurations", key_controls:["Baseline Configuration", "Change Management", "Inventory"] },
-            { code:"CP", name:"Contingency Planning", description:"Plans for business continuity and disaster recovery", key_controls:["Backup", "Recovery Planning", "Incident Response"] },
-            { code:"IA", name:"Identification and Authentication", description:"User identification and authentication mechanisms", key_controls:["User Authentication", "Credential Management", "MFA"] },
-            { code:"IR", name:"Incident Response", description:"Procedures for detecting and responding to incidents", key_controls:["Incident Handling", "Incident Analysis", "Evidence Handling"] },
-            { code:"MA", name:"Maintenance", description:"Maintenance of systems and security tools", key_controls:["Maintenance Procedures", "Tools Update", "Maintenance Tracking"] },
-            { code:"MP", name:"Media Protection", description:"Protection of physical and digital media", key_controls:["Media Sanitization", "Media Transport", "Media Storage"] },
-            { code:"PE", name:"Physical and Environmental Protection", description:"Physical security of facilities and equipment", key_controls:["Access Control", "Environmental Controls", "Surveillance"] },
-            { code:"PL", name:"Planning", description:"Information security planning", key_controls:["Security Planning", "Policy Development", "Strategic Planning"] },
-            { code:"PM", name:"Program Management", description:"Cybersecurity program management", key_controls:["Program Plan", "Risk Strategy", "Enterprise Architecture"] },
-            { code:"PS", name:"Personnel Security", description:"Personnel security controls and management", key_controls:["Personnel Screening", "Termination", "Contractor Management"] },
-            { code:"RA", name:"Risk Assessment", description:"Risk assessment and management", key_controls:["Risk Assessment", "Vulnerability Scanning", "Risk Review"] },
-            { code:"SA", name:"System and Services Acquisition", description:"Acquisition and management of systems and services", key_controls:["Requirements Definition", "Security Testing", "Supply Chain"] },
-            { code:"SC", name:"System and Communications Protection", description:"Protection of system boundaries and communications", key_controls:["Boundary Protection", "Encryption", "DoS Protection"] },
-            { code:"SI", name:"System and Information Integrity", description:"System and information integrity protection", key_controls:["Malware Protection", "Software Integrity", "Monitoring"]}
-        ];
+        function saveDataBankFavorites() {
+            localStorage.setItem(dataBankFavoritesKey, JSON.stringify([...dataBankState.favorites]));
+        }
 
-        const dataBankGlossary = [
-            { term: "Attack Surface", definition: "All possible entry points where a system can be attacked" },
-            { term: "Baseline", definition: "A documented, approved configuration serving as a reference point" },
-            { term: "CVSS", definition: "Common Vulnerability Scoring System - metric for assessing vulnerability severity" },
-            { term: "Data Classification", definition: "Process of organizing data by sensitivity and criticality" },
-            { term: "Defense in Depth", definition: "Multiple layers of security controls to reduce risk" },
-            { term: "Due Diligence", definition: "Investigation into compliance and security practices" },
-            { term: "Exploit", definition: "Code or technique used to take advantage of a vulnerability" },
-            { term: "GRC", definition: "Governance, Risk, and Compliance management" },
-            { term: "ISMS", definition: "Information Security Management System" },
-            { term: "Zero Trust", definition: "Security model requiring verification for every access request" },
-            { term: "Vulnerability", definition: "Weakness in a system that can be exploited" },
-            { term: "Threat", definition: "Potential danger that could exploit a vulnerability" },
-            { term: "Risk", definition: "Probability of a threat exploiting a vulnerability with impact" },
-            { term: "Mitigation", definition: "Actions taken to reduce risk impact or probability" },
-            { term: "Incident", definition: "Security event that compromises information or systems" }
-        ];
-
-        const dataBankRiskMatrices = [
-            {
-                title: "Risk Matrix (Probability vs Impact)",
-                description: "Assess risk by mapping likelihood and impact levels. Standard grid: Low, Medium, High, Critical.",
-                table: [
-                    [" ", "Low", "Medium", "High", "Critical"],
-                    ["Low", "Low", "Low", "Medium", "High"],
-                    ["Medium", "Low", "Medium", "High", "Critical"],
-                    ["High", "Medium", "High", "Critical", "Critical"]
-                ]
-            },
-            {
-                title: "CVSS Scoring Scale",
-                description: "CVSS (Common Vulnerability Scoring System) rates vulnerabilities from 0.0–10.0. Severity: Low (0–3.9), Medium (4–6.9), High (7–8.9), Critical (9–10).",
-                scale: [
-                    { range: "0–3.9", label: "Low", color: "#5dde8c" },
-                    { range: "4–6.9", label: "Medium", color: "#ffd700" },
-                    { range: "7–8.9", label: "High", color: "#ff6b00" },
-                    { range: "9–10", label: "Critical", color: "#ff0040" }
-                ]
-            },
-            {
-                title: "Risk Rating Methodology",
-                description: "Risk = Likelihood x Impact. Matrix scores help prioritize security controls."
+        function loadDataBankRecent() {
+            try {
+                const raw = localStorage.getItem(dataBankRecentKey);
+                const parsed = JSON.parse(raw || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
             }
-        ];
+        }
 
-        const dataBankGuides = [
-            {
-                title: "NIST CSF Implementation Steps",
-                steps: [
-                    "Conduct a cybersecurity risk assessment",
-                    "Map existing controls to NIST CSF categories",
-                    "Identify gaps and prioritize actions",
-                    "Develop an implementation plan",
-                    "Engage stakeholders across organization",
-                    "Monitor effectiveness and adjust as needed"
-                ]
-            },
-            {
-                title: "ISO 27001 Certification Path",
-                steps: [
-                    "Establish ISMS team & scope",
-                    "Perform gap analysis",
-                    "Define policies & procedures",
-                    "Implement controls per Annex A",
-                    "Conduct internal audit & management review",
-                    "Undergo formal certification audit"
-                ]
-            },
-            {
-                title: "CIS Controls Implementation Roadmap",
-                steps: [
-                    "Identify critical assets",
-                    "Apply basic controls (CIS 1–6)",
-                    "Expand to foundational & organizational controls",
-                    "Continuously monitor & improve"
-                ]
-            },
-            {
-                title: "Risk Assessment Methodology",
-                steps: [
-                    "Asset inventory",
-                    "Threat identification",
-                    "Vulnerability assessment",
-                    "Evaluate likelihood & impact",
-                    "Prioritize & mitigate risks",
-                    "Document and review periodically"
-                ]
+        function saveDataBankRecent() {
+            localStorage.setItem(dataBankRecentKey, JSON.stringify(dataBankState.recent));
+        }
+
+        function getDataBankAllItems() {
+            return [
+                ...dataBankData.frameworks,
+                ...dataBankData.controlFamilies,
+                ...dataBankData.glossary,
+                ...dataBankData.guides
+            ];
+        }
+
+        function getDataBankItemById(id) {
+            return getDataBankAllItems().find(item => item.id === id);
+        }
+
+        function getDataBankSectionForType(type) {
+            if (type === 'framework') return 'frameworks';
+            if (type === 'control') return 'controls';
+            if (type === 'term') return 'glossary';
+            if (type === 'guide') return 'guides';
+            return 'frameworks';
+        }
+
+        function getDataBankSearchText(item) {
+            if (!item) return '';
+            if (item.type === 'framework') {
+                return [
+                    item.name,
+                    item.description,
+                    item.best_for,
+                    ...(item.functions_list || []),
+                    item.structure_summary
+                ].join(' ');
             }
-        ];
+            if (item.type === 'control') {
+                return [
+                    item.code,
+                    item.name,
+                    item.description,
+                    item.purpose,
+                    ...(item.key_controls || []),
+                    ...(item.key_controls_detail || []).map(ctrl => ctrl.name)
+                ].join(' ');
+            }
+            if (item.type === 'term') {
+                return [
+                    item.term,
+                    item.definition,
+                    item.expanded_definition,
+                    ...(item.related || [])
+                ].join(' ');
+            }
+            if (item.type === 'guide') {
+                return [
+                    item.title,
+                    item.summary,
+                    ...(item.steps || []).map(step => step.step)
+                ].join(' ');
+            }
+            return '';
+        }
+
+        function getDataBankSnippet(item) {
+            if (!item) return '';
+            if (item.type === 'framework') return item.description || item.what_it_is || '';
+            if (item.type === 'control') return item.description || item.purpose || '';
+            if (item.type === 'term') return item.definition || '';
+            if (item.type === 'guide') {
+                const firstStep = item.steps?.[0]?.step;
+                return firstStep ? `Step 1: ${firstStep}` : (item.summary || '');
+            }
+            return '';
+        }
+
+        function toggleDataBankFavorite(id) {
+            if (!id) return;
+            if (dataBankState.favorites.has(id)) {
+                dataBankState.favorites.delete(id);
+            } else {
+                dataBankState.favorites.add(id);
+            }
+            saveDataBankFavorites();
+            renderDataBankMiniRows();
+            updateDataBankFavoriteButtons();
+        }
+
+        function updateDataBankRecent(id) {
+            if (!id) return;
+            dataBankState.recent = dataBankState.recent.filter(entry => entry !== id);
+            dataBankState.recent.unshift(id);
+            dataBankState.recent = dataBankState.recent.slice(0, 10);
+            saveDataBankRecent();
+            renderDataBankMiniRows();
+        }
+
+        function renderDataBankMiniRows() {
+            const favoritesContainer = document.getElementById('databank-favorites');
+            const favoritesEmpty = document.getElementById('databank-favorites-empty');
+            const recentContainer = document.getElementById('databank-recent');
+            const recentEmpty = document.getElementById('databank-recent-empty');
+
+            if (!favoritesContainer || !recentContainer || !favoritesEmpty || !recentEmpty) return;
+
+            const favoriteItems = [...dataBankState.favorites]
+                .map(id => getDataBankItemById(id))
+                .filter(Boolean);
+            const recentItems = dataBankState.recent
+                .map(id => getDataBankItemById(id))
+                .filter(Boolean);
+
+            favoritesContainer.innerHTML = favoriteItems.map(item => `
+                <button class="databank-mini-chip" type="button" data-databank-chip="${escapeHtml(item.id)}">
+                    <span>${dataBankTypeMeta[item.type]?.icon || '📌'}</span>
+                    <span>${escapeHtml(item.name || item.term || item.title)}</span>
+                    <span class="databank-chip-type">${escapeHtml(dataBankTypeMeta[item.type]?.label || 'Item')}</span>
+                </button>
+            `).join('');
+            favoritesEmpty.style.display = favoriteItems.length ? 'none' : 'block';
+
+            recentContainer.innerHTML = recentItems.map(item => `
+                <button class="databank-mini-chip" type="button" data-databank-chip="${escapeHtml(item.id)}">
+                    <span>${dataBankTypeMeta[item.type]?.icon || '📌'}</span>
+                    <span>${escapeHtml(item.name || item.term || item.title)}</span>
+                    <span class="databank-chip-type">${escapeHtml(dataBankTypeMeta[item.type]?.label || 'Item')}</span>
+                </button>
+            `).join('');
+            recentEmpty.style.display = recentItems.length ? 'none' : 'block';
+        }
+
+        function updateDataBankFavoriteButtons() {
+            document.querySelectorAll('[data-databank-fav]').forEach(btn => {
+                const id = btn.dataset.databankFav;
+                if (!id) return;
+                const isFav = dataBankState.favorites.has(id);
+                btn.classList.toggle('is-active', isFav);
+                btn.setAttribute('aria-pressed', String(isFav));
+                btn.textContent = isFav ? '★' : '☆';
+            });
+        }
+
+        function updateDataBankSearchResults(query) {
+            const resultsContainer = document.getElementById('databank-search-results');
+            if (!resultsContainer) return;
+            const trimmed = query.trim().toLowerCase();
+            if (!trimmed) {
+                resultsContainer.classList.remove('active');
+                resultsContainer.innerHTML = '';
+                return;
+            }
+
+            const results = getDataBankAllItems().filter(item => {
+                const haystack = getDataBankSearchText(item).toLowerCase();
+                return haystack.includes(trimmed);
+            });
+
+            if (!results.length) {
+                resultsContainer.innerHTML = `
+                    <div class="databank-search-result">
+                        <div class="databank-result-icon">🔎</div>
+                        <div>
+                            <div class="databank-result-title">No matches</div>
+                            <div class="databank-result-snippet">Try a different term or filter.</div>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.classList.add('active');
+                return;
+            }
+
+            resultsContainer.innerHTML = results.map(item => `
+                <div class="databank-search-result" data-databank-result="${escapeHtml(item.id)}">
+                    <div class="databank-result-icon">${dataBankTypeMeta[item.type]?.icon || '📌'}</div>
+                    <div>
+                        <div class="databank-result-type">${escapeHtml(dataBankTypeMeta[item.type]?.label || 'Item')}</div>
+                        <div class="databank-result-title">${escapeHtml(item.name || item.term || item.title)}</div>
+                        <div class="databank-result-snippet">${escapeHtml(getDataBankSnippet(item))}</div>
+                    </div>
+                </div>
+            `).join('');
+            resultsContainer.classList.add('active');
+        }
 
         function switchDataBankSection(section) {
-            // Show correct button as active
+            dataBankState.activeSection = section;
             const dbBtns = document.querySelectorAll('[data-databank]');
             dbBtns.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[data-databank="${section}"]`).classList.add('active');
-
-            renderDataBankSection(section, document.getElementById('databank-search').value.trim().toLowerCase());
+            const activeBtn = document.querySelector(`[data-databank="${section}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            renderDataBankSection(section, dataBankState.search);
         }
 
-        // Data Bank Search Filter
         function filterDataBank() {
-            const activeSectionBtn = document.querySelector('.nav-tabs [data-databank].active');
-            if (!activeSectionBtn) return;
-            const section = activeSectionBtn.dataset.databank;
-            renderDataBankSection(section, document.getElementById('databank-search').value.trim().toLowerCase());
+            const searchInput = document.getElementById('databank-search');
+            if (!searchInput) return;
+            const query = searchInput.value.trim().toLowerCase();
+            dataBankState.search = query;
+            renderDataBankSection(dataBankState.activeSection, query);
+            updateDataBankSearchResults(query);
         }
 
-        // Data Bank Renderer
         function renderDataBankSection(section, searchTerm) {
             const contentDiv = document.getElementById('databank-content');
+            if (!contentDiv) return;
             let html = "";
+            const query = (searchTerm || '').trim().toLowerCase();
+
             if (section === 'frameworks') {
+                const frameworks = dataBankData.frameworks.filter(item => {
+                    if (!query) return true;
+                    return getDataBankSearchText(item).toLowerCase().includes(query);
+                });
                 html += `<div class='news-grid'>`;
-                dataBankFrameworks.forEach(framework => {
-                    if (searchTerm && !
-                        (framework.name.toLowerCase().includes(searchTerm) ||
-                         (framework.description && framework.description.toLowerCase().includes(searchTerm)) ||
-                         (framework.best_for && framework.best_for.toLowerCase().includes(searchTerm)) ||
-                         (framework.functions_list && framework.functions_list.some(f => f.toLowerCase().includes(searchTerm))))
-                    ) return;
+                frameworks.forEach(framework => {
                     html += `
-                        <div class='news-card' style='border-left: 5px solid #22d3ee;'>
-                            <span class='news-badge badge-blue'>${framework.name}</span>
-                            <h3>${framework.name} <span style='font-size:13px; color: #00ff88;'>v.${framework.version}</span></h3>
-                            <p>${framework.description}</p>
-                            <div style='font-size:13px; color: #ff4444;'>${framework.best_for}</div>
+                        <div class='news-card' style='border-left: 5px solid #22d3ee;' data-databank-item data-databank-id='${escapeHtml(framework.id)}' data-clipboard-anchor='databank-${escapeHtml(framework.id)}'>
+                            <div class="databank-card-header">
+                                <span class='news-badge badge-blue'>${escapeHtml(framework.name)}</span>
+                                <button class="databank-fav-btn" type="button" data-databank-fav="${escapeHtml(framework.id)}" aria-label="Toggle favorite">☆</button>
+                            </div>
+                            <h3>${escapeHtml(framework.name)} <span style='font-size:13px; color: #00ff88;'>v.${escapeHtml(framework.version)}</span></h3>
+                            <p>${escapeHtml(framework.description)}</p>
+                            <div style='font-size:13px; color: #ff4444;'>${escapeHtml(framework.best_for)}</div>
                             <div class='news-meta'>
                                 <span style='color:#00ff88;'>${framework.functions || framework.families || framework.domains} ${framework.functions ? 'Functions' : framework.families ? 'Families' : 'Domains'}</span>
                                 <span style='color:#ff0040;'>${framework.controls || framework.safeguards || framework.subcategories} controls</span>
                             </div>
-                            ${framework.functions_list ? `<div style='margin-top:12px; font-size:13px;'>Core Functions: <span style='color:#ff4444;'>${framework.functions_list.join(', ')}</span></div>` : ''}
-                            ${framework.link ? `<a class='news-link' href='${framework.link}' target='_blank' rel='noopener'>View official standard →</a>` : ''}
+                            ${framework.functions_list ? `<div style='margin-top:12px; font-size:13px;'>Core Functions: <span style='color:#ff4444;'>${framework.functions_list.map(item => escapeHtml(item)).join(', ')}</span></div>` : ''}
+                            ${framework.link ? `<a class='news-link' href='${escapeHtml(framework.link)}' target='_blank' rel='noopener'>View official standard →</a>` : ''}
                         </div>`;
                 });
                 html += `</div>`;
+                if (!frameworks.length) {
+                    html = `<div class='premium-card'><p>No matches in Frameworks & Standards.</p></div>`;
+                }
             } else if (section === 'controls') {
+                const families = dataBankData.controlFamilies.filter(item => {
+                    if (!query) return true;
+                    return getDataBankSearchText(item).toLowerCase().includes(query);
+                });
                 html += `<div class='malware-grid'>`;
-                dataBankFamilies.forEach(fam => {
-                    if (searchTerm && !(fam.name.toLowerCase().includes(searchTerm) || fam.code.toLowerCase().includes(searchTerm) || fam.description.toLowerCase().includes(searchTerm) || fam.key_controls.some(kc => kc.toLowerCase().includes(searchTerm)))) return;
+                families.forEach(fam => {
                     html += `
-                        <div class='malware-card' style='border-left: 5px solid #9b59b6;'>
-                            <div style='font-weight:600; font-size:17px; margin-bottom:4px; color:#9b59b6;'>${fam.code} – ${fam.name}</div>
-                            <div style='font-size:14px; margin-bottom:8px;'>${fam.description}</div>
-                            <div style='font-size:13px;'><span style='color:#ff6b35;'>Key Controls:</span> ${fam.key_controls.map(kc => `<span style='padding:2px 6px; background:rgba(34,211,238,0.1); border-radius:5px; margin-right:6px;'>${kc}</span>`).join('')}</div>
+                        <div class='malware-card' style='border-left: 5px solid #9b59b6;' data-databank-item data-databank-id='${escapeHtml(fam.id)}' data-clipboard-anchor='databank-${escapeHtml(fam.id)}'>
+                            <div class="databank-card-header">
+                                <div style='font-weight:600; font-size:17px; margin-bottom:4px; color:#9b59b6;'>${escapeHtml(fam.code)} – ${escapeHtml(fam.name)}</div>
+                                <button class="databank-fav-btn" type="button" data-databank-fav="${escapeHtml(fam.id)}" aria-label="Toggle favorite">☆</button>
+                            </div>
+                            <div style='font-size:14px; margin-bottom:8px;'>${escapeHtml(fam.description)}</div>
+                            <div style='font-size:13px;'><span style='color:#ff6b35;'>Key Controls:</span> ${fam.key_controls.map(kc => `<span style='padding:2px 6px; background:rgba(34,211,238,0.1); border-radius:5px; margin-right:6px;'>${escapeHtml(kc)}</span>`).join('')}</div>
                         </div>`;
                 });
                 html += `</div>`;
+                if (!families.length) {
+                    html = `<div class='premium-card'><p>No matches in Control Families.</p></div>`;
+                }
             } else if (section === 'glossary') {
-                html += `<div class='breach-table'><table class='data-table'><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody>`;
-                dataBankGlossary.forEach(gloss => {
-                    if (searchTerm && !(gloss.term.toLowerCase().includes(searchTerm) || gloss.definition.toLowerCase().includes(searchTerm))) return;
-                    html += `<tr><td><strong style='color: #22d3ee;'>${gloss.term}</strong></td><td>${gloss.definition}</td></tr>`;
+                const terms = dataBankData.glossary.filter(item => {
+                    if (!query) return true;
+                    return getDataBankSearchText(item).toLowerCase().includes(query);
+                });
+                html += `<div class='breach-table'><table class='data-table'><thead><tr><th>Term</th><th>Definition</th><th style="width:70px;">Favorite</th></tr></thead><tbody>`;
+                terms.forEach(gloss => {
+                    html += `
+                        <tr data-databank-item data-databank-id='${escapeHtml(gloss.id)}' data-clipboard-anchor='databank-${escapeHtml(gloss.id)}'>
+                            <td><strong style='color: #22d3ee;'>${escapeHtml(gloss.term)}</strong></td>
+                            <td>${escapeHtml(gloss.definition)}</td>
+                            <td><button class="databank-fav-btn" type="button" data-databank-fav="${escapeHtml(gloss.id)}" aria-label="Toggle favorite">☆</button></td>
+                        </tr>
+                    `;
                 });
                 html += `</tbody></table></div>`;
+                if (!terms.length) {
+                    html = `<div class='premium-card'><p>No matches in Glossary.</p></div>`;
+                }
             } else if (section === 'risk') {
-                dataBankRiskMatrices.forEach(matrix => {
-                    if (searchTerm && !((matrix.title && matrix.title.toLowerCase().includes(searchTerm)) || (matrix.description && matrix.description.toLowerCase().includes(searchTerm)))) return;
+                dataBankData.riskMatrices.forEach(matrix => {
+                    if (query && !((matrix.title && matrix.title.toLowerCase().includes(query)) || (matrix.description && matrix.description.toLowerCase().includes(query)))) return;
                     html += `<div class='premium-card' style='box-shadow:0 0 10px #ffd700; margin-bottom:18px;'>`;
-                    html += `<h3 style='color:#ff6b00; margin-bottom:10px;'>${matrix.title}</h3><p style='margin-bottom:12px;'>${matrix.description || ''}</p>`;
+                    html += `<h3 style='color:#ff6b00; margin-bottom:10px;'>${escapeHtml(matrix.title)}</h3><p style='margin-bottom:12px;'>${escapeHtml(matrix.description || '')}</p>`;
                     if (matrix.table) {
                         html += `<table class='data-table'><tbody>`;
                         matrix.table.forEach(row => {
-                            html += `<tr>${row.map((cell,i) => `<td style='${i===0?"font-weight:600;color:#ff6b35;":"font-weight:500;color:#ff0040;"}'>${cell}</td>`).join('')}</tr>`;
+                            html += `<tr>${row.map((cell,i) => `<td style='${i===0?"font-weight:600;color:#ff6b35;":"font-weight:500;color:#ff0040;"}'>${escapeHtml(cell)}</td>`).join('')}</tr>`;
                         });
                         html += `</tbody></table>`;
                     }
                     if (matrix.scale) {
                         html += `<div style='display:flex; gap:12px; margin:10px 0;'>`;
                         matrix.scale.forEach(s => {
-                            html += `<span style='padding:6px 16px; background:${s.color}; color:#0f1419; border-radius:6px; font-weight:600;'>${s.label} (${s.range})</span>`;
+                            html += `<span style='padding:6px 16px; background:${escapeHtml(s.color)}; color:#0f1419; border-radius:6px; font-weight:600;'>${escapeHtml(s.label)} (${escapeHtml(s.range)})</span>`;
                         });
                         html += `</div>`;
                     }
                     html += `</div>`;
                 });
+                if (!html) {
+                    html = `<div class='premium-card'><p>No matches in Risk Matrices.</p></div>`;
+                }
             } else if (section === 'guides') {
+                const guides = dataBankData.guides.filter(item => {
+                    if (!query) return true;
+                    return getDataBankSearchText(item).toLowerCase().includes(query);
+                });
                 html += `<div class='timeline'>`;
-                dataBankGuides.forEach(guide => {
-                    if (searchTerm && !((guide.title && guide.title.toLowerCase().includes(searchTerm)) || (guide.steps && guide.steps.some(s => s.toLowerCase().includes(searchTerm))))) return;
-                    html += `<div class='timeline-item'><div class='timeline-dot' style='background:#22d3ee;'></div><div class='timeline-content'>`;
-                    html += `<div class='timeline-header'><strong style='color:#22d3ee;'>${guide.title}</strong></div>`;
-                    html += `<div class='timeline-meta'>Steps:</div>`;
-                    html += `<div class='timeline-desc'><ul style='margin-top:10px;margin-bottom:0;'>`;
-                    (guide.steps || []).forEach(step => {
-                        html += `<li style='padding:3px 0;font-size:13px;'>${step}</li>`;
-                    });
-                    html += `</ul></div>`;
-                    html += `</div></div>`;
+                guides.forEach(guide => {
+                    html += `
+                        <div class='timeline-item' data-databank-item data-databank-id='${escapeHtml(guide.id)}' data-clipboard-anchor='databank-${escapeHtml(guide.id)}'>
+                            <div class='timeline-dot' style='background:#22d3ee;'></div>
+                            <div class='timeline-content'>
+                                <div class='databank-guide-header'>
+                                    <div>
+                                        <div class='timeline-header'><strong style='color:#22d3ee;'>${escapeHtml(guide.title)}</strong></div>
+                                        <div class='timeline-meta'>${escapeHtml(guide.summary || 'Implementation steps and evidence guidance.')}</div>
+                                    </div>
+                                    <div class="databank-guide-actions">
+                                        <button class="databank-fav-btn" type="button" data-databank-fav="${escapeHtml(guide.id)}" aria-label="Toggle favorite">☆</button>
+                                        <button class="databank-guide-toggle" type="button" data-guide-toggle="${escapeHtml(guide.id)}">Toggle steps</button>
+                                        <button class="databank-detail-btn" type="button" data-databank-open="${escapeHtml(guide.id)}">Details</button>
+                                    </div>
+                                </div>
+                                <div class='databank-guide-body' data-guide-body="${escapeHtml(guide.id)}">
+                                    ${(guide.steps || []).map((step, index) => `
+                                        <div class="databank-guide-step">
+                                            <strong>Step ${index + 1}:</strong> ${escapeHtml(step.step)}
+                                            <div style="margin-top:6px; font-size:12px; color: rgba(255,255,255,0.65);">
+                                                <div><span style="color:#22d3ee;">Deliverables:</span> ${(step.deliverables || []).map(item => escapeHtml(item)).join(', ') || 'TBD'}</div>
+                                                <div><span style="color:#ffb020;">Evidence:</span> ${(step.evidence || []).map(item => escapeHtml(item)).join(', ') || 'TBD'}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 });
                 html += `</div>`;
+                if (!guides.length) {
+                    html = `<div class='premium-card'><p>No matches in Implementation Guides.</p></div>`;
+                }
             } else {
                 html = `<div class='premium-card'><p>No data available for this section.</p></div>`;
             }
             contentDiv.innerHTML = html;
+            updateDataBankFavoriteButtons();
+            updatePinButtons();
+        }
+
+        function highlightDataBankItem(id) {
+            if (!id) return;
+            const safeId = (window.CSS && CSS.escape) ? CSS.escape(id) : id;
+            const selector = `[data-databank-id="${safeId}"]`;
+            const target = document.querySelector(selector);
+            if (!target) return;
+            target.classList.add('databank-highlight');
+            setTimeout(() => {
+                target.classList.remove('databank-highlight');
+            }, 1200);
+        }
+
+        function scrollToDataBankItem(id) {
+            if (!id) return;
+            const safeId = (window.CSS && CSS.escape) ? CSS.escape(id) : id;
+            const selector = `[data-databank-id="${safeId}"]`;
+            const target = document.querySelector(selector);
+            if (!target) return;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlightDataBankItem(id);
+        }
+
+        function buildDataBankActionButtons(item) {
+            if (!item) return '';
+            return `
+                <div class="databank-detail-actions">
+                    <button class="library-action-btn" type="button" data-databank-action="library" data-databank-id="${escapeHtml(item.id)}">Save to Library</button>
+                    <button class="library-action-btn" type="button" data-databank-action="clipboard" data-databank-id="${escapeHtml(item.id)}">Pin to Clipboard</button>
+                    <button class="library-action-btn" type="button" data-databank-action="case" data-databank-id="${escapeHtml(item.id)}">Add to Case</button>
+                </div>
+            `;
+        }
+
+        function renderDataBankModalContent(item) {
+            if (!item) return '<p>No detail information available.</p>';
+            if (item.type === 'framework') {
+                return `
+                    <div class="databank-detail-grid">
+                        <div class="databank-detail-section">
+                            <h4>What it is</h4>
+                            <p style="color: rgba(255,255,255,0.75); font-size: 13px;">${escapeHtml(item.what_it_is)}</p>
+                            <h4 style="margin-top:12px;">Who it’s for</h4>
+                            <p style="color: rgba(255,255,255,0.75); font-size: 13px;">${escapeHtml(item.who_its_for)}</p>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Structure summary</h4>
+                            <p style="color: rgba(255,255,255,0.75); font-size: 13px;">${escapeHtml(item.structure_summary)}</p>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Getting started checklist</h4>
+                            <ul>${(item.checklist || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Evidence examples (audit-ready)</h4>
+                            <ul>${(item.evidence_examples || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Official links</h4>
+                            <ul>${(item.official_links || []).map(link => `<li><a class="news-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)} →</a></li>`).join('')}</ul>
+                        </div>
+                        ${buildDataBankActionButtons(item)}
+                    </div>
+                `;
+            }
+            if (item.type === 'control') {
+                return `
+                    <div class="databank-detail-grid">
+                        <div class="databank-detail-section">
+                            <h4>Family purpose</h4>
+                            <p style="color: rgba(255,255,255,0.75); font-size: 13px;">${escapeHtml(item.purpose)}</p>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Key controls</h4>
+                            <ul>${(item.key_controls_detail || []).map(ctrl => `<li><strong>${escapeHtml(ctrl.name)}:</strong> ${escapeHtml(ctrl.description)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Implementation examples</h4>
+                            <ul>${(item.implementation_examples || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Evidence to collect</h4>
+                            <ul>${(item.evidence || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Audit questions</h4>
+                            <ul>${(item.audit_questions || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        ${buildDataBankActionButtons(item)}
+                    </div>
+                `;
+            }
+            if (item.type === 'term') {
+                return `
+                    <div class="databank-detail-grid">
+                        <div class="databank-detail-section">
+                            <h4>Expanded definition</h4>
+                            <p style="color: rgba(255,255,255,0.75); font-size: 13px;">${escapeHtml(item.expanded_definition)}</p>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Examples</h4>
+                            <ul>${(item.examples || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Related terms</h4>
+                            <ul>${(item.related || []).map(entry => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>
+                        </div>
+                        ${buildDataBankActionButtons(item)}
+                    </div>
+                `;
+            }
+            if (item.type === 'guide') {
+                return `
+                    <div class="databank-detail-grid">
+                        <div class="databank-detail-section">
+                            <h4>Overview</h4>
+                            <p style="color: rgba(255,255,255,0.75); font-size: 13px;">${escapeHtml(item.summary)}</p>
+                        </div>
+                        <div class="databank-detail-section">
+                            <h4>Steps + deliverables + evidence</h4>
+                            <ul>
+                                ${(item.steps || []).map((step, index) => `
+                                    <li>
+                                        <strong>Step ${index + 1}:</strong> ${escapeHtml(step.step)}<br>
+                                        <span style="color:#22d3ee;">Deliverables:</span> ${(step.deliverables || []).map(entry => escapeHtml(entry)).join(', ') || 'TBD'}<br>
+                                        <span style="color:#ffb020;">Evidence:</span> ${(step.evidence || []).map(entry => escapeHtml(entry)).join(', ') || 'TBD'}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ${buildDataBankActionButtons(item)}
+                    </div>
+                `;
+            }
+            return '<p>No detail information available.</p>';
+        }
+
+        function openDataBankModal(item) {
+            if (!item) return;
+            const modal = document.getElementById('databank-detail-modal');
+            const title = document.getElementById('databank-detail-modal-title');
+            const body = document.getElementById('databank-detail-modal-body');
+            if (!modal || !body || !title) return;
+            title.textContent = item.name || item.term || item.title || 'Data Bank Details';
+            body.innerHTML = renderDataBankModalContent(item);
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            updateDataBankRecent(item.id);
+        }
+
+        function closeDataBankModal() {
+            const modal = document.getElementById('databank-detail-modal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function buildDataBankLibraryPayload(item) {
+            const title = item.name || item.term || item.title || 'Data Bank Item';
+            const summary = getDataBankSnippet(item);
+            return {
+                id: `databank:${item.id}`,
+                type: 'knowledge',
+                title: title,
+                summary: summary,
+                source: 'Data Bank',
+                date: new Date().toLocaleDateString(),
+                url: item.link || '',
+                tags: ['databank', dataBankTypeMeta[item.type]?.label || item.type]
+            };
+        }
+
+        function addDataBankToClipboard(item) {
+            if (!item) return;
+            const payload = {
+                id: `databank:${item.id}`,
+                anchor: `databank-${item.id}`,
+                type: 'knowledge',
+                title: item.name || item.term || item.title || 'Data Bank Item',
+                subtitle: dataBankTypeMeta[item.type]?.label || 'Knowledge',
+                url: item.link || '',
+                meta: {
+                    source: 'Data Bank',
+                    category: dataBankTypeMeta[item.type]?.label || item.type
+                }
+            };
+            upsertClipboardItem(payload);
+            renderClipboard();
+            updatePinButtons();
+            showToast('Pinned to clipboard');
+        }
+
+        function addDataBankToCase(item) {
+            if (!item) return;
+            const data = loadCaseBuilder();
+            const caseItem = {
+                id: `case-item:${Date.now()}`,
+                title: item.name || item.term || item.title || 'Data Bank Item',
+                description: getDataBankSnippet(item),
+                type: dataBankTypeMeta[item.type]?.label || item.type,
+                createdAt: new Date().toISOString()
+            };
+            if (data.cases.length) {
+                if (!Array.isArray(data.cases[0].items)) {
+                    data.cases[0].items = [];
+                }
+                data.cases[0].items.unshift(caseItem);
+                saveCaseBuilder(data);
+                showToast('Added to current case');
+                return;
+            }
+            const entry = {
+                id: `case:${Date.now()}`,
+                title: `Case: ${caseItem.title}`,
+                description: caseItem.description,
+                items: [caseItem],
+                createdAt: new Date().toISOString()
+            };
+            data.cases.unshift(entry);
+            saveCaseBuilder(data);
+            showToast('Case created');
+        }
+
+        function handleDataBankAction(action, id) {
+            const item = getDataBankItemById(id);
+            if (!item) return;
+            if (action === 'library') {
+                addLibraryItem(buildDataBankLibraryPayload(item));
+                return;
+            }
+            if (action === 'clipboard') {
+                addDataBankToClipboard(item);
+                return;
+            }
+            if (action === 'case') {
+                addDataBankToCase(item);
+            }
+        }
+
+        function setupDataBank() {
+            const searchInput = document.getElementById('databank-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterDataBank);
+                searchInput.addEventListener('focus', () => {
+                    updateDataBankSearchResults(searchInput.value);
+                });
+            }
+            renderDataBankMiniRows();
+
+            document.addEventListener('click', event => {
+                const resultItem = event.target.closest('[data-databank-result]');
+                if (resultItem) {
+                    const id = resultItem.dataset.databankResult;
+                    const item = getDataBankItemById(id);
+                    if (!item) return;
+                    const targetSection = getDataBankSectionForType(item.type);
+                    switchDataBankSection(targetSection);
+                    setTimeout(() => {
+                        scrollToDataBankItem(id);
+                    }, 120);
+                    const resultsContainer = document.getElementById('databank-search-results');
+                    if (resultsContainer) {
+                        resultsContainer.classList.remove('active');
+                    }
+                    return;
+                }
+
+                const favBtn = event.target.closest('[data-databank-fav]');
+                if (favBtn) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleDataBankFavorite(favBtn.dataset.databankFav);
+                    return;
+                }
+
+                const actionBtn = event.target.closest('[data-databank-action]');
+                if (actionBtn) {
+                    handleDataBankAction(actionBtn.dataset.databankAction, actionBtn.dataset.databankId);
+                    return;
+                }
+
+                const chipBtn = event.target.closest('[data-databank-chip]');
+                if (chipBtn) {
+                    const item = getDataBankItemById(chipBtn.dataset.databankChip);
+                    if (item) {
+                        openDataBankModal(item);
+                    }
+                    return;
+                }
+
+                const toggleBtn = event.target.closest('[data-guide-toggle]');
+                if (toggleBtn) {
+                    const id = toggleBtn.dataset.guideToggle;
+                    const safeId = (window.CSS && CSS.escape) ? CSS.escape(id) : id;
+                    const body = document.querySelector(`[data-guide-body="${safeId}"]`);
+                    if (body) {
+                        body.classList.toggle('active');
+                    }
+                    return;
+                }
+
+                const openBtn = event.target.closest('[data-databank-open]');
+                if (openBtn) {
+                    const item = getDataBankItemById(openBtn.dataset.databankOpen);
+                    openDataBankModal(item);
+                    return;
+                }
+
+                const card = event.target.closest('[data-databank-item]');
+                if (card && !event.target.closest('a') && !event.target.closest('button')) {
+                    const item = getDataBankItemById(card.dataset.databankId);
+                    openDataBankModal(item);
+                    return;
+                }
+
+                const modal = document.getElementById('databank-detail-modal');
+                if (modal && modal.classList.contains('active')) {
+                    if (event.target.closest('#databank-detail-modal .modal-close') || event.target === modal) {
+                        closeDataBankModal();
+                        return;
+                    }
+                }
+
+                if (!event.target.closest('.databank-search-wrapper')) {
+                    const resultsContainer = document.getElementById('databank-search-results');
+                    if (resultsContainer) {
+                        resultsContainer.classList.remove('active');
+                    }
+                }
+            });
+
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    closeDataBankModal();
+                }
+            });
         }
 
         // Fix: Learning Hub Tab - Subtab/section init
