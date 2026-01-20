@@ -522,6 +522,117 @@ body{
     color: var(--color-white);
 }
 
+/* Document Analyzer Enhancements */
+.doc-accordion {
+    border: 1px solid rgba(34,211,238,0.16);
+    border-radius: var(--radius-md);
+    background: rgba(10, 15, 20, 0.55);
+    overflow: hidden;
+    margin-top: 16px;
+}
+
+.doc-accordion:first-of-type {
+    margin-top: 0;
+}
+
+.doc-accordion-toggle {
+    width: 100%;
+    background: rgba(34,211,238,0.08);
+    border: none;
+    color: var(--color-white);
+    padding: 14px 16px;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.doc-accordion-toggle:hover {
+    background: rgba(34,211,238,0.16);
+}
+
+.doc-accordion-toggle span:last-child {
+    font-size: 16px;
+    transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.doc-accordion-toggle[aria-expanded="false"] span:last-child {
+    transform: rotate(-90deg);
+}
+
+.doc-accordion-body {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.doc-accordion-body.is-collapsed {
+    display: none;
+}
+
+.artifact-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.artifact-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.artifact-group-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+}
+
+.artifact-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.artifact-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(34,211,238,0.35);
+    background: rgba(34,211,238,0.1);
+    color: #8be9ff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.artifact-chip:hover {
+    background: rgba(139,92,246,0.18);
+    border-color: rgba(139,92,246,0.4);
+    transform: translateY(-1px);
+}
+
+.artifact-chip span {
+    opacity: 0.7;
+    margin-left: 6px;
+    font-size: 11px;
+}
+
+.artifact-empty {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+}
+
+#document-export-buttons {
+    flex-wrap: wrap;
+}
+
 .news-cluster {
     margin-top: var(--space-8);
     padding: var(--space-10);
@@ -3656,6 +3767,12 @@ window.addEventListener('DOMContentLoaded', () => {
                             <button class="btn btn-secondary" onclick="copyToClipboard(&#39;document&#39;)" style="padding: 12px 20px;">
                                 📋 Copy
                             </button>
+                            <button class="btn btn-secondary" onclick="pinDocumentSummary()" style="padding: 12px 20px;">
+                                📌 Pin to Clipboard
+                            </button>
+                            <button class="btn btn-secondary" onclick="createDocumentCase()" style="padding: 12px 20px;">
+                                🗂️ Create Case
+                            </button>
                         </div>
                     </div>
 
@@ -4056,6 +4173,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const appState = {
             currentTab: 'dashboard',
             uploadedFile: null,
+            documentText: '',
             lastResults: {
                 research: null,
                 youtube: null,
@@ -4307,6 +4425,7 @@ window.addEventListener('DOMContentLoaded', () => {
             setupNewsFilters();
             setupTabNavigation();
             setupFileUpload();
+            setupDocumentAnalyzerEnhancements();
             renderBreaches();
             setupLearningHubTabs();
             setupLibrary();
@@ -6492,6 +6611,202 @@ function analyzePassword() {
             analyzeBtn.disabled = false;
         }
 
+        function cleanSummaryText(text) {
+            if (!text) return '';
+            let cleaned = text.replace(/\[\d+\](\s*\[\d+\])+/g, '');
+            cleaned = cleaned.replace(/\[\d+\]/g, '');
+            cleaned = cleaned.replace(/[ \t]{2,}/g, ' ');
+            cleaned = cleaned.replace(/[ \t]+\n/g, '\n').trim();
+            return cleaned;
+        }
+
+        function sanitizeArtifactValue(value) {
+            if (!value) return '';
+            return value.replace(/[),.;]+$/g, '');
+        }
+
+        function extractArtifacts(primaryText, secondaryText) {
+            const combined = [primaryText, secondaryText].filter(Boolean).join('\n');
+            const cveRegex = /CVE-\d{4}-\d{4,7}/g;
+            const ipRegex = /\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\b/g;
+            const urlRegex = /https?:\/\/[^\s"'<>]+/g;
+            const emailRegex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+            const md5Regex = /\b[a-f0-9]{32}\b/gi;
+            const sha1Regex = /\b[a-f0-9]{40}\b/gi;
+            const sha256Regex = /\b[a-f0-9]{64}\b/gi;
+            const domainRegex = /\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\b/gi;
+
+            const cves = new Set((combined.match(cveRegex) || []).map(value => value.toUpperCase()));
+            const ips = new Set((combined.match(ipRegex) || []).map(value => value));
+            const urls = new Set((combined.match(urlRegex) || []).map(value => sanitizeArtifactValue(value)));
+            const emails = new Set((combined.match(emailRegex) || []).map(value => value.toLowerCase()));
+            const md5 = new Set((combined.match(md5Regex) || []).map(value => value.toLowerCase()));
+            const sha1 = new Set((combined.match(sha1Regex) || []).map(value => value.toLowerCase()));
+            const sha256 = new Set((combined.match(sha256Regex) || []).map(value => value.toLowerCase()));
+
+            const emailDomains = new Set(Array.from(emails).map(email => email.split('@')[1]).filter(Boolean));
+            const urlDomains = new Set(Array.from(urls).map(url => {
+                try {
+                    return new URL(url).hostname.toLowerCase();
+                } catch (error) {
+                    return '';
+                }
+            }).filter(Boolean));
+
+            const domains = new Set(
+                (combined.match(domainRegex) || [])
+                    .map(value => value.toLowerCase())
+                    .filter(value => value && !emailDomains.has(value) && !urlDomains.has(value))
+            );
+
+            return {
+                cves: Array.from(cves),
+                ips: Array.from(ips),
+                urls: Array.from(urls),
+                emails: Array.from(emails),
+                hashes: {
+                    md5: Array.from(md5),
+                    sha1: Array.from(sha1),
+                    sha256: Array.from(sha256)
+                },
+                domains: Array.from(domains)
+            };
+        }
+
+        function countArtifacts(artifacts) {
+            if (!artifacts) return 0;
+            return artifacts.cves.length +
+                artifacts.ips.length +
+                artifacts.urls.length +
+                artifacts.emails.length +
+                artifacts.domains.length +
+                artifacts.hashes.md5.length +
+                artifacts.hashes.sha1.length +
+                artifacts.hashes.sha256.length;
+        }
+
+        function renderArtifactGroup(label, items, type, options = {}) {
+            if (!items.length) return '';
+            const chips = items.map(value => `
+                <button class="artifact-chip" type="button" data-artifact-type="${type}" data-artifact-value="${escapeHtml(value)}" ${options.hashType ? `data-hash-type="${options.hashType}"` : ''}>
+                    ${escapeHtml(value)} <span>· ${label}</span>
+                </button>
+            `).join('');
+            return `
+                <div>
+                    <div class="artifact-group-title">${label} (${items.length})</div>
+                    <div class="artifact-chips">${chips}</div>
+                </div>
+            `;
+        }
+
+        function renderArtifactsHtml(artifacts) {
+            const total = countArtifacts(artifacts);
+            if (!total) {
+                return `<div class="artifact-empty">No artifacts detected.</div>`;
+            }
+            return `
+                <div class="artifact-toolbar">
+                    <div style="font-size: 12px; color: rgba(255,255,255,0.7);">${total} artifacts detected</div>
+                    <button class="btn btn-secondary" type="button" data-artifact-action="copy-all">📋 Copy All Artifacts</button>
+                </div>
+                <div class="artifact-groups">
+                    ${renderArtifactGroup('CVEs', artifacts.cves, 'cve')}
+                    ${renderArtifactGroup('IPv4s', artifacts.ips, 'ip')}
+                    ${renderArtifactGroup('URLs', artifacts.urls, 'url')}
+                    ${renderArtifactGroup('Emails', artifacts.emails, 'email')}
+                    ${renderArtifactGroup('Domains', artifacts.domains, 'domain')}
+                    ${renderArtifactGroup('MD5', artifacts.hashes.md5, 'hash', { hashType: 'md5' })}
+                    ${renderArtifactGroup('SHA1', artifacts.hashes.sha1, 'hash', { hashType: 'sha1' })}
+                    ${renderArtifactGroup('SHA256', artifacts.hashes.sha256, 'hash', { hashType: 'sha256' })}
+                </div>
+            `;
+        }
+
+        function formatArtifactsForClipboard(artifacts) {
+            if (!artifacts) return '';
+            const lines = [];
+            if (artifacts.cves.length) lines.push(`CVEs: ${artifacts.cves.join(', ')}`);
+            if (artifacts.ips.length) lines.push(`IPs: ${artifacts.ips.join(', ')}`);
+            if (artifacts.urls.length) lines.push(`URLs: ${artifacts.urls.join(', ')}`);
+            if (artifacts.emails.length) lines.push(`Emails: ${artifacts.emails.join(', ')}`);
+            if (artifacts.domains.length) lines.push(`Domains: ${artifacts.domains.join(', ')}`);
+            if (artifacts.hashes.md5.length) lines.push(`MD5: ${artifacts.hashes.md5.join(', ')}`);
+            if (artifacts.hashes.sha1.length) lines.push(`SHA1: ${artifacts.hashes.sha1.join(', ')}`);
+            if (artifacts.hashes.sha256.length) lines.push(`SHA256: ${artifacts.hashes.sha256.join(', ')}`);
+            return lines.join('\n');
+        }
+
+        function setupDocumentAnalyzerEnhancements() {
+            document.addEventListener('click', event => {
+                const accordionToggle = event.target.closest('[data-accordion-toggle]');
+                if (accordionToggle && accordionToggle.closest('#document-results')) {
+                    const targetId = accordionToggle.dataset.accordionToggle;
+                    const target = targetId ? document.getElementById(targetId) : null;
+                    if (target) {
+                        const isExpanded = accordionToggle.getAttribute('aria-expanded') === 'true';
+                        accordionToggle.setAttribute('aria-expanded', String(!isExpanded));
+                        target.classList.toggle('is-collapsed', isExpanded);
+                    }
+                    return;
+                }
+
+                const actionBtn = event.target.closest('[data-artifact-action]');
+                if (actionBtn && actionBtn.closest('#document-results')) {
+                    if (actionBtn.dataset.artifactAction === 'copy-all') {
+                        copyAllArtifactsToClipboard();
+                    }
+                    return;
+                }
+
+                const chip = event.target.closest('[data-artifact-type]');
+                if (chip && chip.closest('#document-results')) {
+                    routeArtifactToTool(chip.dataset.artifactType, chip.dataset.artifactValue);
+                }
+            });
+        }
+
+        function activateMainTab(tabName) {
+            const button = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+            if (button) {
+                button.click();
+            }
+        }
+
+        function routeArtifactToTool(type, value) {
+            if (!value) return;
+            activateMainTab('tools');
+            const toolMap = {
+                cve: 'cve-input',
+                ip: 'ip-input',
+                url: 'url-input',
+                hash: 'hash-input',
+                email: 'email-input',
+                domain: 'threatminer-input'
+            };
+            const inputId = toolMap[type];
+            const input = inputId ? document.getElementById(inputId) : null;
+            if (input) {
+                input.value = value;
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function copyAllArtifactsToClipboard() {
+            const artifacts = appState.lastResults.document?.artifacts;
+            if (!artifacts || !countArtifacts(artifacts)) {
+                showToast('No artifacts to copy');
+                return;
+            }
+            const text = formatArtifactsForClipboard(artifacts);
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Artifacts copied');
+            }).catch(() => {
+                showToast('Unable to copy artifacts');
+            });
+        }
+
         // Analyze Document with Perplexity API
         async function analyzeDocument() {
             const action = document.getElementById('document-action').value;
@@ -6512,6 +6827,7 @@ function analyzePassword() {
             try {
                 // Read file content
                 const fileContent = await readFileContent(appState.uploadedFile);
+                appState.documentText = fileContent;
                 
                 const actionPrompt = {
                     'summarize': 'Provide an executive summary of this document',
@@ -6524,26 +6840,52 @@ function analyzePassword() {
                 const result = await callPerplexityAPI(query);
                 
                 const timestamp = new Date().toLocaleString();
-                appState.lastResults.document = {
-                    title: appState.uploadedFile.name,
-                    content: result,
-                    action: action,
-                    timestamp: timestamp
-                };
-
                 let content = '';
                 
                 if (action === 'summarize') {
+                    const cleanedResult = cleanSummaryText(result);
+                    const artifacts = extractArtifacts(cleanedResult, fileContent);
+                    appState.lastResults.document = {
+                        title: appState.uploadedFile.name,
+                        content: cleanedResult,
+                        rawContent: result,
+                        cleanedContent: cleanedResult,
+                        action: action,
+                        timestamp: timestamp,
+                        artifacts: artifacts
+                    };
                     content = `
-                        <div class="results-card" id="document-result-content">
-                            <h3>Document Summary</h3>
-                            <p><strong>Document:</strong> ${appState.uploadedFile.name}</p>
-                            <p><strong>Generated:</strong> ${timestamp}</p>
-                            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 16px 0;">
-                            <div style="line-height: 1.8; white-space: pre-wrap;">${result}</div>
+                        <div class="results-card" id="document-result-content" data-clipboard-anchor="document-summary">
+                            <div class="doc-accordion">
+                                <button class="doc-accordion-toggle" type="button" data-accordion-toggle="document-summary-body" aria-expanded="true">
+                                    <span>Document Summary</span>
+                                    <span>▾</span>
+                                </button>
+                                <div class="doc-accordion-body" id="document-summary-body">
+                                    <p><strong>Document:</strong> ${appState.uploadedFile.name}</p>
+                                    <p><strong>Generated:</strong> ${timestamp}</p>
+                                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 16px 0;">
+                                    <div style="line-height: 1.8; white-space: pre-wrap;">${cleanedResult}</div>
+                                </div>
+                            </div>
+                            <div class="doc-accordion">
+                                <button class="doc-accordion-toggle" type="button" data-accordion-toggle="document-artifacts-body" aria-expanded="true">
+                                    <span>Detected Artifacts</span>
+                                    <span>▾</span>
+                                </button>
+                                <div class="doc-accordion-body" id="document-artifacts-body">
+                                    ${renderArtifactsHtml(artifacts)}
+                                </div>
+                            </div>
                         </div>
                     `;
                 } else if (action === 'quiz') {
+                    appState.lastResults.document = {
+                        title: appState.uploadedFile.name,
+                        content: result,
+                        action: action,
+                        timestamp: timestamp
+                    };
                     content = `
                         <div class="results-card" id="document-result-content">
                             <h3>Document Knowledge Quiz</h3>
@@ -6554,6 +6896,12 @@ function analyzePassword() {
                         </div>
                     `;
                 } else {
+                    appState.lastResults.document = {
+                        title: appState.uploadedFile.name,
+                        content: result,
+                        action: action,
+                        timestamp: timestamp
+                    };
                     content = `
                         <div class="results-card" id="document-result-content">
                             <h3>Q&amp;A Mode - Ask Questions</h3>
@@ -7171,6 +7519,91 @@ function analyzePassword() {
             });
         }
 
+        const caseBuilderStorageKey = 'case_builder_v1';
+        const caseBuilderVersion = 1;
+
+        function loadCaseBuilder() {
+            try {
+                const raw = localStorage.getItem(caseBuilderStorageKey);
+                if (!raw) return { version: caseBuilderVersion, cases: [] };
+                const parsed = JSON.parse(raw);
+                if (!parsed || parsed.version !== caseBuilderVersion || !Array.isArray(parsed.cases)) {
+                    return { version: caseBuilderVersion, cases: [] };
+                }
+                return parsed;
+            } catch (error) {
+                return { version: caseBuilderVersion, cases: [] };
+            }
+        }
+
+        function saveCaseBuilder(data) {
+            try {
+                localStorage.setItem(caseBuilderStorageKey, JSON.stringify(data));
+            } catch (error) {
+                showToast('Case storage unavailable');
+            }
+        }
+
+        function getDocumentActionLabel(action) {
+            const labels = {
+                summarize: 'Summarize - Executive Summary',
+                quiz: 'Quiz - Knowledge Check',
+                qa: 'Q&A - Ask Questions'
+            };
+            return labels[action] || action;
+        }
+
+        function pinDocumentSummary(options = {}) {
+            const result = appState.lastResults.document;
+            if (!result || result.action !== 'summarize') {
+                showToast('Generate a document summary first');
+                return null;
+            }
+            const id = result.clipboardId || `doc:${result.title}:${result.timestamp}`;
+            const payload = {
+                id: id,
+                anchor: 'document-summary',
+                type: 'doc',
+                title: result.title,
+                subtitle: getDocumentActionLabel(result.action),
+                notes: result.cleanedContent || result.content,
+                meta: {
+                    generatedAt: result.timestamp,
+                    artifacts: result.artifacts
+                }
+            };
+            upsertClipboardItem(payload);
+            renderClipboard();
+            updatePinButtons();
+            result.clipboardId = id;
+            if (!options.silent) {
+                showToast('Pinned to Clipboard');
+            }
+            return id;
+        }
+
+        function createDocumentCase() {
+            const result = appState.lastResults.document;
+            if (!result || result.action !== 'summarize') {
+                showToast('Generate a document summary first');
+                return;
+            }
+            const clipboardId = result.clipboardId || pinDocumentSummary({ silent: true });
+            const data = loadCaseBuilder();
+            const description = (result.cleanedContent || result.content || '').slice(0, 200);
+            const entry = {
+                id: `case:${Date.now()}`,
+                title: `Document Analysis: ${result.title}`,
+                description: description,
+                artifacts: result.artifacts || {},
+                clipboardId: clipboardId,
+                createdAt: new Date().toISOString()
+            };
+            data.cases.unshift(entry);
+            saveCaseBuilder(data);
+            showToast('Case created');
+        }
+
         // === Saved Library ===
         const libraryStorageKey = 'library_v1';
         const libraryTypeLabels = {
@@ -7490,7 +7923,8 @@ function analyzePassword() {
             incident: 'Incident',
             actor: 'Threat Actor',
             technique: 'Technique',
-            tool: 'Tool Result'
+            tool: 'Tool Result',
+            doc: 'Document'
         };
         let clipboardState = loadClipboard();
         let clipboardUiState = loadClipboardUiState();
@@ -7685,7 +8119,10 @@ function analyzePassword() {
                 chips.push(`<span class="clipboard-chip severity">${escapeHtml(item.severity)}</span>`);
             }
             chips.push(`<span class="clipboard-chip">${escapeHtml(clipboardTypeLabels[item.type] || item.type)}</span>`);
-            const entries = Object.entries(item.meta || {}).filter(([, value]) => value != null && value !== '');
+            const entries = Object.entries(item.meta || {}).filter(([, value]) => {
+                const valueType = typeof value;
+                return value != null && value !== '' && (valueType === 'string' || valueType === 'number' || valueType === 'boolean');
+            });
             entries.slice(0, 3).forEach(([key, value]) => {
                 const label = `${key}: ${value}`;
                 chips.push(`<span class="clipboard-chip">${escapeHtml(label)}</span>`);
