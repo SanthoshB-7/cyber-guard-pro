@@ -2419,6 +2419,233 @@ body{
     box-shadow: 0 0 22px rgba(34,211,238,0.3);
     transition: outline 0.2s var(--ease-standard);
 }
+
+.risk-builder-card {
+    border: 1px solid rgba(255, 176, 32, 0.35);
+    box-shadow: 0 0 14px rgba(255, 176, 32, 0.2);
+}
+
+.risk-builder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.risk-builder-toggle {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.risk-toggle-btn {
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.7);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-standard);
+}
+
+.risk-toggle-btn.active {
+    background: rgba(255,176,32,0.2);
+    border-color: rgba(255,176,32,0.5);
+    color: #ffb020;
+}
+
+.risk-builder-labels {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-bottom: 16px;
+}
+
+.risk-label-group {
+    background: rgba(12, 16, 24, 0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+}
+
+.risk-label-group h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+}
+
+.risk-label-inputs {
+    display: grid;
+    gap: 8px;
+}
+
+.risk-label-inputs input {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    font-size: 12px;
+}
+
+.risk-matrix-grid {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 12px;
+}
+
+.risk-matrix-grid th,
+.risk-matrix-grid td {
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 8px;
+}
+
+.risk-matrix-grid th {
+    background: rgba(34,211,238,0.12);
+    color: #22d3ee;
+    font-weight: 600;
+}
+
+.risk-matrix-grid td {
+    position: relative;
+    color: #0f1419;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.risk-cell-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #0f1419;
+}
+
+.risk-cell-select {
+    width: 100%;
+    border-radius: 6px;
+    border: none;
+    padding: 4px 6px;
+    font-size: 11px;
+    background: rgba(255,255,255,0.85);
+    color: #0f1419;
+}
+
+.risk-register-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.risk-register-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.risk-register-filters {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    margin-bottom: 12px;
+}
+
+.risk-rating-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0f1419;
+}
+
+.risk-row-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.risk-modal-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.risk-rating-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+}
+
+.risk-register-table tbody tr {
+    cursor: pointer;
+    transition: background 0.2s var(--ease-standard);
+}
+
+.risk-register-table tbody tr:hover {
+    background: rgba(34, 211, 238, 0.08);
+}
+
+.checklist-summary {
+    display: grid;
+    gap: 10px;
+}
+
+.checklist-card {
+    background: rgba(12, 16, 24, 0.8);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.checklist-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.checklist-items {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(12, 16, 24, 0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.checklist-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.checklist-item.done {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
@@ -4408,6 +4635,96 @@ window.addEventListener('DOMContentLoaded', () => {
                 <button class="modal-close" type="button" aria-label="Close databank details">Close</button>
             </div>
             <div id="databank-detail-modal-body"></div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="risk-register-modal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="risk-register-modal-title">
+            <div class="modal-header">
+                <h3 id="risk-register-modal-title" style="font-size: 18px; color: #ffb020;">Risk Register Entry</h3>
+                <button class="modal-close" type="button" aria-label="Close risk register">Close</button>
+            </div>
+            <form id="risk-register-form">
+                <input type="hidden" id="risk-id">
+                <div class="form-group">
+                    <label for="risk-title">Title *</label>
+                    <input class="form-input" id="risk-title" type="text" required>
+                </div>
+                <div class="form-group">
+                    <label for="risk-description">Description</label>
+                    <textarea class="form-input" id="risk-description" rows="3"></textarea>
+                </div>
+                <div class="risk-modal-grid">
+                    <div class="form-group">
+                        <label for="risk-category">Category</label>
+                        <select class="form-input" id="risk-category">
+                            <option>Security</option>
+                            <option>Compliance</option>
+                            <option>Vendor</option>
+                            <option>Cloud</option>
+                            <option>AppSec</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="risk-likelihood">Likelihood</label>
+                        <select class="form-input" id="risk-likelihood"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="risk-impact">Impact</label>
+                        <select class="form-input" id="risk-impact"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Risk Rating</label>
+                        <div class="risk-rating-preview" id="risk-rating-preview"></div>
+                    </div>
+                </div>
+                <div class="risk-modal-grid">
+                    <div class="form-group">
+                        <label for="risk-treatment">Treatment</label>
+                        <select class="form-input" id="risk-treatment">
+                            <option>Mitigate</option>
+                            <option>Transfer</option>
+                            <option>Accept</option>
+                            <option>Avoid</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="risk-owner">Owner</label>
+                        <input class="form-input" id="risk-owner" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="risk-due">Due date</label>
+                        <input class="form-input" id="risk-due" type="date">
+                    </div>
+                    <div class="form-group">
+                        <label for="risk-status">Status</label>
+                        <select class="form-input" id="risk-status">
+                            <option>Open</option>
+                            <option>In Progress</option>
+                            <option>Closed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="risk-notes">Notes</label>
+                    <textarea class="form-input" id="risk-notes" rows="3"></textarea>
+                </div>
+                <div style="display:flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" type="submit">Save Risk</button>
+                    <button class="btn btn-danger" type="button" id="risk-delete-btn" style="display:none;">Delete Risk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="checklist-modal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="checklist-modal-title">
+            <div class="modal-header">
+                <h3 id="checklist-modal-title" style="font-size: 18px; color: #22d3ee;">Implementation Checklist</h3>
+                <button class="modal-close" type="button" aria-label="Close checklist">Close</button>
+            </div>
+            <div id="checklist-modal-body"></div>
         </div>
     </div>
 
@@ -8387,6 +8704,794 @@ function analyzePassword() {
             recent: loadDataBankRecent()
         };
 
+        const riskMatrixStorageKey = 'risk_matrix_v1';
+        const riskRegisterStorageKey = 'risk_register_v1';
+        const implementationChecklistsKey = 'implementation_checklists_v1';
+        const riskRatingOptions = ['Low', 'Medium', 'High', 'Critical'];
+        const riskRatingMeta = {
+            Low: { color: '#22c55e', rank: 1 },
+            Medium: { color: '#ffd700', rank: 2 },
+            High: { color: '#ff6b00', rank: 3 },
+            Critical: { color: '#ff0040', rank: 4 }
+        };
+
+        const riskRegisterUiState = {
+            status: 'all',
+            rating: 'Low',
+            category: 'all',
+            sort: 'rating'
+        };
+
+        let riskMatrixState = loadRiskMatrixConfig();
+        let riskRegisterState = loadRiskRegister();
+        let implementationChecklistsState = loadImplementationChecklists();
+
+        function getDefaultRiskLabels(size, type) {
+            if (size === 3) {
+                return ['Low', 'Medium', 'High'];
+            }
+            if (type === 'impact') {
+                return ['Very Low', 'Low', 'Medium', 'High', 'Very High'];
+            }
+            return ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
+        }
+
+        function getDefaultRiskRatings(size) {
+            const ratings = [];
+            for (let row = 1; row <= size; row += 1) {
+                const rowRatings = [];
+                for (let col = 1; col <= size; col += 1) {
+                    const score = (row + col) / (size * 2);
+                    let label = 'Low';
+                    if (score > 0.8) {
+                        label = 'Critical';
+                    } else if (score > 0.6) {
+                        label = 'High';
+                    } else if (score > 0.4) {
+                        label = 'Medium';
+                    }
+                    rowRatings.push(label);
+                }
+                ratings.push(rowRatings);
+            }
+            return ratings;
+        }
+
+        function getDefaultRiskMatrixConfig(size = 3) {
+            return {
+                size,
+                likelihoodLabels: getDefaultRiskLabels(size, 'likelihood'),
+                impactLabels: getDefaultRiskLabels(size, 'impact'),
+                ratings: getDefaultRiskRatings(size)
+            };
+        }
+
+        function normalizeRiskMatrixConfig(config) {
+            const size = config?.size === 5 ? 5 : 3;
+            const defaults = getDefaultRiskMatrixConfig(size);
+            const likelihoodLabels = Array.isArray(config?.likelihoodLabels) ? config.likelihoodLabels.slice(0, size) : [];
+            const impactLabels = Array.isArray(config?.impactLabels) ? config.impactLabels.slice(0, size) : [];
+            while (likelihoodLabels.length < size) {
+                likelihoodLabels.push(defaults.likelihoodLabels[likelihoodLabels.length]);
+            }
+            while (impactLabels.length < size) {
+                impactLabels.push(defaults.impactLabels[impactLabels.length]);
+            }
+            const ratings = Array.isArray(config?.ratings) ? config.ratings : [];
+            const normalizedRatings = Array.from({ length: size }, (_, rowIndex) => {
+                const row = Array.isArray(ratings[rowIndex]) ? ratings[rowIndex] : [];
+                return Array.from({ length: size }, (_, colIndex) => {
+                    const value = row[colIndex];
+                    return riskRatingOptions.includes(value) ? value : defaults.ratings[rowIndex][colIndex];
+                });
+            });
+            return {
+                size,
+                likelihoodLabels,
+                impactLabels,
+                ratings: normalizedRatings
+            };
+        }
+
+        function loadRiskMatrixConfig() {
+            try {
+                const raw = localStorage.getItem(riskMatrixStorageKey);
+                if (!raw) return getDefaultRiskMatrixConfig(3);
+                const parsed = JSON.parse(raw);
+                return normalizeRiskMatrixConfig(parsed);
+            } catch (error) {
+                return getDefaultRiskMatrixConfig(3);
+            }
+        }
+
+        function saveRiskMatrixConfig() {
+            localStorage.setItem(riskMatrixStorageKey, JSON.stringify(riskMatrixState));
+        }
+
+        function loadRiskRegister() {
+            try {
+                const raw = localStorage.getItem(riskRegisterStorageKey);
+                if (!raw) return { version: 1, items: [], updatedAt: null };
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed !== 'object') {
+                    return { version: 1, items: [], updatedAt: null };
+                }
+                return {
+                    version: 1,
+                    items: Array.isArray(parsed.items) ? parsed.items : [],
+                    updatedAt: parsed.updatedAt || null
+                };
+            } catch (error) {
+                return { version: 1, items: [], updatedAt: null };
+            }
+        }
+
+        function saveRiskRegister() {
+            riskRegisterState.updatedAt = new Date().toISOString();
+            localStorage.setItem(riskRegisterStorageKey, JSON.stringify(riskRegisterState));
+        }
+
+        function loadImplementationChecklists() {
+            try {
+                const raw = localStorage.getItem(implementationChecklistsKey);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveImplementationChecklists() {
+            localStorage.setItem(implementationChecklistsKey, JSON.stringify(implementationChecklistsState));
+        }
+
+        function getRiskRatingMeta(label) {
+            return riskRatingMeta[label] || riskRatingMeta.Low;
+        }
+
+        function getRiskCellRating(likelihood, impact) {
+            const rowIndex = Math.max(0, Math.min(riskMatrixState.size - 1, Number(likelihood) - 1));
+            const colIndex = Math.max(0, Math.min(riskMatrixState.size - 1, Number(impact) - 1));
+            return riskMatrixState.ratings[rowIndex][colIndex] || 'Low';
+        }
+
+        function getRiskRatingBadge(label) {
+            const meta = getRiskRatingMeta(label);
+            return `<span class="risk-rating-badge" style="background:${meta.color};">${escapeHtml(label)}</span>`;
+        }
+
+        function getRiskRatingRank(label) {
+            return getRiskRatingMeta(label).rank;
+        }
+
+        function updateRiskRegisterRating(item) {
+            const label = getRiskCellRating(item.likelihood, item.impact);
+            if (item.ratingLabel !== label) {
+                item.ratingLabel = label;
+                saveRiskRegister();
+            }
+            return label;
+        }
+
+        function renderRiskMatrixBuilder() {
+            const size = riskMatrixState.size;
+            const sizeOptions = [3, 5].map(option => `
+                <button class="risk-toggle-btn ${size === option ? 'active' : ''}" type="button" data-risk-size="${option}">
+                    ${option}x${option}
+                </button>
+            `).join('');
+            const likelihoodInputs = riskMatrixState.likelihoodLabels.map((label, index) => `
+                <input type="text" value="${escapeHtml(label)}" data-risk-label="likelihood" data-index="${index}">
+            `).join('');
+            const impactInputs = riskMatrixState.impactLabels.map((label, index) => `
+                <input type="text" value="${escapeHtml(label)}" data-risk-label="impact" data-index="${index}">
+            `).join('');
+            const headerRow = `
+                <tr>
+                    <th>Likelihood \\ Impact</th>
+                    ${riskMatrixState.impactLabels.map(label => `<th>${escapeHtml(label)}</th>`).join('')}
+                </tr>
+            `;
+            const bodyRows = riskMatrixState.ratings.map((row, rowIndex) => `
+                <tr>
+                    <th>${escapeHtml(riskMatrixState.likelihoodLabels[rowIndex])}</th>
+                    ${row.map((cell, colIndex) => {
+                        const meta = getRiskRatingMeta(cell);
+                        return `
+                            <td style="background:${meta.color};" data-risk-cell="${rowIndex}-${colIndex}">
+                                <div class="risk-cell-label">${escapeHtml(cell)}</div>
+                                <select class="risk-cell-select" data-risk-cell-select data-row="${rowIndex}" data-col="${colIndex}">
+                                    ${riskRatingOptions.map(option => `
+                                        <option value="${option}" ${option === cell ? 'selected' : ''}>${option}</option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                        `;
+                    }).join('')}
+                </tr>
+            `).join('');
+            return `
+                <div class="premium-card risk-builder-card" id="risk-matrix-builder">
+                    <div class="risk-builder-header">
+                        <div>
+                            <h3 style="color:#ffb020; margin-bottom:4px;">Risk Matrix Builder</h3>
+                            <div style="font-size:13px; color: rgba(255,255,255,0.7);">Customize likelihood, impact, and rating tiers for offline scoring.</div>
+                        </div>
+                        <div class="risk-builder-toggle">${sizeOptions}</div>
+                    </div>
+                    <div class="risk-builder-labels">
+                        <div class="risk-label-group">
+                            <h4>Likelihood labels (rows)</h4>
+                            <div class="risk-label-inputs">${likelihoodInputs}</div>
+                        </div>
+                        <div class="risk-label-group">
+                            <h4>Impact labels (columns)</h4>
+                            <div class="risk-label-inputs">${impactInputs}</div>
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="risk-matrix-grid">
+                            <thead>${headerRow}</thead>
+                            <tbody>${bodyRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRiskRegisterSection() {
+            const filterOptions = riskRatingOptions.map(option => `
+                <option value="${option}" ${riskRegisterUiState.rating === option ? 'selected' : ''}>${option}+</option>
+            `).join('');
+            const categoryOptions = ['all', 'Security', 'Compliance', 'Vendor', 'Cloud', 'AppSec', 'Other']
+                .map(option => `<option value="${option}" ${riskRegisterUiState.category === option ? 'selected' : ''}>${option === 'all' ? 'All Categories' : option}</option>`)
+                .join('');
+            const statusOptions = ['all', 'Open', 'In Progress', 'Closed']
+                .map(option => `<option value="${option}" ${riskRegisterUiState.status === option ? 'selected' : ''}>${option === 'all' ? 'All Statuses' : option}</option>`)
+                .join('');
+            const sortOptions = [
+                { value: 'rating', label: 'Rating' },
+                { value: 'due', label: 'Due Date' },
+                { value: 'updated', label: 'Last Updated' }
+            ].map(option => `<option value="${option.value}" ${riskRegisterUiState.sort === option.value ? 'selected' : ''}>${option.label}</option>`).join('');
+            const rows = getFilteredRiskRegisterItems().map(item => {
+                const ratingLabel = updateRiskRegisterRating(item);
+                const dueLabel = item.dueDate ? new Date(item.dueDate).toLocaleDateString() : '—';
+                const updatedLabel = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : '—';
+                return `
+                    <tr data-risk-row="true" data-risk-id="${escapeHtml(item.id)}" data-clipboard-anchor="risk:${escapeHtml(item.id)}">
+                        <td>${getRiskRatingBadge(ratingLabel)}</td>
+                        <td><strong>${escapeHtml(item.title)}</strong></td>
+                        <td>${escapeHtml(item.category || '—')}</td>
+                        <td>${escapeHtml(item.owner || '—')}</td>
+                        <td>${escapeHtml(item.status || 'Open')}</td>
+                        <td>${dueLabel}</td>
+                        <td>${updatedLabel}</td>
+                        <td>
+                            <div class="risk-row-actions">
+                                <button class="library-action-btn" type="button" data-risk-action="clipboard" data-risk-id="${escapeHtml(item.id)}">Pin</button>
+                                <button class="library-action-btn" type="button" data-risk-action="case" data-risk-id="${escapeHtml(item.id)}">Case</button>
+                                <button class="library-action-btn" type="button" data-risk-action="library" data-risk-id="${escapeHtml(item.id)}">Save</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            return `
+                <div class="premium-card" id="risk-register">
+                    <div class="risk-register-header">
+                        <div>
+                            <h3 style="color:#22d3ee; margin-bottom:4px;">Risk Register</h3>
+                            <div style="font-size:13px; color: rgba(255,255,255,0.7);">Track risks with auto-scored ratings, owners, and treatments.</div>
+                        </div>
+                        <div class="risk-register-actions">
+                            <button class="btn btn-primary" type="button" data-risk-add="true">Add Risk</button>
+                            <button class="library-action-btn" type="button" data-risk-export="csv">Export CSV</button>
+                            <button class="library-action-btn" type="button" data-risk-export="pdf">Export PDF</button>
+                        </div>
+                    </div>
+                    <div class="risk-register-filters">
+                        <select class="form-input" data-risk-filter="status">${statusOptions}</select>
+                        <select class="form-input" data-risk-filter="rating">${filterOptions}</select>
+                        <select class="form-input" data-risk-filter="category">${categoryOptions}</select>
+                        <select class="form-input" data-risk-sort="true">${sortOptions}</select>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="data-table risk-register-table">
+                            <thead>
+                                <tr>
+                                    <th>Rating</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th>Due</th>
+                                    <th>Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows || `<tr><td colspan="8" style="text-align:center; color: rgba(255,255,255,0.6);">No risks yet. Add your first entry.</td></tr>`}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getFilteredRiskRegisterItems() {
+            const minRating = getRiskRatingRank(riskRegisterUiState.rating);
+            const filtered = riskRegisterState.items.filter(item => {
+                if (riskRegisterUiState.status !== 'all' && item.status !== riskRegisterUiState.status) return false;
+                if (riskRegisterUiState.category !== 'all' && item.category !== riskRegisterUiState.category) return false;
+                const ratingLabel = getRiskCellRating(item.likelihood, item.impact);
+                return getRiskRatingRank(ratingLabel) >= minRating;
+            });
+            if (riskRegisterUiState.sort === 'rating') {
+                filtered.sort((a, b) => {
+                    const ratingA = getRiskRatingRank(getRiskCellRating(a.likelihood, a.impact));
+                    const ratingB = getRiskRatingRank(getRiskCellRating(b.likelihood, b.impact));
+                    return ratingB - ratingA;
+                });
+            } else if (riskRegisterUiState.sort === 'due') {
+                filtered.sort((a, b) => new Date(a.dueDate || 0) - new Date(b.dueDate || 0));
+            } else if (riskRegisterUiState.sort === 'updated') {
+                filtered.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+            }
+            return filtered;
+        }
+
+        function getRiskRegisterItemById(id) {
+            return riskRegisterState.items.find(item => item.id === id);
+        }
+
+        function openRiskRegisterModal(item = null) {
+            const modal = document.getElementById('risk-register-modal');
+            if (!modal) return;
+            const isEdit = Boolean(item);
+            const maxScore = riskMatrixState.size;
+            document.getElementById('risk-id').value = item?.id || '';
+            document.getElementById('risk-title').value = item?.title || '';
+            document.getElementById('risk-description').value = item?.description || '';
+            document.getElementById('risk-category').value = item?.category || 'Security';
+            populateRiskScoreOptions();
+            document.getElementById('risk-likelihood').value = String(Math.min(item?.likelihood || 1, maxScore));
+            document.getElementById('risk-impact').value = String(Math.min(item?.impact || 1, maxScore));
+            document.getElementById('risk-treatment').value = item?.treatment || 'Mitigate';
+            document.getElementById('risk-owner').value = item?.owner || '';
+            document.getElementById('risk-due').value = item?.dueDate || '';
+            document.getElementById('risk-status').value = item?.status || 'Open';
+            document.getElementById('risk-notes').value = item?.notes || '';
+            updateRiskRatingPreview();
+            const deleteBtn = document.getElementById('risk-delete-btn');
+            if (deleteBtn) {
+                deleteBtn.style.display = isEdit ? 'inline-flex' : 'none';
+            }
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRiskRegisterModal() {
+            const modal = document.getElementById('risk-register-modal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function populateRiskScoreOptions() {
+            const likelihoodSelect = document.getElementById('risk-likelihood');
+            const impactSelect = document.getElementById('risk-impact');
+            if (!likelihoodSelect || !impactSelect) return;
+            const options = Array.from({ length: riskMatrixState.size }, (_, index) => {
+                const value = index + 1;
+                return `<option value="${value}">${value}</option>`;
+            }).join('');
+            likelihoodSelect.innerHTML = options;
+            impactSelect.innerHTML = options;
+        }
+
+        function updateRiskRatingPreview() {
+            const likelihood = document.getElementById('risk-likelihood')?.value || 1;
+            const impact = document.getElementById('risk-impact')?.value || 1;
+            const label = getRiskCellRating(likelihood, impact);
+            const preview = document.getElementById('risk-rating-preview');
+            if (preview) {
+                preview.innerHTML = `${getRiskRatingBadge(label)} <span>Auto-scored from matrix</span>`;
+            }
+        }
+
+        function saveRiskFromForm() {
+            const idField = document.getElementById('risk-id');
+            const title = document.getElementById('risk-title').value.trim();
+            if (!title) {
+                showToast('Title is required');
+                return;
+            }
+            const likelihood = Number(document.getElementById('risk-likelihood').value);
+            const impact = Number(document.getElementById('risk-impact').value);
+            const ratingLabel = getRiskCellRating(likelihood, impact);
+            const now = new Date().toISOString();
+            const payload = {
+                id: idField.value || `risk-${Date.now()}`,
+                title,
+                description: document.getElementById('risk-description').value.trim(),
+                category: document.getElementById('risk-category').value,
+                likelihood,
+                impact,
+                ratingLabel,
+                treatment: document.getElementById('risk-treatment').value,
+                owner: document.getElementById('risk-owner').value.trim(),
+                dueDate: document.getElementById('risk-due').value,
+                status: document.getElementById('risk-status').value,
+                notes: document.getElementById('risk-notes').value.trim()
+            };
+            const existingIndex = riskRegisterState.items.findIndex(item => item.id === payload.id);
+            if (existingIndex >= 0) {
+                const existing = riskRegisterState.items[existingIndex];
+                riskRegisterState.items[existingIndex] = {
+                    ...existing,
+                    ...payload,
+                    updatedAt: now
+                };
+            } else {
+                riskRegisterState.items.unshift({
+                    ...payload,
+                    createdAt: now,
+                    updatedAt: now
+                });
+            }
+            saveRiskRegister();
+            closeRiskRegisterModal();
+            renderDataBankSection('risk', dataBankState.search);
+            showToast('Risk saved');
+        }
+
+        function deleteRisk(id) {
+            riskRegisterState.items = riskRegisterState.items.filter(item => item.id !== id);
+            saveRiskRegister();
+            closeRiskRegisterModal();
+            renderDataBankSection('risk', dataBankState.search);
+            showToast('Risk removed');
+        }
+
+        function exportRiskRegisterCsv() {
+            if (!riskRegisterState.items.length) {
+                showToast('No risks to export');
+                return;
+            }
+            const headers = ['Title', 'Description', 'Category', 'Likelihood', 'Impact', 'Rating', 'Treatment', 'Owner', 'Due Date', 'Status', 'Notes', 'Created At', 'Updated At'];
+            const rows = riskRegisterState.items.map(item => [
+                item.title,
+                item.description,
+                item.category,
+                item.likelihood,
+                item.impact,
+                getRiskCellRating(item.likelihood, item.impact),
+                item.treatment,
+                item.owner,
+                item.dueDate,
+                item.status,
+                item.notes,
+                item.createdAt,
+                item.updatedAt
+            ]);
+            const csv = [headers, ...rows]
+                .map(row => row.map(value => `"${String(value || '').replace(/"/g, '""')}"`).join(','))
+                .join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `risk-register-${Date.now()}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('Risk register exported');
+        }
+
+        function exportRiskRegisterPdf() {
+            if (!riskRegisterState.items.length) {
+                showToast('No risks to export');
+                return;
+            }
+            if (!window.jspdf?.jsPDF) {
+                const payload = {
+                    title: 'Risk Register',
+                    generatedAt: new Date().toISOString(),
+                    items: riskRegisterState.items
+                };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `risk-register-${Date.now()}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('PDF unavailable, exported JSON instead');
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            const margin = 40;
+            let y = 50;
+            pdf.setFontSize(18);
+            pdf.text('Risk Register', margin, y);
+            y += 20;
+            pdf.setFontSize(10);
+            pdf.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+            y += 20;
+            const sorted = [...riskRegisterState.items].sort((a, b) => {
+                const ratingA = getRiskRatingRank(getRiskCellRating(a.likelihood, a.impact));
+                const ratingB = getRiskRatingRank(getRiskCellRating(b.likelihood, b.impact));
+                return ratingB - ratingA;
+            });
+            const topRisks = sorted.slice(0, 10);
+            pdf.setFontSize(12);
+            pdf.text('Top Risks (by rating)', margin, y);
+            y += 16;
+            pdf.setFontSize(10);
+            topRisks.forEach(item => {
+                const rating = getRiskCellRating(item.likelihood, item.impact);
+                const line = `${rating} • ${item.title} (${item.category || 'Uncategorized'})`;
+                if (y > 760) {
+                    pdf.addPage();
+                    y = 40;
+                }
+                pdf.text(line, margin, y);
+                y += 14;
+            });
+            pdf.save(`risk-register-${Date.now()}.pdf`);
+            showToast('Risk register PDF exported');
+        }
+
+        function buildRiskClipboardPayload(item) {
+            const rating = getRiskCellRating(item.likelihood, item.impact);
+            return {
+                id: `risk:${item.id}`,
+                anchor: `risk:${item.id}`,
+                type: 'risk',
+                title: `Risk: ${item.title}`,
+                subtitle: `${rating} • ${item.category || 'Uncategorized'}`,
+                url: '',
+                severity: rating.toUpperCase(),
+                meta: {
+                    owner: item.owner || 'Unassigned',
+                    status: item.status || 'Open'
+                }
+            };
+        }
+
+        function addRiskToLibrary(item) {
+            addLibraryItem({
+                id: `risk:${item.id}`,
+                type: 'risk',
+                title: item.title,
+                summary: item.description || `Rating: ${getRiskCellRating(item.likelihood, item.impact)}`,
+                source: 'Risk Register',
+                date: item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : new Date().toLocaleDateString(),
+                url: '',
+                tags: ['risk', item.category || 'General', getRiskCellRating(item.likelihood, item.impact)]
+            });
+        }
+
+        function addRiskToCase(item) {
+            const data = loadCaseBuilder();
+            const caseItem = {
+                id: `case-item:${Date.now()}`,
+                title: item.title,
+                description: item.description || `Rating: ${getRiskCellRating(item.likelihood, item.impact)}`,
+                type: 'Risk',
+                createdAt: new Date().toISOString()
+            };
+            if (data.cases.length) {
+                if (!Array.isArray(data.cases[0].items)) {
+                    data.cases[0].items = [];
+                }
+                data.cases[0].items.unshift(caseItem);
+                saveCaseBuilder(data);
+                showToast('Added to current case');
+                return;
+            }
+            const entry = {
+                id: `case:${Date.now()}`,
+                title: `Case: ${caseItem.title}`,
+                description: caseItem.description,
+                items: [caseItem],
+                createdAt: new Date().toISOString()
+            };
+            data.cases.unshift(entry);
+            saveCaseBuilder(data);
+            showToast('Case created');
+        }
+
+        function renderChecklistSummarySection() {
+            if (!implementationChecklistsState.length) {
+                return `
+                    <div class="premium-card">
+                        <h3 style="color:#22d3ee; margin-bottom:6px;">My Checklists</h3>
+                        <p style="color: rgba(255,255,255,0.65); font-size: 13px;">No saved checklists yet. Convert a guide to get started.</p>
+                    </div>
+                `;
+            }
+            const cards = implementationChecklistsState.map(checklist => {
+                const completed = checklist.items?.filter(item => item.done).length || 0;
+                const total = checklist.items?.length || 0;
+                return `
+                    <div class="checklist-card" data-checklist-id="${escapeHtml(checklist.id)}">
+                        <div>
+                            <div style="font-weight:600;">${escapeHtml(checklist.title)}</div>
+                            <div style="font-size:12px; color: rgba(255,255,255,0.6);">${completed}/${total} complete</div>
+                        </div>
+                        <div class="checklist-actions">
+                            <button class="library-action-btn" type="button" data-checklist-open="${escapeHtml(checklist.id)}">Open</button>
+                            <button class="library-action-btn" type="button" data-checklist-delete="${escapeHtml(checklist.id)}">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            return `
+                <div class="premium-card">
+                    <h3 style="color:#22d3ee; margin-bottom:6px;">My Checklists</h3>
+                    <div class="checklist-summary">${cards}</div>
+                </div>
+            `;
+        }
+
+        function createChecklistFromGuide(guide) {
+            if (!guide) return;
+            const checklist = {
+                id: `checklist-${Date.now()}`,
+                title: guide.title,
+                items: (guide.steps || []).map(step => ({
+                    text: step.step,
+                    done: false
+                })),
+                createdAt: new Date().toISOString()
+            };
+            implementationChecklistsState.unshift(checklist);
+            saveImplementationChecklists();
+            renderDataBankSection('guides', dataBankState.search);
+            openChecklistModal(checklist.id);
+            showToast('Checklist created');
+        }
+
+        function getChecklistById(id) {
+            return implementationChecklistsState.find(checklist => checklist.id === id);
+        }
+
+        function openChecklistModal(id) {
+            const checklist = getChecklistById(id);
+            const modal = document.getElementById('checklist-modal');
+            const body = document.getElementById('checklist-modal-body');
+            const title = document.getElementById('checklist-modal-title');
+            if (!checklist || !modal || !body || !title) return;
+            title.textContent = checklist.title;
+            const completed = checklist.items.filter(item => item.done).length;
+            const total = checklist.items.length;
+            body.innerHTML = `
+                <div>
+                    <div style="display:flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div style="color: rgba(255,255,255,0.7); font-size: 13px;">${completed}/${total} complete</div>
+                        <div class="checklist-actions">
+                            <button class="library-action-btn" type="button" data-checklist-pin="${escapeHtml(checklist.id)}">Pin checklist</button>
+                            <button class="library-action-btn" type="button" data-checklist-library="${escapeHtml(checklist.id)}">Save to Library</button>
+                            <button class="library-action-btn" type="button" data-checklist-export="${escapeHtml(checklist.id)}">Export</button>
+                        </div>
+                    </div>
+                    <div class="checklist-items">
+                        ${checklist.items.map((item, index) => `
+                            <label class="checklist-item ${item.done ? 'done' : ''}">
+                                <input type="checkbox" data-checklist-item="${escapeHtml(checklist.id)}" data-index="${index}" ${item.done ? 'checked' : ''}>
+                                <span>${escapeHtml(item.text)}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeChecklistModal() {
+            const modal = document.getElementById('checklist-modal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function updateChecklistItem(checklistId, index, done) {
+            const checklist = getChecklistById(checklistId);
+            if (!checklist || !checklist.items[index]) return;
+            checklist.items[index].done = done;
+            saveImplementationChecklists();
+            openChecklistModal(checklistId);
+            renderDataBankSection('guides', dataBankState.search);
+        }
+
+        function deleteChecklist(id) {
+            implementationChecklistsState = implementationChecklistsState.filter(checklist => checklist.id !== id);
+            saveImplementationChecklists();
+            renderDataBankSection('guides', dataBankState.search);
+            closeChecklistModal();
+            showToast('Checklist removed');
+        }
+
+        function pinChecklistToClipboard(checklist) {
+            if (!checklist) return;
+            const completed = checklist.items.filter(item => item.done).length;
+            const payload = {
+                id: `checklist:${checklist.id}`,
+                anchor: `checklist:${checklist.id}`,
+                type: 'checklist',
+                title: checklist.title,
+                subtitle: 'Implementation Checklist',
+                url: '',
+                severity: null,
+                meta: {
+                    progress: `${completed}/${checklist.items.length}`
+                }
+            };
+            upsertClipboardItem(payload);
+            renderClipboard();
+            updatePinButtons();
+            showToast('Checklist pinned');
+        }
+
+        function saveChecklistToLibrary(checklist) {
+            if (!checklist) return;
+            const completed = checklist.items.filter(item => item.done).length;
+            addLibraryItem({
+                id: `checklist:${checklist.id}`,
+                type: 'checklist',
+                title: checklist.title,
+                summary: `${completed}/${checklist.items.length} tasks complete`,
+                source: 'Implementation Guides',
+                date: new Date(checklist.createdAt).toLocaleDateString(),
+                url: '',
+                tags: ['checklist', 'implementation']
+            });
+        }
+
+        function exportChecklist(checklist) {
+            if (!checklist) return;
+            if (window.jspdf?.jsPDF) {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                let y = 50;
+                pdf.setFontSize(16);
+                pdf.text(checklist.title, 40, y);
+                y += 20;
+                pdf.setFontSize(10);
+                pdf.text(`Generated: ${new Date().toLocaleString()}`, 40, y);
+                y += 20;
+                pdf.setFontSize(11);
+                checklist.items.forEach(item => {
+                    const text = `${item.done ? '☑' : '☐'} ${item.text}`;
+                    if (y > 760) {
+                        pdf.addPage();
+                        y = 40;
+                    }
+                    pdf.text(text, 40, y);
+                    y += 14;
+                });
+                pdf.save(`checklist-${Date.now()}.pdf`);
+                showToast('Checklist exported');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(checklist, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `checklist-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('Checklist exported');
+        }
+
         function loadDataBankFavorites() {
             try {
                 const raw = localStorage.getItem(dataBankFavoritesKey);
@@ -8690,6 +9795,8 @@ function analyzePassword() {
                     html = `<div class='premium-card'><p>No matches in Glossary.</p></div>`;
                 }
             } else if (section === 'risk') {
+                html += renderRiskMatrixBuilder();
+                html += renderRiskRegisterSection();
                 dataBankData.riskMatrices.forEach(matrix => {
                     if (query && !((matrix.title && matrix.title.toLowerCase().includes(query)) || (matrix.description && matrix.description.toLowerCase().includes(query)))) return;
                     html += `<div class='premium-card' style='box-shadow:0 0 10px #ffd700; margin-bottom:18px;'>`;
@@ -8710,14 +9817,18 @@ function analyzePassword() {
                     }
                     html += `</div>`;
                 });
-                if (!html) {
-                    html = `<div class='premium-card'><p>No matches in Risk Matrices.</p></div>`;
+                if (!dataBankData.riskMatrices.some(matrix => {
+                    if (!query) return true;
+                    return (matrix.title && matrix.title.toLowerCase().includes(query)) || (matrix.description && matrix.description.toLowerCase().includes(query));
+                })) {
+                    html += `<div class='premium-card'><p>No matches in Risk Matrices.</p></div>`;
                 }
             } else if (section === 'guides') {
                 const guides = dataBankData.guides.filter(item => {
                     if (!query) return true;
                     return getDataBankSearchText(item).toLowerCase().includes(query);
                 });
+                html += renderChecklistSummarySection();
                 html += `<div class='timeline'>`;
                 guides.forEach(guide => {
                     html += `
@@ -8731,6 +9842,7 @@ function analyzePassword() {
                                     </div>
                                     <div class="databank-guide-actions">
                                         <button class="databank-fav-btn" type="button" data-databank-fav="${escapeHtml(guide.id)}" aria-label="Toggle favorite">☆</button>
+                                        <button class="databank-detail-btn" type="button" data-checklist-create="${escapeHtml(guide.id)}">Convert to Checklist</button>
                                         <button class="databank-guide-toggle" type="button" data-guide-toggle="${escapeHtml(guide.id)}">Toggle steps</button>
                                         <button class="databank-detail-btn" type="button" data-databank-open="${escapeHtml(guide.id)}">Details</button>
                                     </div>
@@ -8752,7 +9864,7 @@ function analyzePassword() {
                 });
                 html += `</div>`;
                 if (!guides.length) {
-                    html = `<div class='premium-card'><p>No matches in Implementation Guides.</p></div>`;
+                    html += `<div class='premium-card'><p>No matches in Implementation Guides.</p></div>`;
                 }
             } else {
                 html = `<div class='premium-card'><p>No data available for this section.</p></div>`;
@@ -9030,6 +10142,99 @@ function analyzePassword() {
                     return;
                 }
 
+                const riskSizeBtn = event.target.closest('[data-risk-size]');
+                if (riskSizeBtn) {
+                    const size = Number(riskSizeBtn.dataset.riskSize);
+                    if (size === riskMatrixState.size) return;
+                    riskMatrixState = getDefaultRiskMatrixConfig(size);
+                    saveRiskMatrixConfig();
+                    renderDataBankSection('risk', dataBankState.search);
+                    return;
+                }
+
+                const riskAddBtn = event.target.closest('[data-risk-add]');
+                if (riskAddBtn) {
+                    openRiskRegisterModal();
+                    return;
+                }
+
+                const riskExportBtn = event.target.closest('[data-risk-export]');
+                if (riskExportBtn) {
+                    const type = riskExportBtn.dataset.riskExport;
+                    if (type === 'csv') exportRiskRegisterCsv();
+                    if (type === 'pdf') exportRiskRegisterPdf();
+                    return;
+                }
+
+                const riskActionBtn = event.target.closest('[data-risk-action]');
+                if (riskActionBtn) {
+                    const id = riskActionBtn.dataset.riskId;
+                    const action = riskActionBtn.dataset.riskAction;
+                    const item = getRiskRegisterItemById(id);
+                    if (!item) return;
+                    if (action === 'clipboard') {
+                        upsertClipboardItem(buildRiskClipboardPayload(item));
+                        renderClipboard();
+                        updatePinButtons();
+                        showToast('Pinned to clipboard');
+                    } else if (action === 'case') {
+                        addRiskToCase(item);
+                    } else if (action === 'library') {
+                        addRiskToLibrary(item);
+                    }
+                    return;
+                }
+
+                const riskRow = event.target.closest('[data-risk-row]');
+                if (riskRow && !event.target.closest('button') && !event.target.closest('a')) {
+                    const id = riskRow.dataset.riskId;
+                    const item = getRiskRegisterItemById(id);
+                    if (item) {
+                        openRiskRegisterModal(item);
+                    }
+                    return;
+                }
+
+                const checklistCreateBtn = event.target.closest('[data-checklist-create]');
+                if (checklistCreateBtn) {
+                    const guide = getDataBankItemById(checklistCreateBtn.dataset.checklistCreate);
+                    createChecklistFromGuide(guide);
+                    return;
+                }
+
+                const checklistOpenBtn = event.target.closest('[data-checklist-open]');
+                if (checklistOpenBtn) {
+                    openChecklistModal(checklistOpenBtn.dataset.checklistOpen);
+                    return;
+                }
+
+                const checklistDeleteBtn = event.target.closest('[data-checklist-delete]');
+                if (checklistDeleteBtn) {
+                    deleteChecklist(checklistDeleteBtn.dataset.checklistDelete);
+                    return;
+                }
+
+                const checklistPinBtn = event.target.closest('[data-checklist-pin]');
+                if (checklistPinBtn) {
+                    const checklist = getChecklistById(checklistPinBtn.dataset.checklistPin);
+                    pinChecklistToClipboard(checklist);
+                    return;
+                }
+
+                const checklistLibraryBtn = event.target.closest('[data-checklist-library]');
+                if (checklistLibraryBtn) {
+                    const checklist = getChecklistById(checklistLibraryBtn.dataset.checklistLibrary);
+                    saveChecklistToLibrary(checklist);
+                    return;
+                }
+
+                const checklistExportBtn = event.target.closest('[data-checklist-export]');
+                if (checklistExportBtn) {
+                    const checklist = getChecklistById(checklistExportBtn.dataset.checklistExport);
+                    exportChecklist(checklist);
+                    return;
+                }
+
                 const favBtn = event.target.closest('[data-databank-fav]');
                 if (favBtn) {
                     event.preventDefault();
@@ -9086,6 +10291,22 @@ function analyzePassword() {
                     }
                 }
 
+                const riskModal = document.getElementById('risk-register-modal');
+                if (riskModal && riskModal.classList.contains('active')) {
+                    if (event.target.closest('#risk-register-modal .modal-close') || event.target === riskModal) {
+                        closeRiskRegisterModal();
+                        return;
+                    }
+                }
+
+                const checklistModal = document.getElementById('checklist-modal');
+                if (checklistModal && checklistModal.classList.contains('active')) {
+                    if (event.target.closest('#checklist-modal .modal-close') || event.target === checklistModal) {
+                        closeChecklistModal();
+                        return;
+                    }
+                }
+
                 if (!event.target.closest('.databank-search-wrapper')) {
                     const resultsContainer = document.getElementById('databank-search-results');
                     if (resultsContainer) {
@@ -9094,9 +10315,99 @@ function analyzePassword() {
                 }
             });
 
+            document.addEventListener('change', event => {
+                if (event.target.matches('[data-risk-cell-select]')) {
+                    const row = Number(event.target.dataset.row);
+                    const col = Number(event.target.dataset.col);
+                    const value = event.target.value;
+                    if (!riskRatingOptions.includes(value)) return;
+                    riskMatrixState.ratings[row][col] = value;
+                    saveRiskMatrixConfig();
+                    const cell = event.target.closest('td');
+                    if (cell) {
+                        const meta = getRiskRatingMeta(value);
+                        cell.style.background = meta.color;
+                        const label = cell.querySelector('.risk-cell-label');
+                        if (label) label.textContent = value;
+                    }
+                    renderDataBankSection('risk', dataBankState.search);
+                    return;
+                }
+
+                if (event.target.matches('[data-risk-filter]')) {
+                    const type = event.target.dataset.riskFilter;
+                    if (type === 'status') riskRegisterUiState.status = event.target.value;
+                    if (type === 'rating') riskRegisterUiState.rating = event.target.value;
+                    if (type === 'category') riskRegisterUiState.category = event.target.value;
+                    renderDataBankSection('risk', dataBankState.search);
+                    return;
+                }
+
+                if (event.target.matches('[data-risk-sort]')) {
+                    riskRegisterUiState.sort = event.target.value;
+                    renderDataBankSection('risk', dataBankState.search);
+                    return;
+                }
+
+                if (event.target.id === 'risk-likelihood' || event.target.id === 'risk-impact') {
+                    updateRiskRatingPreview();
+                    return;
+                }
+
+                if (event.target.matches('[data-checklist-item]')) {
+                    const checklistId = event.target.dataset.checklistItem;
+                    const index = Number(event.target.dataset.index);
+                    updateChecklistItem(checklistId, index, event.target.checked);
+                }
+            });
+
+            document.addEventListener('input', event => {
+                if (event.target.matches('[data-risk-label]')) {
+                    const type = event.target.dataset.riskLabel;
+                    const index = Number(event.target.dataset.index);
+                    const value = event.target.value;
+                    if (type === 'likelihood') {
+                        riskMatrixState.likelihoodLabels[index] = value;
+                    } else if (type === 'impact') {
+                        riskMatrixState.impactLabels[index] = value;
+                    }
+                    saveRiskMatrixConfig();
+                    const table = document.querySelector('#risk-matrix-builder .risk-matrix-grid');
+                    if (table) {
+                        if (type === 'likelihood') {
+                            const rowHeader = table.querySelector(`tbody tr:nth-child(${index + 1}) th`);
+                            if (rowHeader) rowHeader.textContent = value || '';
+                        } else if (type === 'impact') {
+                            const headerCell = table.querySelector(`thead th:nth-child(${index + 2})`);
+                            if (headerCell) headerCell.textContent = value || '';
+                        }
+                    }
+                }
+            });
+
+            const riskForm = document.getElementById('risk-register-form');
+            if (riskForm) {
+                riskForm.addEventListener('submit', event => {
+                    event.preventDefault();
+                    saveRiskFromForm();
+                });
+            }
+
+            const riskDeleteBtn = document.getElementById('risk-delete-btn');
+            if (riskDeleteBtn) {
+                riskDeleteBtn.addEventListener('click', () => {
+                    const id = document.getElementById('risk-id').value;
+                    if (id) {
+                        deleteRisk(id);
+                    }
+                });
+            }
+
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') {
                     closeDataBankModal();
+                    closeRiskRegisterModal();
+                    closeChecklistModal();
                 }
             });
         }
@@ -9336,7 +10647,9 @@ function analyzePassword() {
             cve: 'CVE',
             kev: 'KEV',
             actor: 'Threat Actor',
-            technique: 'Technique'
+            technique: 'Technique',
+            risk: 'Risk Register',
+            checklist: 'Checklist'
         };
         const libraryState = {
             items: [],
@@ -9647,7 +10960,9 @@ function analyzePassword() {
             actor: 'Threat Actor',
             technique: 'Technique',
             tool: 'Tool Result',
-            doc: 'Document'
+            doc: 'Document',
+            risk: 'Risk',
+            checklist: 'Checklist'
         };
         let clipboardState = loadClipboard();
         let clipboardUiState = loadClipboardUiState();
