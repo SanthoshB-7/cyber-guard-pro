@@ -4091,7 +4091,10 @@ p, .muted-text, .subtitle{
             <h2>🛰️ Vendor Advisories Radar</h2>
             <div class="module-meta">Last updated: <strong id="advisories-updated">Loading...</strong></div>
         </div>
-        <button class="btn btn-secondary" type="button" id="advisories-refresh-btn">Refresh</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn btn-secondary" type="button" id="advisories-refresh-btn">Refresh</button>
+            <a class="btn btn-secondary" href="/api/feeds?type=advisories&debug=1" target="_blank" rel="noopener" style="padding: 6px 10px; font-size: 12px;">Diagnostics</a>
+        </div>
     </div>
     <div class="module-degraded" id="advisories-degraded">Degraded: Showing last cached advisories while upstream feeds recover.</div>
     <div class="module-controls">
@@ -4114,7 +4117,10 @@ p, .muted-text, .subtitle{
             <h2>🧩 Supply Chain Advisories (OSV)</h2>
             <div class="module-meta">Last updated: <strong id="osv-updated">Loading...</strong></div>
         </div>
-        <button class="btn btn-secondary" type="button" id="osv-refresh-btn">Refresh</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn btn-secondary" type="button" id="osv-refresh-btn">Refresh</button>
+            <a class="btn btn-secondary" href="/api/feeds?type=osv&debug=1" target="_blank" rel="noopener" style="padding: 6px 10px; font-size: 12px;">Diagnostics</a>
+        </div>
     </div>
     <div class="module-degraded" id="osv-degraded">Degraded: Showing last cached OSV advisories while API recovers.</div>
     <div class="module-controls">
@@ -4132,6 +4138,10 @@ p, .muted-text, .subtitle{
             <option value="LOW">Severity: ≥ LOW</option>
             <option value="UNKNOWN">Severity: All</option>
         </select>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color: rgba(255,255,255,0.7);">
+            <input type="checkbox" id="osv-include-unknown">
+            Include unknown severities
+        </label>
     </div>
     <div class="module-list" id="osv-list"></div>
     <button class="btn btn-secondary" type="button" id="osv-load-more" style="margin-top: 12px;">Load more</button>
@@ -4144,7 +4154,10 @@ p, .muted-text, .subtitle{
             <h2>☁️ Cloud/SaaS Status Board</h2>
             <div class="module-meta">Last updated: <strong id="status-updated">Loading...</strong></div>
         </div>
-        <button class="btn btn-secondary" type="button" id="status-refresh-btn">Refresh</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn btn-secondary" type="button" id="status-refresh-btn">Refresh</button>
+            <a class="btn btn-secondary" href="/api/feeds?type=status&debug=1" target="_blank" rel="noopener" style="padding: 6px 10px; font-size: 12px;">Diagnostics</a>
+        </div>
     </div>
     <div class="module-degraded" id="status-degraded">Degraded: Showing last cached status updates while feeds recover.</div>
     <div class="intel-summary-chips" id="status-summary-chips"></div>
@@ -4285,7 +4298,12 @@ const advisoriesState = {
     cveOnly: false,
     visible: 10,
     degraded: false,
-    timestamp: null
+    timestamp: null,
+    parsedCount: 0,
+    filteredCount: 0,
+    fetchedCount: 0,
+    errors: [],
+    filteredByCveOnly: false
 };
 
 const osvState = {
@@ -4293,16 +4311,25 @@ const osvState = {
     filtered: [],
     ecosystems: ['npm', 'PyPI', 'Maven'],
     severity: 'MEDIUM',
+    includeUnknown: false,
     visible: 5,
     degraded: false,
-    timestamp: null
+    timestamp: null,
+    parsedCount: 0,
+    filteredCount: 0,
+    fetchedCount: 0,
+    errors: []
 };
 
 const statusState = {
     items: [],
     visible: 5,
     degraded: false,
-    timestamp: null
+    timestamp: null,
+    parsedCount: 0,
+    filteredCount: 0,
+    fetchedCount: 0,
+    errors: []
 };
 
 function updateHealthStatus(key, isDegraded, timestamp) {
@@ -4393,6 +4420,26 @@ function buildSummaryData(raw, maxLength) {
     return { fullText, shortText, isTrimmed: true };
 }
 
+function renderDebugDetails(errors) {
+    if (!Array.isArray(errors) || errors.length === 0) return '';
+    const items = errors.map(error => {
+        const source = escapeHtml(error.sourceName || 'Source');
+        const url = escapeHtml(error.url || '');
+        const status = error.status != null ? escapeHtml(String(error.status)) : 'n/a';
+        const message = escapeHtml(error.message || 'Unknown error');
+        return `<li style="margin-bottom:6px;"><strong>${source}</strong> (${status})<br><span style="color: rgba(255,255,255,0.65);">${message}</span>${url ? `<br><span style="color: rgba(255,255,255,0.45);">${url}</span>` : ''}</li>`;
+    }).join('');
+    return `
+        <div style="margin-top: 12px; text-align: left;">
+            <div style="font-size: 12px; color: rgba(255,255,255,0.75); margin-bottom: 6px;">Degraded: sources failed.</div>
+            <details style="font-size: 12px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                <summary style="cursor:pointer; color:#22d3ee;">View debug</summary>
+                <ul style="margin: 8px 0 0 16px;">${items}</ul>
+            </details>
+        </div>
+    `;
+}
+
 function updateAdvisoryVendors(items) {
     const vendorSelect = document.getElementById('advisories-vendor-filter');
     if (!vendorSelect) return;
@@ -4409,13 +4456,20 @@ async function loadVendorAdvisories(force = false) {
     listEl.innerHTML = '<div style="text-align:center; padding:24px; color:#22d3ee;"><span class="spinner" style="width:28px; height:28px;"></span><br><br>Loading vendor advisories...</div>';
 
     try {
-        const url = `/api/feeds?type=advisories${force ? '&force=1' : ''}`;
+        const params = new URLSearchParams({ type: 'advisories' });
+        if (advisoriesState.cveOnly) params.set('cveOnly', '1');
+        if (force) params.set('force', '1');
+        const url = `/api/feeds?${params.toString()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('Vendor advisories unavailable');
         const data = await res.json();
         advisoriesState.items = data.items || [];
         advisoriesState.timestamp = data.timestamp;
         advisoriesState.degraded = Boolean(data.degraded);
+        advisoriesState.parsedCount = Number(data.parsedCount ?? advisoriesState.items.length);
+        advisoriesState.fetchedCount = Number(data.fetchedCount ?? 0);
+        advisoriesState.errors = data.errors || [];
+        advisoriesState.filteredByCveOnly = Boolean(data.filteredByCveOnly);
         updateAdvisoryVendors(advisoriesState.items);
         applyAdvisoriesFilters();
         setDegradedBanner('advisories-degraded', advisoriesState.degraded);
@@ -4442,6 +4496,8 @@ function applyAdvisoriesFilters() {
         const cveMatch = !cveOnly || (item.cves && item.cves.length > 0);
         return vendorMatch && cveMatch;
     });
+    advisoriesState.filteredCount = advisoriesState.filtered.length;
+    advisoriesState.filteredByCveOnly = advisoriesState.filteredByCveOnly || (cveOnly && advisoriesState.parsedCount > 0 && advisoriesState.filteredCount === 0);
     renderAdvisoriesList();
 }
 
@@ -4452,7 +4508,11 @@ function renderAdvisoriesList() {
     const visibleItems = advisoriesState.filtered.slice(0, advisoriesState.visible);
 
     if (!visibleItems.length) {
-        if (!advisoriesState.items.length) {
+        if (advisoriesState.parsedCount > 0 && advisoriesState.filteredCount === 0) {
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">Items were fetched but filtered out—try disabling Has CVE only / include unknown severity.</div>';
+        } else if (advisoriesState.errors.length && advisoriesState.parsedCount === 0) {
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.7);">No advisories available.</div>${renderDebugDetails(advisoriesState.errors)}`;
+        } else if (!advisoriesState.items.length) {
             listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No items returned. Try Refresh or disable “Has CVE only”.</div>';
         } else {
             listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No advisories match the current filters.</div>';
@@ -4544,6 +4604,9 @@ async function loadOsvAdvisories(force = false) {
         osvState.visible = 5;
         osvState.timestamp = data.timestamp;
         osvState.degraded = Boolean(data.degraded);
+        osvState.parsedCount = Number(data.parsedCount ?? osvState.items.length);
+        osvState.fetchedCount = Number(data.fetchedCount ?? 0);
+        osvState.errors = data.errors || [];
         applyOsvFilters();
         setDegradedBanner('osv-degraded', osvState.degraded);
         const updatedEl = document.getElementById('osv-updated');
@@ -4563,12 +4626,15 @@ async function loadOsvAdvisories(force = false) {
 
 function applyOsvFilters() {
     const minSeverity = severityRank(osvState.severity);
-    const placeholders = ['sample-package', 'example-lib'];
+    const includeUnknown = osvState.includeUnknown || minSeverity <= severityRank('MEDIUM');
     osvState.filtered = osvState.items.filter(item => {
-        const pkg = (item.package || '').toLowerCase();
-        if (placeholders.includes(pkg)) return false;
-        return severityRank(item.severity) >= minSeverity;
+        const severity = (item.severity || 'UNKNOWN').toUpperCase();
+        if (severity === 'UNKNOWN') {
+            return includeUnknown;
+        }
+        return severityRank(severity) >= minSeverity;
     });
+    osvState.filteredCount = osvState.filtered.length;
     renderOsvList();
 }
 
@@ -4579,7 +4645,13 @@ function renderOsvList() {
     const visibleItems = osvState.filtered.slice(0, osvState.visible);
 
     if (!visibleItems.length) {
-        listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No OSV advisories match the current filters.</div>';
+        if (osvState.parsedCount > 0 && osvState.filteredCount === 0) {
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">Items were fetched but filtered out—try disabling Has CVE only / include unknown severity.</div>';
+        } else if (osvState.errors.length && osvState.parsedCount === 0) {
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.7);">No OSV advisories available.</div>${renderDebugDetails(osvState.errors)}`;
+        } else {
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No OSV advisories match the current filters.</div>';
+        }
     } else {
         listEl.innerHTML = visibleItems.map(item => {
             const anchorId = `osv:${item.id}`;
@@ -4670,6 +4742,10 @@ async function loadStatusBoard(force = false) {
         statusState.visible = 5;
         statusState.timestamp = data.timestamp;
         statusState.degraded = Boolean(data.degraded);
+        statusState.parsedCount = Number(data.parsedCount ?? statusState.items.length);
+        statusState.fetchedCount = Number(data.fetchedCount ?? 0);
+        statusState.errors = data.errors || [];
+        statusState.filteredCount = statusState.items.length;
         renderStatusBoard();
         setDegradedBanner('status-degraded', statusState.degraded);
         const updatedEl = document.getElementById('status-updated');
@@ -4716,7 +4792,11 @@ function renderStatusBoard() {
     const ordered = [...active, ...maintenance, ...resolved].filter(Boolean);
 
     if (!ordered.length) {
-        listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No recent status updates.</div>';
+        if (statusState.errors.length && statusState.parsedCount === 0) {
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.7);">No status updates available.</div>${renderDebugDetails(statusState.errors)}`;
+        } else {
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No recent status updates.</div>';
+        }
         if (loadMoreBtn) loadMoreBtn.style.display = 'none';
         if (showLessBtn) showLessBtn.style.display = 'none';
         return;
@@ -4799,7 +4879,7 @@ function setupDashboardIntel() {
         cveOnlyToggle.addEventListener('change', () => {
             advisoriesState.cveOnly = cveOnlyToggle.checked;
             advisoriesState.visible = 10;
-            applyAdvisoriesFilters();
+            loadVendorAdvisories();
         });
     }
     if (advisoriesLoadMore) {
@@ -4814,6 +4894,7 @@ function setupDashboardIntel() {
 
     const ecosystemSelect = document.getElementById('osv-ecosystem-filter');
     const osvSeveritySelect = document.getElementById('osv-severity-filter');
+    const osvIncludeUnknownToggle = document.getElementById('osv-include-unknown');
     const osvLoadMore = document.getElementById('osv-load-more');
     const osvRefresh = document.getElementById('osv-refresh-btn');
 
@@ -4828,6 +4909,14 @@ function setupDashboardIntel() {
     if (osvSeveritySelect) {
         osvSeveritySelect.addEventListener('change', () => {
             osvState.severity = osvSeveritySelect.value;
+            osvState.visible = 5;
+            applyOsvFilters();
+        });
+    }
+    if (osvIncludeUnknownToggle) {
+        osvState.includeUnknown = osvIncludeUnknownToggle.checked;
+        osvIncludeUnknownToggle.addEventListener('change', () => {
+            osvState.includeUnknown = osvIncludeUnknownToggle.checked;
             osvState.visible = 5;
             applyOsvFilters();
         });
