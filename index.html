@@ -3800,7 +3800,6 @@ p, .muted-text, .subtitle{
         <!-- Navigation Tabs -->
         <nav class="nav-tabs">
             <button class="tab-btn active" data-tab="dashboard">🏠 Dashboard</button>
-            <button class="tab-btn" data-tab="posture">📊 Posture</button>
             <button class="tab-btn" data-tab="threats">📺 Threat Intel</button>
             <button class="tab-btn" data-tab="tools">🔐 Security Tools</button>
             <button class="tab-btn" data-tab="learning">🧠 Learning Hub</button>
@@ -4282,28 +4281,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-            </div>
-
-            <!-- Posture Tab -->
-            <div class="tab-content" id="posture-tab">
-                <div class="premium-card posture-hero">
-                    <div class="posture-hero-title">
-                        <div>
-                            <h2 style="margin-bottom: 6px; font-size: 22px; font-weight: 600;">🧭 Posture View</h2>
-                            <p style="font-size: 13px; color: rgba(255,255,255,0.7);">Executive snapshot of risk exposure, control execution, and urgent priorities.</p>
-                        </div>
-                        <div class="posture-hero-actions">
-                            <select class="form-input" id="posture-time-range" aria-label="Posture time range">
-                                <option value="24h">Last 24h</option>
-                                <option value="7d" selected>Last 7 days</option>
-                                <option value="30d">Last 30 days</option>
-                            </select>
-                            <button class="btn btn-primary" id="posture-briefing-btn" type="button">Generate Briefing Pack</button>
-                        </div>
-                    </div>
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6);" id="posture-range-label">Loading posture summary...</div>
-                </div>
-                <div class="posture-dashboard" id="posture-dashboard"></div>
             </div>
 
             <!-- Threat Intelligence Tab -->
@@ -5065,7 +5042,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <!-- Data Bank Sub-Tab -->
+                <!-- Data Bank Sub-Tab (Posture lives only under Learning Hub → Data Bank) -->
                 <div class="learning-subtab" id="learning-databank-content">
                     <div class="premium-card">
                         <h2 style="margin-bottom: 20px; font-size: 24px; display: flex; align-items: center; gap: 8px;">
@@ -5558,7 +5535,8 @@ window.addEventListener('DOMContentLoaded', () => {
         
         // Load Threat Intel data when user opens Threat Intel tab
         function setupTabNavigation() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
+            // Bind only main tabs (data-tab) to prevent Data Bank sub-tabs from leaking across pages.
+            const tabButtons = document.querySelectorAll('.tab-btn[data-tab]');
             const tabContents = document.querySelectorAll('.tab-content');
 
             tabButtons.forEach(btn => {
@@ -7395,7 +7373,8 @@ function analyzePassword() {
 
         // Tab Navigation
         function setupTabNavigation() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
+            // Bind only main tabs (data-tab) to prevent Data Bank sub-tabs from leaking across pages.
+            const tabButtons = document.querySelectorAll('.tab-btn[data-tab]');
             const tabContents = document.querySelectorAll('.tab-content');
 
             tabButtons.forEach(btn => {
@@ -7413,9 +7392,6 @@ function analyzePassword() {
                     document.getElementById(`${tabName}-tab`).classList.add('active');
                     appState.currentTab = tabName;
 
-                    if (tabName === 'posture') {
-                        renderPostureDashboard();
-                    }
                 });
             });
         }
@@ -9798,6 +9774,64 @@ function analyzePassword() {
             return counts;
         }
 
+        function isWithinNextDays(dateValue, days) {
+            if (!dateValue) return false;
+            const dueDate = new Date(dateValue);
+            if (Number.isNaN(dueDate.getTime())) return false;
+            const now = new Date();
+            const cutoff = new Date(now);
+            cutoff.setDate(cutoff.getDate() + days);
+            return dueDate >= now && dueDate <= cutoff;
+        }
+
+        // Posture KPIs are computed here for the Data Bank Posture view and exports.
+        function computePostureKpis() {
+            initializeRiskMatrixAndRegister();
+            const filteredRisks = getPostureFilteredRisks();
+            const openRisks = filteredRisks.filter(item => item.status !== 'Closed');
+            const mappedControls = openRisks.flatMap(item => item.mappedControls || []);
+            const controlCounts = mappedControls.reduce((acc, control) => {
+                const status = control.status || 'Planned';
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, { 'Implemented': 0, 'In Progress': 0, 'Planned': 0 });
+            const evidenceConfigured = mappedControls.some(control => (control.evidenceItems || []).length > 0);
+            const evidenceCounts = evidenceConfigured
+                ? mappedControls.reduce((acc, control) => {
+                    const items = control.evidenceItems || [];
+                    if (!items.length) {
+                        acc.Missing += 1;
+                        return acc;
+                    }
+                    items.forEach(item => {
+                        const status = getEvidenceStatus(item);
+                        acc[status] += 1;
+                    });
+                    return acc;
+                }, { OK: 0, Stale: 0, Missing: 0 })
+                : null;
+            const ratingCounts = openRisks.reduce((acc, item) => {
+                const rating = getRiskCellRating(item.likelihood, item.impact);
+                if (['Critical', 'High', 'Medium'].includes(rating)) {
+                    acc[rating] += 1;
+                }
+                return acc;
+            }, { Critical: 0, High: 0, Medium: 0 });
+            const riskDue = getUpcomingDueCounts(openRisks, 'dueDate');
+            const controlDue = getUpcomingDueCounts(mappedControls, 'dueDate');
+            return {
+                filteredRisks,
+                openRisks,
+                mappedControls,
+                controlCounts,
+                evidenceCounts,
+                evidenceConfigured,
+                ratingCounts,
+                riskDue,
+                controlDue
+            };
+        }
+
         function renderPostureBar(label, value, total) {
             const percent = total ? Math.round((value / total) * 100) : 0;
             return `
@@ -9814,42 +9848,66 @@ function analyzePassword() {
         }
 
         function renderPostureSection() {
-            const categoryOptions = ['all', 'Security', 'Compliance', 'Vendor', 'Cloud']
+            const categoryOptions = ['all', 'Security', 'Compliance', 'Vendor', 'Cloud', 'Other']
                 .map(option => `<option value="${option}" ${postureUiState.category === option ? 'selected' : ''}>${option === 'all' ? 'All Categories' : option}</option>`)
                 .join('');
-            const filteredRisks = getPostureFilteredRisks();
-            const openRisks = filteredRisks.filter(item => item.status !== 'Closed');
-            const mappedControls = openRisks.flatMap(item => item.mappedControls || []);
-            const controlCounts = mappedControls.reduce((acc, control) => {
-                const status = control.status || 'Planned';
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, { 'Implemented': 0, 'In Progress': 0, 'Planned': 0 });
-            const evidenceCounts = mappedControls.reduce((acc, control) => {
-                const items = control.evidenceItems || [];
-                if (!items.length) {
-                    acc.Missing += 1;
-                    return acc;
-                }
-                items.forEach(item => {
-                    const status = getEvidenceStatus(item);
-                    acc[status] += 1;
-                });
-                return acc;
-            }, { OK: 0, Stale: 0, Missing: 0 });
-            const ratingCounts = openRisks.reduce((acc, item) => {
-                const rating = getRiskCellRating(item.likelihood, item.impact);
-                if (['Critical', 'High', 'Medium'].includes(rating)) {
-                    acc[rating] += 1;
-                }
-                return acc;
-            }, { Critical: 0, High: 0, Medium: 0 });
-            const riskDue = getUpcomingDueCounts(openRisks, 'dueDate');
-            const controlDue = getUpcomingDueCounts(mappedControls, 'dueDate');
+            const postureData = computePostureKpis();
+            const {
+                openRisks,
+                mappedControls,
+                controlCounts,
+                evidenceCounts,
+                evidenceConfigured,
+                ratingCounts,
+                riskDue,
+                controlDue
+            } = postureData;
             const totalControls = mappedControls.length || 1;
-            const totalEvidence = Math.max(1, evidenceCounts.OK + evidenceCounts.Stale + evidenceCounts.Missing);
+            const totalEvidence = evidenceCounts
+                ? Math.max(1, evidenceCounts.OK + evidenceCounts.Stale + evidenceCounts.Missing)
+                : 1;
+            const evidenceCards = evidenceConfigured
+                ? `
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Evidence OK</div>
+                            <div class="posture-kpi-value">${evidenceCounts.OK}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Evidence Stale</div>
+                            <div class="posture-kpi-value">${evidenceCounts.Stale}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Evidence Missing</div>
+                            <div class="posture-kpi-value">${evidenceCounts.Missing}</div>
+                        </div>
+                    `
+                : `
+                        <div class="posture-kpi-card" style="grid-column: span 3;">
+                            <div class="posture-kpi-label">Evidence Freshness</div>
+                            <div class="posture-kpi-value">Evidence not configured</div>
+                            <div style="font-size: 11px; color: rgba(255,255,255,0.6);">Add evidence items to mapped controls to track OK / Stale / Missing.</div>
+                        </div>
+                    `;
+            const evidenceBars = evidenceConfigured
+                ? `
+                        ${renderPostureBar('Evidence OK', evidenceCounts.OK, totalEvidence)}
+                        ${renderPostureBar('Evidence Stale', evidenceCounts.Stale, totalEvidence)}
+                    `
+                : `<div class="posture-empty" style="margin-top: 6px;">Evidence not configured.</div>`;
+            const emptyStateCard = riskRegisterState.items.length === 0
+                ? `
+                    <div class="premium-card" style="border-left: 4px solid #22d3ee;">
+                        <h3 style="margin-bottom: 8px; font-size: 18px;">No risks yet</h3>
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 12px;">
+                            Add one in Risk Matrices → Risk Register to populate Posture.
+                        </p>
+                        <button class="btn btn-secondary" type="button" data-posture-go-risk="true">Go to Risk Register</button>
+                    </div>
+                `
+                : '';
 
             return `
+                ${emptyStateCard}
                 <div class="premium-card">
                     <div class="posture-toolbar">
                         <div>
@@ -9858,7 +9916,7 @@ function analyzePassword() {
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap: wrap;">
                             <select class="form-input" data-posture-filter="category">${categoryOptions}</select>
-                            <button class="library-action-btn" type="button" data-posture-export="true">Export Monthly GRC Report</button>
+                            <button class="library-action-btn" type="button" data-posture-export="true">Export Report (PDF/JSON fallback)</button>
                         </div>
                     </div>
                     <div class="posture-kpi-grid">
@@ -9874,18 +9932,7 @@ function analyzePassword() {
                             <div class="posture-kpi-label">Controls Planned</div>
                             <div class="posture-kpi-value">${controlCounts['Planned'] || 0}</div>
                         </div>
-                        <div class="posture-kpi-card">
-                            <div class="posture-kpi-label">Evidence OK</div>
-                            <div class="posture-kpi-value">${evidenceCounts.OK}</div>
-                        </div>
-                        <div class="posture-kpi-card">
-                            <div class="posture-kpi-label">Evidence Stale</div>
-                            <div class="posture-kpi-value">${evidenceCounts.Stale}</div>
-                        </div>
-                        <div class="posture-kpi-card">
-                            <div class="posture-kpi-label">Evidence Missing</div>
-                            <div class="posture-kpi-value">${evidenceCounts.Missing}</div>
-                        </div>
+                        ${evidenceCards}
                         <div class="posture-kpi-card">
                             <div class="posture-kpi-label">Open Risks (Critical)</div>
                             <div class="posture-kpi-value">${ratingCounts.Critical}</div>
@@ -9902,8 +9949,7 @@ function analyzePassword() {
                     <div class="posture-bars">
                         ${renderPostureBar('Controls Implemented', controlCounts['Implemented'] || 0, totalControls)}
                         ${renderPostureBar('Controls In Progress', controlCounts['In Progress'] || 0, totalControls)}
-                        ${renderPostureBar('Evidence OK', evidenceCounts.OK, totalEvidence)}
-                        ${renderPostureBar('Evidence Stale', evidenceCounts.Stale, totalEvidence)}
+                        ${evidenceBars}
                     </div>
                     <div class="posture-due-grid">
                         <div class="posture-due-card">
@@ -10272,6 +10318,12 @@ function analyzePassword() {
             setTimeout(() => {
                 activateLearningSubTab('databank');
                 switchDataBankSection('risk');
+                setTimeout(() => {
+                    const register = document.getElementById('risk-register');
+                    if (register) {
+                        register.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 150);
             }, 120);
         }
 
@@ -11440,105 +11492,177 @@ function analyzePassword() {
             showToast('Evidence pack exported');
         }
 
-        function exportMonthlyGrcReport() {
-            const filteredRisks = getPostureFilteredRisks();
-            const openRisks = filteredRisks.filter(item => item.status !== 'Closed');
-            const mappedControls = openRisks.flatMap(item => item.mappedControls || []);
-            const controlCounts = mappedControls.reduce((acc, control) => {
-                const status = control.status || 'Planned';
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, { 'Implemented': 0, 'In Progress': 0, 'Planned': 0 });
-            const evidenceCounts = mappedControls.reduce((acc, control) => {
-                const items = control.evidenceItems || [];
-                if (!items.length) {
-                    acc.Missing += 1;
-                    return acc;
-                }
-                items.forEach(item => {
-                    const status = getEvidenceStatus(item);
-                    acc[status] += 1;
-                });
-                return acc;
-            }, { OK: 0, Stale: 0, Missing: 0 });
-            const ratingCounts = openRisks.reduce((acc, item) => {
-                const rating = getRiskCellRating(item.likelihood, item.impact);
-                if (['Critical', 'High', 'Medium'].includes(rating)) {
-                    acc[rating] += 1;
-                }
-                return acc;
-            }, { Critical: 0, High: 0, Medium: 0 });
-            const payload = {
-                title: 'Monthly GRC Report',
-                generatedAt: new Date().toISOString(),
-                category: postureUiState.category,
-                controls: controlCounts,
-                evidence: evidenceCounts,
-                openRisks: ratingCounts,
-                risks: openRisks.map(risk => ({
-                    id: risk.id,
+        function buildMonthlyGrcReportData() {
+            const postureData = computePostureKpis();
+            const {
+                openRisks,
+                mappedControls,
+                controlCounts,
+                evidenceCounts,
+                evidenceConfigured,
+                ratingCounts,
+                riskDue,
+                controlDue
+            } = postureData;
+            const topRisks = [...openRisks]
+                .sort((a, b) => {
+                    const ratingA = getRiskRatingRank(getRiskCellRating(a.likelihood, a.impact));
+                    const ratingB = getRiskRatingRank(getRiskCellRating(b.likelihood, b.impact));
+                    if (ratingB !== ratingA) return ratingB - ratingA;
+                    return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+                })
+                .slice(0, 5)
+                .map(risk => ({
                     title: risk.title,
                     rating: getRiskCellRating(risk.likelihood, risk.impact),
-                    status: risk.status,
-                    dueDate: risk.dueDate || ''
-                }))
-            };
+                    owner: risk.owner || 'Unassigned',
+                    dueDate: risk.dueDate || 'N/A',
+                    treatment: risk.treatment || 'N/A'
+                }));
+            const risksDueSoon = openRisks
+                .filter(risk => isWithinNextDays(risk.dueDate, 30))
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                .map(risk => ({
+                    title: risk.title,
+                    rating: getRiskCellRating(risk.likelihood, risk.impact),
+                    owner: risk.owner || 'Unassigned',
+                    dueDate: risk.dueDate || 'N/A',
+                    treatment: risk.treatment || 'N/A'
+                }));
+            const controlsDueSoon = openRisks.flatMap(risk => (risk.mappedControls || [])
+                .filter(control => isWithinNextDays(control.dueDate, 30))
+                .map(control => ({
+                    title: control.title || control.id || 'Control',
+                    status: control.status || 'Planned',
+                    owner: control.owner || risk.owner || 'Unassigned',
+                    dueDate: control.dueDate || 'N/A',
+                    riskTitle: risk.title
+                })))
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
-            if (!window.jspdf?.jsPDF) {
+            return {
+                title: 'Monthly GRC Posture Report',
+                generatedAt: new Date().toISOString(),
+                category: postureUiState.category,
+                kpis: {
+                    risks: ratingCounts,
+                    controls: controlCounts,
+                    evidence: evidenceConfigured ? evidenceCounts : 'Evidence not configured',
+                    dueSoon: {
+                        risksNext7: riskDue.next7,
+                        risksNext30: riskDue.next30,
+                        controlsNext7: controlDue.next7,
+                        controlsNext30: controlDue.next30
+                    }
+                },
+                topRisks,
+                risksDueSoon,
+                controlsDueSoon
+            };
+        }
+
+        function exportMonthlyGrcReport() {
+            const payload = buildMonthlyGrcReportData();
+            const fallbackToJson = () => {
                 const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `monthly-grc-report-${Date.now()}.json`;
+                link.download = `monthly-grc-posture-report-${Date.now()}.json`;
                 link.click();
                 URL.revokeObjectURL(url);
                 showToast('PDF unavailable, exported JSON instead');
+            };
+
+            if (!window.jspdf?.jsPDF) {
+                fallbackToJson();
                 return;
             }
 
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'pt', 'a4');
-            let y = 50;
-            pdf.setFontSize(16);
-            pdf.text('Monthly GRC Report', 40, y);
-            y += 18;
-            pdf.setFontSize(10);
-            pdf.text(`Generated: ${new Date().toLocaleString()}`, 40, y);
-            y += 18;
-            pdf.text(`Category: ${postureUiState.category === 'all' ? 'All' : postureUiState.category}`, 40, y);
-            y += 18;
-            pdf.setFontSize(12);
-            pdf.text(`Controls Implemented: ${controlCounts['Implemented'] || 0}`, 40, y);
-            y += 14;
-            pdf.text(`Controls In Progress: ${controlCounts['In Progress'] || 0}`, 40, y);
-            y += 14;
-            pdf.text(`Controls Planned: ${controlCounts['Planned'] || 0}`, 40, y);
-            y += 18;
-            pdf.text(`Evidence OK: ${evidenceCounts.OK}`, 40, y);
-            y += 14;
-            pdf.text(`Evidence Stale: ${evidenceCounts.Stale}`, 40, y);
-            y += 14;
-            pdf.text(`Evidence Missing: ${evidenceCounts.Missing}`, 40, y);
-            y += 18;
-            pdf.text(`Open Risks - Critical: ${ratingCounts.Critical}`, 40, y);
-            y += 14;
-            pdf.text(`Open Risks - High: ${ratingCounts.High}`, 40, y);
-            y += 14;
-            pdf.text(`Open Risks - Medium: ${ratingCounts.Medium}`, 40, y);
-            y += 18;
-            pdf.setFontSize(11);
-            pdf.text('Open Risks Detail:', 40, y);
-            y += 14;
-            openRisks.forEach(risk => {
-                if (y > 760) {
-                    pdf.addPage();
-                    y = 40;
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const margin = 40;
+                let y = 50;
+                const ensureSpace = () => {
+                    if (y > pageHeight - 50) {
+                        pdf.addPage();
+                        y = 40;
+                    }
+                };
+                const addLine = (text, indent = 0) => {
+                    ensureSpace();
+                    pdf.text(text, margin + indent, y);
+                    y += 14;
+                };
+                const addParagraph = (text, indent = 0) => {
+                    const lines = pdf.splitTextToSize(text, pageWidth - margin * 2 - indent);
+                    lines.forEach(line => addLine(line, indent));
+                };
+
+                pdf.setFontSize(16);
+                addLine(payload.title);
+                pdf.setFontSize(10);
+                addLine(`Generated: ${new Date(payload.generatedAt).toLocaleString()}`);
+                addLine(`Category: ${postureUiState.category === 'all' ? 'All' : postureUiState.category}`);
+                y += 6;
+
+                pdf.setFontSize(12);
+                addLine('KPI Summary');
+                pdf.setFontSize(10);
+                addLine(`Open Risks - Critical: ${payload.kpis.risks.Critical}, High: ${payload.kpis.risks.High}, Medium: ${payload.kpis.risks.Medium}`);
+                addLine(`Controls - Implemented: ${payload.kpis.controls['Implemented'] || 0}, In Progress: ${payload.kpis.controls['In Progress'] || 0}, Planned: ${payload.kpis.controls['Planned'] || 0}`);
+                if (typeof payload.kpis.evidence === 'string') {
+                    addLine(`Evidence: ${payload.kpis.evidence}`);
+                } else {
+                    addLine(`Evidence - OK: ${payload.kpis.evidence.OK}, Stale: ${payload.kpis.evidence.Stale}, Missing: ${payload.kpis.evidence.Missing}`);
                 }
-                pdf.text(`• ${risk.title} (${getRiskCellRating(risk.likelihood, risk.impact)})`, 40, y);
-                y += 12;
-            });
-            pdf.save(`monthly-grc-report-${Date.now()}.pdf`);
-            showToast('Monthly GRC report exported');
+                addLine(`Due Soon - Risks: ${payload.kpis.dueSoon.risksNext7} (7d), ${payload.kpis.dueSoon.risksNext30} (30d)`);
+                addLine(`Due Soon - Controls: ${payload.kpis.dueSoon.controlsNext7} (7d), ${payload.kpis.dueSoon.controlsNext30} (30d)`);
+                y += 6;
+
+                pdf.setFontSize(12);
+                addLine('Top 5 Open Risks');
+                pdf.setFontSize(10);
+                if (!payload.topRisks.length) {
+                    addLine('No open risks to display.');
+                } else {
+                    payload.topRisks.forEach(risk => {
+                        addParagraph(`• ${risk.title} (${risk.rating}) — Owner: ${risk.owner} | Due: ${risk.dueDate} | Treatment: ${risk.treatment}`);
+                    });
+                }
+                y += 6;
+
+                pdf.setFontSize(12);
+                addLine('Controls Due Soon (Next 30 Days)');
+                pdf.setFontSize(10);
+                if (!payload.controlsDueSoon.length) {
+                    addLine('No controls due in the next 30 days.');
+                } else {
+                    payload.controlsDueSoon.slice(0, 10).forEach(control => {
+                        addParagraph(`• ${control.title} (${control.status}) — Due: ${control.dueDate} | Owner: ${control.owner} | Risk: ${control.riskTitle}`);
+                    });
+                }
+                y += 6;
+
+                pdf.setFontSize(12);
+                addLine('Risks Due Soon (Next 30 Days)');
+                pdf.setFontSize(10);
+                if (!payload.risksDueSoon.length) {
+                    addLine('No risks due in the next 30 days.');
+                } else {
+                    payload.risksDueSoon.slice(0, 10).forEach(risk => {
+                        addParagraph(`• ${risk.title} (${risk.rating}) — Owner: ${risk.owner} | Due: ${risk.dueDate} | Treatment: ${risk.treatment}`);
+                    });
+                }
+
+                pdf.save(`monthly-grc-posture-report-${Date.now()}.pdf`);
+                showToast('Monthly GRC posture report exported');
+            } catch (error) {
+                fallbackToJson();
+            }
         }
 
         function buildRiskClipboardPayload(item) {
@@ -12470,6 +12594,12 @@ function analyzePassword() {
                 const postureExportBtn = event.target.closest('[data-posture-export]');
                 if (postureExportBtn) {
                     exportMonthlyGrcReport();
+                    return;
+                }
+
+                const postureRiskBtn = event.target.closest('[data-posture-go-risk]');
+                if (postureRiskBtn) {
+                    openRiskRegisterFromPosture();
                     return;
                 }
 
