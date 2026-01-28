@@ -1144,6 +1144,186 @@ body{
     box-shadow: var(--shadow-premium);
 }
 
+.dashboard-module {
+    margin-bottom: 30px;
+}
+
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-12);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-12);
+}
+
+.module-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.module-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.module-controls {
+    display: flex;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: var(--space-12);
+}
+
+.module-controls .form-select,
+.module-controls .form-input {
+    min-width: 160px;
+}
+
+.module-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+}
+
+.module-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    padding: var(--space-16);
+    box-shadow: var(--shadow-sm);
+}
+
+.module-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-12);
+    margin-bottom: var(--space-10);
+}
+
+.module-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    align-items: center;
+}
+
+.module-summary {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.6;
+    margin-bottom: var(--space-10);
+}
+
+.module-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    align-items: center;
+}
+
+.module-actions a {
+    text-decoration: none;
+}
+
+.module-degraded {
+    display: none;
+    margin-bottom: var(--space-10);
+    padding: 8px 12px;
+    border-radius: var(--radius-base);
+    background: rgba(255, 153, 51, 0.15);
+    border: 1px solid rgba(255, 153, 51, 0.4);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 12px;
+}
+
+.status-pill {
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.status-pill.incident {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 68, 68, 0.4);
+}
+
+.status-pill.maintenance {
+    background: rgba(255, 176, 32, 0.15);
+    color: #ffb020;
+    border: 1px solid rgba(255, 176, 32, 0.4);
+}
+
+.status-pill.resolved {
+    background: rgba(39, 174, 96, 0.15);
+    color: #5dde8c;
+    border: 1px solid rgba(39, 174, 96, 0.4);
+}
+
+.intel-summary-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    margin-bottom: var(--space-12);
+}
+
+.intel-summary-chip {
+    padding: 6px 10px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    background: rgba(34, 211, 238, 0.12);
+    border: 1px solid rgba(34, 211, 238, 0.35);
+    color: #8fe8f5;
+}
+
+.health-card {
+    background: rgba(15, 20, 25, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-16);
+    box-shadow: var(--shadow-sm);
+}
+
+.health-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+}
+
+.health-row:last-child {
+    border-bottom: none;
+}
+
+.health-badge {
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.health-badge.ok {
+    background: rgba(39, 174, 96, 0.2);
+    color: #5dde8c;
+    border: 1px solid rgba(39, 174, 96, 0.4);
+}
+
+.health-badge.degraded {
+    background: rgba(255, 176, 32, 0.2);
+    color: #ffb020;
+    border: 1px solid rgba(255, 176, 32, 0.4);
+}
+
 .threat-icon {
     font-size: 32px;
     margin-bottom: var(--space-8);
@@ -3829,6 +4009,104 @@ p, .muted-text, .subtitle{
     <div class="cve-grid" id="cisa-kev-grid"><div style="text-align:center; padding:40px; color:#ff0040;">Error loading CISA data: Failed to fetch<br><br>Please refresh and try again.</div></div>
 </div>
 
+<!-- Vendor Advisories Radar -->
+<div class="premium-card dashboard-module" id="vendor-advisories-module">
+    <div class="module-header">
+        <div>
+            <h2>🛰️ Vendor Advisories Radar</h2>
+            <div class="module-meta">Last updated: <strong id="advisories-updated">Loading...</strong></div>
+        </div>
+        <button class="btn btn-secondary" type="button" id="advisories-refresh-btn">Refresh</button>
+    </div>
+    <div class="module-degraded" id="advisories-degraded">Degraded: Showing last cached advisories while upstream feeds recover.</div>
+    <div class="module-controls">
+        <select class="form-select" id="advisories-vendor-filter">
+            <option value="all" selected>Vendor: All</option>
+            <option value="Microsoft">Microsoft</option>
+            <option value="Cisco">Cisco</option>
+            <option value="Fortinet">Fortinet</option>
+            <option value="Palo Alto Networks">Palo Alto Networks</option>
+            <option value="VMware">VMware</option>
+        </select>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color: rgba(255,255,255,0.7);">
+            <input type="checkbox" id="advisories-cve-only">
+            Has CVE only
+        </label>
+    </div>
+    <div class="module-list" id="advisories-list"></div>
+    <button class="btn btn-secondary" type="button" id="advisories-load-more" style="margin-top: 12px;">Load more</button>
+</div>
+
+<!-- Supply Chain Advisories (OSV) -->
+<div class="premium-card dashboard-module" id="osv-module">
+    <div class="module-header">
+        <div>
+            <h2>🧩 Supply Chain Advisories (OSV)</h2>
+            <div class="module-meta">Last updated: <strong id="osv-updated">Loading...</strong></div>
+        </div>
+        <button class="btn btn-secondary" type="button" id="osv-refresh-btn">Refresh</button>
+    </div>
+    <div class="module-degraded" id="osv-degraded">Degraded: Showing last cached OSV advisories while API recovers.</div>
+    <div class="module-controls">
+        <select class="form-select" id="osv-ecosystem-filter" multiple size="3">
+            <option value="npm" selected>npm</option>
+            <option value="PyPI" selected>PyPI</option>
+            <option value="Maven" selected>Maven</option>
+            <option value="Go">Go</option>
+            <option value="RubyGems">RubyGems</option>
+        </select>
+        <select class="form-select" id="osv-severity-filter">
+            <option value="MEDIUM" selected>Severity: ≥ MEDIUM</option>
+            <option value="HIGH">Severity: ≥ HIGH</option>
+            <option value="CRITICAL">Severity: CRITICAL only</option>
+            <option value="LOW">Severity: ≥ LOW</option>
+            <option value="UNKNOWN">Severity: All</option>
+        </select>
+    </div>
+    <div class="module-list" id="osv-list"></div>
+    <button class="btn btn-secondary" type="button" id="osv-load-more" style="margin-top: 12px;">Load more</button>
+</div>
+
+<!-- Cloud/SaaS Status Board -->
+<div class="premium-card dashboard-module" id="status-module">
+    <div class="module-header">
+        <div>
+            <h2>☁️ Cloud/SaaS Status Board</h2>
+            <div class="module-meta">Last updated: <strong id="status-updated">Loading...</strong></div>
+        </div>
+        <button class="btn btn-secondary" type="button" id="status-refresh-btn">Refresh</button>
+    </div>
+    <div class="module-degraded" id="status-degraded">Degraded: Showing last cached status updates while feeds recover.</div>
+    <div class="intel-summary-chips" id="status-summary-chips"></div>
+    <div class="module-list" id="status-list"></div>
+</div>
+
+<!-- API Health -->
+<div class="health-card" id="intel-health-card" style="margin-bottom: 30px;">
+    <h3 style="font-size: 16px; margin-bottom: 8px;">API Health</h3>
+    <div class="health-row">
+        <div>
+            <div>Vendor Advisories Radar</div>
+            <div class="module-meta" id="health-advisories-time">Last update: --</div>
+        </div>
+        <span class="health-badge ok" id="health-advisories-status">OK</span>
+    </div>
+    <div class="health-row">
+        <div>
+            <div>Supply Chain Advisories (OSV)</div>
+            <div class="module-meta" id="health-osv-time">Last update: --</div>
+        </div>
+        <span class="health-badge ok" id="health-osv-status">OK</span>
+    </div>
+    <div class="health-row">
+        <div>
+            <div>Cloud/SaaS Status Board</div>
+            <div class="module-meta" id="health-status-time">Last update: --</div>
+        </div>
+        <span class="health-badge ok" id="health-status-status">OK</span>
+    </div>
+</div>
+
 <script>
 let cisaKevCache = [];
 let fixFirstSourceCache = [];
@@ -3926,12 +4204,488 @@ async function loadCISAKEV() {
     }
 }
 
+const advisoriesState = {
+    items: [],
+    filtered: [],
+    vendor: 'all',
+    cveOnly: false,
+    visible: 10,
+    degraded: false,
+    timestamp: null
+};
+
+const osvState = {
+    items: [],
+    filtered: [],
+    ecosystems: ['npm', 'PyPI', 'Maven'],
+    severity: 'MEDIUM',
+    visible: 10,
+    degraded: false,
+    timestamp: null
+};
+
+const statusState = {
+    items: [],
+    degraded: false,
+    timestamp: null
+};
+
+function updateHealthStatus(key, isDegraded, timestamp) {
+    const statusEl = document.getElementById(`health-${key}-status`);
+    const timeEl = document.getElementById(`health-${key}-time`);
+    if (statusEl) {
+        statusEl.textContent = isDegraded ? 'Degraded' : 'OK';
+        statusEl.classList.toggle('degraded', isDegraded);
+        statusEl.classList.toggle('ok', !isDegraded);
+    }
+    if (timeEl) {
+        timeEl.textContent = `Last update: ${timestamp ? new Date(timestamp).toLocaleString() : '--'}`;
+    }
+}
+
+function setDegradedBanner(id, show) {
+    const banner = document.getElementById(id);
+    if (banner) banner.style.display = show ? 'block' : 'none';
+}
+
+function formatModuleDate(iso) {
+    if (!iso) return 'Unknown';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return 'Unknown';
+    return date.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+function getVendorBadgeClass(vendor) {
+    const map = {
+        Microsoft: 'badge-blue',
+        Cisco: 'badge-cyan',
+        Fortinet: 'badge-orange',
+        'Palo Alto Networks': 'badge-purple',
+        VMware: 'badge-green'
+    };
+    return map[vendor] || 'badge-blue';
+}
+
+function getEcosystemBadgeClass(ecosystem) {
+    const map = {
+        npm: 'badge-blue',
+        PyPI: 'badge-purple',
+        Maven: 'badge-orange',
+        Go: 'badge-green',
+        RubyGems: 'badge-pink'
+    };
+    return map[ecosystem] || 'badge-blue';
+}
+
+function getSeverityBadgeClass(severity) {
+    const value = (severity || '').toUpperCase();
+    if (value === 'CRITICAL') return 'badge-cyan';
+    if (value === 'HIGH') return 'badge-orange';
+    if (value === 'MEDIUM') return 'badge-pink';
+    if (value === 'LOW') return 'badge-green';
+    return 'badge-blue';
+}
+
+function severityRank(value) {
+    const map = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1, UNKNOWN: 0 };
+    return map[(value || '').toUpperCase()] ?? 0;
+}
+
+async function loadVendorAdvisories(force = false) {
+    const listEl = document.getElementById('advisories-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="text-align:center; padding:24px; color:#22d3ee;"><span class="spinner" style="width:28px; height:28px;"></span><br><br>Loading vendor advisories...</div>';
+
+    try {
+        const url = `/api/advisories${force ? '?force=1' : ''}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Vendor advisories unavailable');
+        const data = await res.json();
+        advisoriesState.items = data.items || [];
+        advisoriesState.timestamp = data.timestamp;
+        advisoriesState.degraded = Boolean(data.degraded);
+        applyAdvisoriesFilters();
+        setDegradedBanner('advisories-degraded', advisoriesState.degraded);
+        const updatedEl = document.getElementById('advisories-updated');
+        if (updatedEl) updatedEl.textContent = formatModuleDate(advisoriesState.timestamp);
+        updateHealthStatus('advisories', advisoriesState.degraded, advisoriesState.timestamp);
+    } catch (error) {
+        if (advisoriesState.items.length) {
+            setDegradedBanner('advisories-degraded', true);
+            updateHealthStatus('advisories', true, advisoriesState.timestamp);
+            renderAdvisoriesList();
+        } else {
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color:#ff4444;">${error.message}</div>`;
+            updateHealthStatus('advisories', true, advisoriesState.timestamp);
+        }
+    }
+}
+
+function applyAdvisoriesFilters() {
+    const vendor = advisoriesState.vendor;
+    const cveOnly = advisoriesState.cveOnly;
+    advisoriesState.filtered = advisoriesState.items.filter(item => {
+        const vendorMatch = vendor === 'all' || item.vendor === vendor;
+        const cveMatch = !cveOnly || (item.cves && item.cves.length > 0);
+        return vendorMatch && cveMatch;
+    });
+    renderAdvisoriesList();
+}
+
+function renderAdvisoriesList() {
+    const listEl = document.getElementById('advisories-list');
+    const loadMoreBtn = document.getElementById('advisories-load-more');
+    if (!listEl) return;
+    const visibleItems = advisoriesState.filtered.slice(0, advisoriesState.visible);
+
+    if (!visibleItems.length) {
+        listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No advisories match the current filters.</div>';
+    } else {
+        listEl.innerHTML = visibleItems.map(item => {
+            const anchorId = `advisory:${item.id}`;
+            const cveChips = (item.cves || []).map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`).join('');
+            return `
+                <div class="module-item" data-clipboard-anchor="${anchorId}">
+                    <div class="module-item-header">
+                        <div>
+                            <div class="module-badges">
+                                <span class="news-badge ${getVendorBadgeClass(item.vendor)}">${escapeHtml(item.vendor)}</span>
+                                <span style="font-size:12px; color: rgba(255,255,255,0.6);">${formatNewsDate(item.publishedISO)}</span>
+                            </div>
+                            <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">${escapeHtml(item.title)}</div>
+                        </div>
+                        <div class="module-actions">
+                            ${getLibrarySaveMarkup({
+                                id: anchorId,
+                                type: 'advisory',
+                                title: item.title,
+                                url: item.url,
+                                source: item.vendor,
+                                date: formatNewsDate(item.publishedISO),
+                                summary: item.summary || '',
+                                tags: ['vendor', item.vendor]
+                            }, { label: 'Save' })}
+                            ${getPinButtonMarkup({
+                                id: anchorId,
+                                anchor: anchorId,
+                                type: 'advisory',
+                                title: item.title,
+                                subtitle: item.vendor,
+                                url: item.url,
+                                severity: null,
+                                meta: {
+                                    vendor: item.vendor,
+                                    published: item.publishedISO,
+                                    cves: item.cves || []
+                                }
+                            }, { compact: true })}
+                        </div>
+                    </div>
+                    <div class="module-summary">${escapeHtml(item.summary || '')}</div>
+                    ${cveChips ? `<div class="news-cve-chips">${cveChips}</div>` : ''}
+                    <div class="module-actions" style="margin-top: 10px;">
+                        <a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        updatePinButtons();
+    }
+
+    if (loadMoreBtn) {
+        loadMoreBtn.style.display = advisoriesState.filtered.length > advisoriesState.visible ? 'inline-flex' : 'none';
+    }
+}
+
+async function loadOsvAdvisories(force = false) {
+    const listEl = document.getElementById('osv-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="text-align:center; padding:24px; color:#22d3ee;"><span class="spinner" style="width:28px; height:28px;"></span><br><br>Loading OSV advisories...</div>';
+
+    try {
+        const ecosystems = (osvState.ecosystems || []).join(',');
+        const url = `/api/osv?ecosystem=${encodeURIComponent(ecosystems)}&days=7${force ? '&force=1' : ''}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('OSV advisories unavailable');
+        const data = await res.json();
+        osvState.items = data.items || [];
+        osvState.timestamp = data.timestamp;
+        osvState.degraded = Boolean(data.degraded);
+        applyOsvFilters();
+        setDegradedBanner('osv-degraded', osvState.degraded);
+        const updatedEl = document.getElementById('osv-updated');
+        if (updatedEl) updatedEl.textContent = formatModuleDate(osvState.timestamp);
+        updateHealthStatus('osv', osvState.degraded, osvState.timestamp);
+    } catch (error) {
+        if (osvState.items.length) {
+            setDegradedBanner('osv-degraded', true);
+            updateHealthStatus('osv', true, osvState.timestamp);
+            renderOsvList();
+        } else {
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color:#ff4444;">${error.message}</div>`;
+            updateHealthStatus('osv', true, osvState.timestamp);
+        }
+    }
+}
+
+function applyOsvFilters() {
+    const minSeverity = severityRank(osvState.severity);
+    osvState.filtered = osvState.items.filter(item => severityRank(item.severity) >= minSeverity);
+    renderOsvList();
+}
+
+function renderOsvList() {
+    const listEl = document.getElementById('osv-list');
+    const loadMoreBtn = document.getElementById('osv-load-more');
+    if (!listEl) return;
+    const visibleItems = osvState.filtered.slice(0, osvState.visible);
+
+    if (!visibleItems.length) {
+        listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No OSV advisories match the current filters.</div>';
+    } else {
+        listEl.innerHTML = visibleItems.map(item => {
+            const anchorId = `osv:${item.id}`;
+            const cveAliases = (item.aliases || []).filter(alias => alias.toUpperCase().startsWith('CVE-'));
+            const cveChips = cveAliases.map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`).join('');
+            return `
+                <div class="module-item" data-clipboard-anchor="${anchorId}">
+                    <div class="module-item-header">
+                        <div>
+                            <div class="module-badges">
+                                <span class="news-badge ${getEcosystemBadgeClass(item.ecosystem)}">${escapeHtml(item.ecosystem)}</span>
+                                <span class="news-badge ${getSeverityBadgeClass(item.severity)}">${escapeHtml(item.severity || 'Unknown')}</span>
+                                <span style="font-size:12px; color: rgba(255,255,255,0.6);">${formatNewsDate(item.publishedISO)}</span>
+                            </div>
+                            <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">${escapeHtml(item.package)}</div>
+                        </div>
+                        <div class="module-actions">
+                            ${getLibrarySaveMarkup({
+                                id: anchorId,
+                                type: 'osv',
+                                title: `${item.package} (${item.ecosystem})`,
+                                url: item.url,
+                                source: `OSV ${item.ecosystem}`,
+                                date: formatNewsDate(item.publishedISO),
+                                summary: item.summary || '',
+                                tags: ['osv', item.ecosystem, item.severity]
+                            }, { label: 'Save' })}
+                            ${getPinButtonMarkup({
+                                id: anchorId,
+                                anchor: anchorId,
+                                type: 'osv',
+                                title: item.package,
+                                subtitle: item.ecosystem,
+                                url: item.url,
+                                severity: item.severity,
+                                meta: {
+                                    aliases: item.aliases || [],
+                                    published: item.publishedISO
+                                }
+                            }, { compact: true })}
+                        </div>
+                    </div>
+                    <div class="module-summary">${escapeHtml(item.summary || '')}</div>
+                    ${cveChips ? `<div class="news-cve-chips">${cveChips}</div>` : ''}
+                    <div class="module-actions" style="margin-top: 10px;">
+                        <a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        updatePinButtons();
+    }
+
+    if (loadMoreBtn) {
+        loadMoreBtn.style.display = osvState.filtered.length > osvState.visible ? 'inline-flex' : 'none';
+    }
+}
+
+async function loadStatusBoard(force = false) {
+    const listEl = document.getElementById('status-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="text-align:center; padding:24px; color:#22d3ee;"><span class="spinner" style="width:28px; height:28px;"></span><br><br>Loading status updates...</div>';
+
+    try {
+        const url = `/api/status${force ? '?force=1' : ''}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Status feeds unavailable');
+        const data = await res.json();
+        statusState.items = data.items || [];
+        statusState.timestamp = data.timestamp;
+        statusState.degraded = Boolean(data.degraded);
+        renderStatusBoard();
+        setDegradedBanner('status-degraded', statusState.degraded);
+        const updatedEl = document.getElementById('status-updated');
+        if (updatedEl) updatedEl.textContent = formatModuleDate(statusState.timestamp);
+        updateHealthStatus('status', statusState.degraded, statusState.timestamp);
+    } catch (error) {
+        if (statusState.items.length) {
+            setDegradedBanner('status-degraded', true);
+            updateHealthStatus('status', true, statusState.timestamp);
+            renderStatusBoard();
+        } else {
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color:#ff4444;">${error.message}</div>`;
+            updateHealthStatus('status', true, statusState.timestamp);
+        }
+    }
+}
+
+function renderStatusBoard() {
+    const listEl = document.getElementById('status-list');
+    const summaryEl = document.getElementById('status-summary-chips');
+    if (!listEl) return;
+    const now = Date.now();
+    const active = statusState.items.filter(item => item.statusType === 'incident');
+    const maintenance = statusState.items.filter(item => item.statusType === 'maintenance');
+    const resolvedRecent = statusState.items.filter(item => item.statusType === 'resolved' && (now - new Date(item.publishedISO).getTime()) <= 24 * 60 * 60 * 1000);
+
+    if (summaryEl) {
+        summaryEl.innerHTML = `
+            <div class="intel-summary-chip">Active incidents: ${active.length}</div>
+            <div class="intel-summary-chip">Maintenance: ${maintenance.length}</div>
+            <div class="intel-summary-chip">Resolved (24h): ${resolvedRecent.length}</div>
+        `;
+    }
+
+    const ordered = [...active, ...maintenance, ...statusState.items.filter(item => item.statusType === 'resolved')].filter(Boolean);
+
+    if (!ordered.length) {
+        listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No recent status updates.</div>';
+        return;
+    }
+
+    listEl.innerHTML = ordered.slice(0, 20).map(item => {
+        const anchorId = `status:${item.id}`;
+        return `
+            <div class="module-item" data-clipboard-anchor="${anchorId}">
+                <div class="module-item-header">
+                    <div>
+                        <div class="module-badges">
+                            <span class="news-badge badge-blue">${escapeHtml(item.service)}</span>
+                            <span class="status-pill ${escapeHtml(item.statusType)}">${escapeHtml(item.statusType)}</span>
+                            <span style="font-size:12px; color: rgba(255,255,255,0.6);">${formatNewsDate(item.publishedISO)}</span>
+                        </div>
+                        <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">${escapeHtml(item.title)}</div>
+                    </div>
+                    <div class="module-actions">
+                        ${getLibrarySaveMarkup({
+                            id: anchorId,
+                            type: 'status',
+                            title: item.title,
+                            url: item.url,
+                            source: item.service,
+                            date: formatNewsDate(item.publishedISO),
+                            summary: item.summary || '',
+                            tags: ['status', item.statusType]
+                        }, { label: 'Save' })}
+                        ${getPinButtonMarkup({
+                            id: anchorId,
+                            anchor: anchorId,
+                            type: 'status',
+                            title: item.title,
+                            subtitle: item.service,
+                            url: item.url,
+                            severity: null,
+                            meta: {
+                                status: item.statusType,
+                                published: item.publishedISO
+                            }
+                        }, { compact: true })}
+                    </div>
+                </div>
+                <div class="module-summary">${escapeHtml(item.summary || '')}</div>
+                <div class="module-actions" style="margin-top: 10px;">
+                    <a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>
+                </div>
+            </div>
+        `;
+    }).join('');
+    updatePinButtons();
+}
+
+function setupDashboardIntel() {
+    const vendorSelect = document.getElementById('advisories-vendor-filter');
+    const cveOnlyToggle = document.getElementById('advisories-cve-only');
+    const advisoriesLoadMore = document.getElementById('advisories-load-more');
+    const advisoriesRefresh = document.getElementById('advisories-refresh-btn');
+
+    if (vendorSelect) {
+        vendorSelect.addEventListener('change', () => {
+            advisoriesState.vendor = vendorSelect.value;
+            advisoriesState.visible = 10;
+            applyAdvisoriesFilters();
+        });
+    }
+    if (cveOnlyToggle) {
+        cveOnlyToggle.addEventListener('change', () => {
+            advisoriesState.cveOnly = cveOnlyToggle.checked;
+            advisoriesState.visible = 10;
+            applyAdvisoriesFilters();
+        });
+    }
+    if (advisoriesLoadMore) {
+        advisoriesLoadMore.addEventListener('click', () => {
+            advisoriesState.visible += 10;
+            renderAdvisoriesList();
+        });
+    }
+    if (advisoriesRefresh) {
+        advisoriesRefresh.addEventListener('click', () => loadVendorAdvisories(true));
+    }
+
+    const ecosystemSelect = document.getElementById('osv-ecosystem-filter');
+    const osvSeveritySelect = document.getElementById('osv-severity-filter');
+    const osvLoadMore = document.getElementById('osv-load-more');
+    const osvRefresh = document.getElementById('osv-refresh-btn');
+
+    if (ecosystemSelect) {
+        ecosystemSelect.addEventListener('change', () => {
+            const selected = Array.from(ecosystemSelect.selectedOptions).map(option => option.value);
+            osvState.ecosystems = selected.length ? selected : ['npm', 'PyPI', 'Maven'];
+            osvState.visible = 10;
+            loadOsvAdvisories();
+        });
+    }
+    if (osvSeveritySelect) {
+        osvSeveritySelect.addEventListener('change', () => {
+            osvState.severity = osvSeveritySelect.value;
+            osvState.visible = 10;
+            applyOsvFilters();
+        });
+    }
+    if (osvLoadMore) {
+        osvLoadMore.addEventListener('click', () => {
+            osvState.visible += 10;
+            renderOsvList();
+        });
+    }
+    if (osvRefresh) {
+        osvRefresh.addEventListener('click', () => loadOsvAdvisories(true));
+    }
+
+    const statusRefresh = document.getElementById('status-refresh-btn');
+    if (statusRefresh) {
+        statusRefresh.addEventListener('click', () => loadStatusBoard(true));
+    }
+}
+
 function refreshDashboard() {
     loadCISAKEV();
+    loadVendorAdvisories(true);
+    loadOsvAdvisories(true);
+    loadStatusBoard(true);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     loadCISAKEV();
+    loadVendorAdvisories();
+    loadOsvAdvisories();
+    loadStatusBoard();
+    setupDashboardIntel();
+
+    setInterval(() => loadVendorAdvisories(), 30 * 60 * 1000);
+    setInterval(() => loadOsvAdvisories(), 60 * 60 * 1000);
+    setInterval(() => loadStatusBoard(), 15 * 60 * 1000);
 });
 </script>
 
@@ -13322,7 +14076,10 @@ function analyzePassword() {
             actor: 'Threat Actor',
             technique: 'Technique',
             risk: 'Risk Register',
-            checklist: 'Checklist'
+            checklist: 'Checklist',
+            advisory: 'Vendor Advisory',
+            osv: 'OSV Advisory',
+            status: 'Status Update'
         };
         const libraryState = {
             items: [],
@@ -13635,7 +14392,10 @@ function analyzePassword() {
             tool: 'Tool Result',
             doc: 'Document',
             risk: 'Risk',
-            checklist: 'Checklist'
+            checklist: 'Checklist',
+            advisory: 'Vendor Advisory',
+            osv: 'OSV Advisory',
+            status: 'Status Update'
         };
         let clipboardState = loadClipboard();
         let clipboardUiState = loadClipboardUiState();
