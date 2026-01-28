@@ -6052,6 +6052,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // Perplexity API Integration (server-side proxy)
         const PERPLEXITY_API_ENDPOINT = '/api/perplexity';
+        const FEED_ENDPOINTS = {
+            advisories: '/api/feeds?type=advisories',
+            status: '/api/feeds?type=status',
+            osv: (ecosystem, days) => `/api/feeds?type=osv&ecosystem=${encodeURIComponent(ecosystem)}&days=${encodeURIComponent(days)}`
+        };
 
         // Load saved API key on init (no-op: keys are managed in Vercel)
         function loadSavedAPIKey() {
