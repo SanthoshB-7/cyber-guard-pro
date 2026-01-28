@@ -509,6 +509,16 @@ body{
     gap: var(--space-6);
 }
 
+.news-cve-chips .extra-cve-chips {
+    display: none;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.news-cve-chips.expanded .extra-cve-chips {
+    display: flex;
+}
+
 .news-cve-chip {
     border: 1px solid rgba(139, 92, 246, 0.35);
     background: rgba(139, 92, 246, 0.12);
@@ -1215,6 +1225,35 @@ body{
     color: rgba(255, 255, 255, 0.75);
     line-height: 1.6;
     margin-bottom: var(--space-10);
+}
+
+.module-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.summary-text {
+    display: inline;
+}
+
+.summary-toggle {
+    background: none;
+    border: none;
+    color: #22d3ee;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 6px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.summary-toggle:hover {
+    text-decoration: underline;
 }
 
 .module-actions {
@@ -4009,6 +4048,42 @@ p, .muted-text, .subtitle{
     <div class="cve-grid" id="cisa-kev-grid"><div style="text-align:center; padding:40px; color:#ff0040;">Error loading CISA data: Failed to fetch<br><br>Please refresh and try again.</div></div>
 </div>
 
+<!-- Recent Data Breaches (Verified Dataset) -->
+<div class="premium-card dashboard-module" id="breaches-module">
+    <div class="module-header">
+        <div>
+            <h2 id="breach-header">Recent Data Breaches (Verified Dataset)</h2>
+            <div class="module-meta" id="breach-subtitle">Verified breach registry (HIBP catalog)</div>
+        </div>
+    </div>
+    <div id="breach-fallback-callout" style="display: none; margin-bottom: 16px; padding: 10px 12px; border-radius: 8px; background: rgba(255, 153, 51, 0.12); border: 1px solid rgba(255, 153, 51, 0.4); color: rgba(255,255,255,0.9); font-size: 13px;">
+      Verified breach registry unavailable; showing live intelligence feed.
+    </div>
+    <div class="filter-bar" style="margin-bottom: 12px;">
+      <select class="form-select" id="breach-mode-switch" style="flex: 1;">
+        <option value="verified" selected>Verified Breach Dataset</option>
+        <option value="live">Live Intelligence (Filtered)</option>
+      </select>
+    </div>
+    <div class="filter-bar" style="margin-bottom: 16px;">
+      <select class="form-select" id="breach-category-filter" style="flex: 1;">
+        <option value="all" selected>Category: All</option>
+        <option value="ransomware">Ransomware</option>
+        <option value="breach">Breach</option>
+        <option value="incident">Incident</option>
+      </select>
+      <select class="form-select" id="breach-severity-filter" style="flex: 1;">
+        <option value="medium" selected>Severity: ≥ MEDIUM</option>
+        <option value="high">Severity: ≥ HIGH</option>
+        <option value="critical">Severity: CRITICAL only</option>
+        <option value="all">Severity: All</option>
+      </select>
+    </div>
+    <div class="module-list" id="real-breaches-grid">
+      <!-- Dynamic breach data will load here -->
+    </div>
+</div>
+
 <!-- Vendor Advisories Radar -->
 <div class="premium-card dashboard-module" id="vendor-advisories-module">
     <div class="module-header">
@@ -4022,11 +4097,6 @@ p, .muted-text, .subtitle{
     <div class="module-controls">
         <select class="form-select" id="advisories-vendor-filter">
             <option value="all" selected>Vendor: All</option>
-            <option value="Microsoft">Microsoft</option>
-            <option value="Cisco">Cisco</option>
-            <option value="Fortinet">Fortinet</option>
-            <option value="Palo Alto Networks">Palo Alto Networks</option>
-            <option value="VMware">VMware</option>
         </select>
         <label style="display:flex; align-items:center; gap:6px; font-size:12px; color: rgba(255,255,255,0.7);">
             <input type="checkbox" id="advisories-cve-only">
@@ -4079,6 +4149,10 @@ p, .muted-text, .subtitle{
     <div class="module-degraded" id="status-degraded">Degraded: Showing last cached status updates while feeds recover.</div>
     <div class="intel-summary-chips" id="status-summary-chips"></div>
     <div class="module-list" id="status-list"></div>
+    <div class="module-actions" style="margin-top: 12px;">
+        <button class="btn btn-secondary" type="button" id="status-load-more">Load more</button>
+        <button class="btn btn-secondary" type="button" id="status-show-less" style="display: none;">Show less</button>
+    </div>
 </div>
 
 <!-- API Health -->
@@ -4219,13 +4293,14 @@ const osvState = {
     filtered: [],
     ecosystems: ['npm', 'PyPI', 'Maven'],
     severity: 'MEDIUM',
-    visible: 10,
+    visible: 5,
     degraded: false,
     timestamp: null
 };
 
 const statusState = {
     items: [],
+    visible: 5,
     degraded: false,
     timestamp: null
 };
@@ -4291,6 +4366,43 @@ function severityRank(value) {
     return map[(value || '').toUpperCase()] ?? 0;
 }
 
+function decodeEntities(text) {
+    const entityMap = {
+        '&lt;': '<',
+        '&gt;': '>',
+        '&amp;': '&',
+        '&quot;': '"',
+        '&#39;': "'",
+        '&nbsp;': ' '
+    };
+    return text.replace(/(&lt;|&gt;|&amp;|&quot;|&#39;|&nbsp;)/g, match => entityMap[match] || match);
+}
+
+function cleanText(raw) {
+    if (!raw) return '';
+    const decoded = decodeEntities(String(raw));
+    return decoded.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function buildSummaryData(raw, maxLength) {
+    const fullText = cleanText(raw);
+    if (fullText.length <= maxLength) {
+        return { fullText, shortText: fullText, isTrimmed: false };
+    }
+    const shortText = `${fullText.slice(0, maxLength).trimEnd()}…`;
+    return { fullText, shortText, isTrimmed: true };
+}
+
+function updateAdvisoryVendors(items) {
+    const vendorSelect = document.getElementById('advisories-vendor-filter');
+    if (!vendorSelect) return;
+    const currentValue = vendorSelect.value || 'all';
+    const vendors = Array.from(new Set((items || []).map(item => item.vendor).filter(Boolean))).sort();
+    vendorSelect.innerHTML = '<option value="all">Vendor: All</option>' +
+        vendors.map(vendor => `<option value="${escapeHtml(vendor)}">${escapeHtml(vendor)}</option>`).join('');
+    vendorSelect.value = vendors.includes(currentValue) ? currentValue : 'all';
+}
+
 async function loadVendorAdvisories(force = false) {
     const listEl = document.getElementById('advisories-list');
     if (!listEl) return;
@@ -4304,6 +4416,7 @@ async function loadVendorAdvisories(force = false) {
         advisoriesState.items = data.items || [];
         advisoriesState.timestamp = data.timestamp;
         advisoriesState.degraded = Boolean(data.degraded);
+        updateAdvisoryVendors(advisoriesState.items);
         applyAdvisoriesFilters();
         setDegradedBanner('advisories-degraded', advisoriesState.degraded);
         const updatedEl = document.getElementById('advisories-updated');
@@ -4339,11 +4452,27 @@ function renderAdvisoriesList() {
     const visibleItems = advisoriesState.filtered.slice(0, advisoriesState.visible);
 
     if (!visibleItems.length) {
-        listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No advisories match the current filters.</div>';
+        if (!advisoriesState.items.length) {
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No items returned. Try Refresh or disable “Has CVE only”.</div>';
+        } else {
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No advisories match the current filters.</div>';
+        }
     } else {
         listEl.innerHTML = visibleItems.map(item => {
             const anchorId = `advisory:${item.id}`;
-            const cveChips = (item.cves || []).map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`).join('');
+            const summaryData = buildSummaryData(item.summary || '', 180);
+            const cves = item.cves || [];
+            const visibleCves = cves.slice(0, 6);
+            const extraCves = cves.slice(6);
+            const cveChips = visibleCves
+                .map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`)
+                .join('');
+            const extraCveChips = extraCves
+                .map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`)
+                .join('');
+            const cveToggle = extraCves.length
+                ? `<button class="news-cve-chip" type="button" data-cve-toggle="true" data-cve-toggle-label="+${extraCves.length} more">+${extraCves.length} more</button>`
+                : '';
             return `
                 <div class="module-item" data-clipboard-anchor="${anchorId}">
                     <div class="module-item-header">
@@ -4352,7 +4481,7 @@ function renderAdvisoriesList() {
                                 <span class="news-badge ${getVendorBadgeClass(item.vendor)}">${escapeHtml(item.vendor)}</span>
                                 <span style="font-size:12px; color: rgba(255,255,255,0.6);">${formatNewsDate(item.publishedISO)}</span>
                             </div>
-                            <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">${escapeHtml(item.title)}</div>
+                            <div class="module-title">${escapeHtml(item.title)}</div>
                         </div>
                         <div class="module-actions">
                             ${getLibrarySaveMarkup({
@@ -4381,8 +4510,11 @@ function renderAdvisoriesList() {
                             }, { compact: true })}
                         </div>
                     </div>
-                    <div class="module-summary">${escapeHtml(item.summary || '')}</div>
-                    ${cveChips ? `<div class="news-cve-chips">${cveChips}</div>` : ''}
+                    <div class="module-summary">
+                        <span class="summary-text" data-summary-full="${escapeHtml(summaryData.fullText)}" data-summary-short="${escapeHtml(summaryData.shortText)}">${escapeHtml(summaryData.shortText)}</span>
+                        ${summaryData.isTrimmed ? '<button class="summary-toggle" type="button" data-summary-toggle="true">Show more</button>' : ''}
+                    </div>
+                    ${cveChips ? `<div class="news-cve-chips">${cveChips}${extraCveChips ? `<span class="extra-cve-chips">${extraCveChips}</span>` : ''}${cveToggle}</div>` : ''}
                     <div class="module-actions" style="margin-top: 10px;">
                         <a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>
                     </div>
@@ -4409,6 +4541,7 @@ async function loadOsvAdvisories(force = false) {
         if (!res.ok) throw new Error('OSV advisories unavailable');
         const data = await res.json();
         osvState.items = data.items || [];
+        osvState.visible = 5;
         osvState.timestamp = data.timestamp;
         osvState.degraded = Boolean(data.degraded);
         applyOsvFilters();
@@ -4430,7 +4563,12 @@ async function loadOsvAdvisories(force = false) {
 
 function applyOsvFilters() {
     const minSeverity = severityRank(osvState.severity);
-    osvState.filtered = osvState.items.filter(item => severityRank(item.severity) >= minSeverity);
+    const placeholders = ['sample-package', 'example-lib'];
+    osvState.filtered = osvState.items.filter(item => {
+        const pkg = (item.package || '').toLowerCase();
+        if (placeholders.includes(pkg)) return false;
+        return severityRank(item.severity) >= minSeverity;
+    });
     renderOsvList();
 }
 
@@ -4445,8 +4583,22 @@ function renderOsvList() {
     } else {
         listEl.innerHTML = visibleItems.map(item => {
             const anchorId = `osv:${item.id}`;
-            const cveAliases = (item.aliases || []).filter(alias => alias.toUpperCase().startsWith('CVE-'));
-            const cveChips = cveAliases.map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`).join('');
+            const summaryData = buildSummaryData(item.summary || '', 160);
+            const aliases = item.aliases || [];
+            const cveAliases = aliases.filter(alias => alias.toUpperCase().startsWith('CVE-'));
+            const otherAliases = aliases.filter(alias => !alias.toUpperCase().startsWith('CVE-'));
+            const visibleCves = cveAliases.slice(0, 6);
+            const extraCves = cveAliases.slice(6);
+            const cveChips = visibleCves
+                .map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`)
+                .join('');
+            const extraCveChips = extraCves
+                .map(cve => `<button class="news-cve-chip" type="button" data-cve-chip="${escapeHtml(cve)}">${escapeHtml(cve)}</button>`)
+                .join('');
+            const cveToggle = extraCves.length
+                ? `<button class="news-cve-chip" type="button" data-cve-toggle="true" data-cve-toggle-label="+${extraCves.length} more">+${extraCves.length} more</button>`
+                : '';
+            const aliasChips = otherAliases.map(alias => `<span class="news-cve-chip" style="cursor: default;">${escapeHtml(alias)}</span>`).join('');
             return `
                 <div class="module-item" data-clipboard-anchor="${anchorId}">
                     <div class="module-item-header">
@@ -4456,7 +4608,7 @@ function renderOsvList() {
                                 <span class="news-badge ${getSeverityBadgeClass(item.severity)}">${escapeHtml(item.severity || 'Unknown')}</span>
                                 <span style="font-size:12px; color: rgba(255,255,255,0.6);">${formatNewsDate(item.publishedISO)}</span>
                             </div>
-                            <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">${escapeHtml(item.package)}</div>
+                            <div class="module-title">${escapeHtml(item.package)}</div>
                         </div>
                         <div class="module-actions">
                             ${getLibrarySaveMarkup({
@@ -4484,8 +4636,12 @@ function renderOsvList() {
                             }, { compact: true })}
                         </div>
                     </div>
-                    <div class="module-summary">${escapeHtml(item.summary || '')}</div>
-                    ${cveChips ? `<div class="news-cve-chips">${cveChips}</div>` : ''}
+                    <div class="module-summary">
+                        <span class="summary-text" data-summary-full="${escapeHtml(summaryData.fullText)}" data-summary-short="${escapeHtml(summaryData.shortText)}">${escapeHtml(summaryData.shortText)}</span>
+                        ${summaryData.isTrimmed ? '<button class="summary-toggle" type="button" data-summary-toggle="true">Show more</button>' : ''}
+                    </div>
+                    ${cveChips ? `<div class="news-cve-chips">${cveChips}${extraCveChips ? `<span class="extra-cve-chips">${extraCveChips}</span>` : ''}${cveToggle}</div>` : ''}
+                    ${aliasChips ? `<div class="news-cve-chips" style="margin-top: 8px;">${aliasChips}</div>` : ''}
                     <div class="module-actions" style="margin-top: 10px;">
                         <a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>
                     </div>
@@ -4511,6 +4667,7 @@ async function loadStatusBoard(force = false) {
         if (!res.ok) throw new Error('Status feeds unavailable');
         const data = await res.json();
         statusState.items = data.items || [];
+        statusState.visible = 5;
         statusState.timestamp = data.timestamp;
         statusState.degraded = Boolean(data.degraded);
         renderStatusBoard();
@@ -4533,11 +4690,20 @@ async function loadStatusBoard(force = false) {
 function renderStatusBoard() {
     const listEl = document.getElementById('status-list');
     const summaryEl = document.getElementById('status-summary-chips');
+    const loadMoreBtn = document.getElementById('status-load-more');
+    const showLessBtn = document.getElementById('status-show-less');
     if (!listEl) return;
     const now = Date.now();
-    const active = statusState.items.filter(item => item.statusType === 'incident');
-    const maintenance = statusState.items.filter(item => item.statusType === 'maintenance');
-    const resolvedRecent = statusState.items.filter(item => item.statusType === 'resolved' && (now - new Date(item.publishedISO).getTime()) <= 24 * 60 * 60 * 1000);
+    const active = statusState.items
+        .filter(item => item.statusType === 'incident')
+        .sort((a, b) => new Date(b.publishedISO || 0) - new Date(a.publishedISO || 0));
+    const maintenance = statusState.items
+        .filter(item => item.statusType === 'maintenance')
+        .sort((a, b) => new Date(b.publishedISO || 0) - new Date(a.publishedISO || 0));
+    const resolved = statusState.items
+        .filter(item => item.statusType === 'resolved')
+        .sort((a, b) => new Date(b.publishedISO || 0) - new Date(a.publishedISO || 0));
+    const resolvedRecent = resolved.filter(item => (now - new Date(item.publishedISO).getTime()) <= 24 * 60 * 60 * 1000);
 
     if (summaryEl) {
         summaryEl.innerHTML = `
@@ -4547,15 +4713,18 @@ function renderStatusBoard() {
         `;
     }
 
-    const ordered = [...active, ...maintenance, ...statusState.items.filter(item => item.statusType === 'resolved')].filter(Boolean);
+    const ordered = [...active, ...maintenance, ...resolved].filter(Boolean);
 
     if (!ordered.length) {
         listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No recent status updates.</div>';
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+        if (showLessBtn) showLessBtn.style.display = 'none';
         return;
     }
 
-    listEl.innerHTML = ordered.slice(0, 20).map(item => {
+    listEl.innerHTML = ordered.slice(0, statusState.visible).map(item => {
         const anchorId = `status:${item.id}`;
+        const summaryData = buildSummaryData(item.summary || '', 220);
         return `
             <div class="module-item" data-clipboard-anchor="${anchorId}">
                 <div class="module-item-header">
@@ -4565,7 +4734,7 @@ function renderStatusBoard() {
                             <span class="status-pill ${escapeHtml(item.statusType)}">${escapeHtml(item.statusType)}</span>
                             <span style="font-size:12px; color: rgba(255,255,255,0.6);">${formatNewsDate(item.publishedISO)}</span>
                         </div>
-                        <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">${escapeHtml(item.title)}</div>
+                        <div class="module-title">${escapeHtml(item.title)}</div>
                     </div>
                     <div class="module-actions">
                         ${getLibrarySaveMarkup({
@@ -4593,7 +4762,10 @@ function renderStatusBoard() {
                         }, { compact: true })}
                     </div>
                 </div>
-                <div class="module-summary">${escapeHtml(item.summary || '')}</div>
+                <div class="module-summary">
+                    <span class="summary-text" data-summary-full="${escapeHtml(summaryData.fullText)}" data-summary-short="${escapeHtml(summaryData.shortText)}">${escapeHtml(summaryData.shortText)}</span>
+                    ${summaryData.isTrimmed ? '<button class="summary-toggle" type="button" data-summary-toggle="true">Show more</button>' : ''}
+                </div>
                 <div class="module-actions" style="margin-top: 10px;">
                     <a class="library-action-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Open link</a>
                 </div>
@@ -4601,6 +4773,13 @@ function renderStatusBoard() {
         `;
     }).join('');
     updatePinButtons();
+
+    if (loadMoreBtn) {
+        loadMoreBtn.style.display = ordered.length > statusState.visible ? 'inline-flex' : 'none';
+    }
+    if (showLessBtn) {
+        showLessBtn.style.display = statusState.visible > 5 ? 'inline-flex' : 'none';
+    }
 }
 
 function setupDashboardIntel() {
@@ -4642,20 +4821,20 @@ function setupDashboardIntel() {
         ecosystemSelect.addEventListener('change', () => {
             const selected = Array.from(ecosystemSelect.selectedOptions).map(option => option.value);
             osvState.ecosystems = selected.length ? selected : ['npm', 'PyPI', 'Maven'];
-            osvState.visible = 10;
+            osvState.visible = 5;
             loadOsvAdvisories();
         });
     }
     if (osvSeveritySelect) {
         osvSeveritySelect.addEventListener('change', () => {
             osvState.severity = osvSeveritySelect.value;
-            osvState.visible = 10;
+            osvState.visible = 5;
             applyOsvFilters();
         });
     }
     if (osvLoadMore) {
         osvLoadMore.addEventListener('click', () => {
-            osvState.visible += 10;
+            osvState.visible += 5;
             renderOsvList();
         });
     }
@@ -4664,10 +4843,48 @@ function setupDashboardIntel() {
     }
 
     const statusRefresh = document.getElementById('status-refresh-btn');
+    const statusLoadMore = document.getElementById('status-load-more');
+    const statusShowLess = document.getElementById('status-show-less');
     if (statusRefresh) {
         statusRefresh.addEventListener('click', () => loadStatusBoard(true));
     }
+    if (statusLoadMore) {
+        statusLoadMore.addEventListener('click', () => {
+            statusState.visible += 5;
+            renderStatusBoard();
+        });
+    }
+    if (statusShowLess) {
+        statusShowLess.addEventListener('click', () => {
+            statusState.visible = 5;
+            renderStatusBoard();
+        });
+    }
 }
+
+document.addEventListener('click', event => {
+    const summaryToggle = event.target.closest('[data-summary-toggle]');
+    if (summaryToggle) {
+        const summaryContainer = summaryToggle.closest('.module-summary');
+        const summaryText = summaryContainer?.querySelector('.summary-text');
+        if (!summaryText) return;
+        const isExpanded = summaryContainer.classList.toggle('expanded');
+        const fullText = summaryText.dataset.summaryFull || '';
+        const shortText = summaryText.dataset.summaryShort || '';
+        summaryText.textContent = isExpanded ? fullText : shortText;
+        summaryToggle.textContent = isExpanded ? 'Show less' : 'Show more';
+        return;
+    }
+
+    const cveToggle = event.target.closest('[data-cve-toggle]');
+    if (cveToggle) {
+        const chipRow = cveToggle.closest('.news-cve-chips');
+        if (!chipRow) return;
+        const isExpanded = chipRow.classList.toggle('expanded');
+        const defaultLabel = cveToggle.dataset.cveToggleLabel || 'Show more';
+        cveToggle.textContent = isExpanded ? 'Show less' : defaultLabel;
+    }
+});
 
 function refreshDashboard() {
     loadCISAKEV();
@@ -4688,36 +4905,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(() => loadStatusBoard(), 15 * 60 * 1000);
 });
 </script>
-
-<!-- REAL BREACHES DASHBOARD (verified from breach directory, public reports) -->
-<h2 id="breach-header" style="margin-bottom: 10px; font-size: 22px; font-weight: 600; color: #fff;">Recent Data Breaches (Verified Dataset)</h2>
-<p id="breach-subtitle" style="font-size: 15px; color: #ff4444; margin-bottom: 12px; font-weight:500;">Verified breach registry (HIBP catalog)</p>
-<div id="breach-fallback-callout" style="display: none; margin-bottom: 24px; padding: 10px 12px; border-radius: 8px; background: rgba(255, 153, 51, 0.12); border: 1px solid rgba(255, 153, 51, 0.4); color: rgba(255,255,255,0.9); font-size: 13px;">
-  Verified breach registry unavailable; showing live intelligence feed.
-</div>
-<div class="filter-bar" style="margin-bottom: 12px;">
-  <select class="form-select" id="breach-mode-switch" style="flex: 1;">
-    <option value="verified" selected>Verified Breach Dataset</option>
-    <option value="live">Live Intelligence (Filtered)</option>
-  </select>
-</div>
-<div class="filter-bar" style="margin-bottom: 16px;">
-  <select class="form-select" id="breach-category-filter" style="flex: 1;">
-    <option value="all" selected>Category: All</option>
-    <option value="ransomware">Ransomware</option>
-    <option value="breach">Breach</option>
-    <option value="incident">Incident</option>
-  </select>
-  <select class="form-select" id="breach-severity-filter" style="flex: 1;">
-    <option value="medium" selected>Severity: ≥ MEDIUM</option>
-    <option value="high">Severity: ≥ HIGH</option>
-    <option value="critical">Severity: CRITICAL only</option>
-    <option value="all">Severity: All</option>
-  </select>
-</div>
-<div style="display: grid; grid-template-columns: 1fr; gap: 12px;" id="real-breaches-grid">
-  <!-- Dynamic breach data will load here -->
-</div>
 
 <script>
 

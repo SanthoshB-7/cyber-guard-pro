@@ -224,29 +224,7 @@ function extractOsvList(payload) {
 }
 
 function buildOsvFallback(ecosystem, since) {
-  const now = new Date();
-  return [
-    {
-      id: `OSV-${ecosystem.toUpperCase()}-0001`,
-      ecosystem,
-      package: 'sample-package',
-      summary: 'Sample supply chain vulnerability (fallback entry).',
-      severity: 'HIGH',
-      publishedISO: now.toISOString(),
-      aliases: [],
-      url: `https://osv.dev/vulnerability/OSV-${ecosystem.toUpperCase()}-0001`
-    },
-    {
-      id: `OSV-${ecosystem.toUpperCase()}-0002`,
-      ecosystem,
-      package: 'example-lib',
-      summary: 'Dependency vulnerability with remote code execution risk.',
-      severity: 'CRITICAL',
-      publishedISO: now.toISOString(),
-      aliases: [],
-      url: `https://osv.dev/vulnerability/OSV-${ecosystem.toUpperCase()}-0002`
-    }
-  ].filter((item) => new Date(item.publishedISO) >= new Date(since));
+  return [];
 }
 
 async function fetchFeed(url) {
@@ -281,7 +259,7 @@ function parseFeed(xmlText, feed) {
       getTagValue(itemBlock, 'description') ||
       getTagValue(itemBlock, 'content:encoded') ||
       '';
-    const summary = stripHtml(descriptionRaw).slice(0, 260);
+    const summary = cleanFeedText(descriptionRaw);
     const dateISO = normalizeDate(pubDate);
 
     items.push({
@@ -299,7 +277,7 @@ function parseFeed(xmlText, feed) {
 function normalizeRssItem(item) {
   if (!item || !item.title) return null;
   const url = normalizeUrl(item.url);
-  const summary = item.summary || '';
+  const summary = cleanFeedText(item.summary || '');
   const cves = extractCves(`${item.title} ${summary}`);
   const severity = scoreSeverity(`${item.title} ${summary}`);
   const dateISO = item.dateISO || new Date().toISOString();
@@ -347,7 +325,7 @@ function normalizeOsvItem(item, ecosystem) {
     id: item.id || item.osvId || createId(`${eco}-${pkgName}-${publishedISO}`),
     ecosystem: eco,
     package: pkgName,
-    summary: item.summary || item.details || 'OSV vulnerability',
+    summary: cleanFeedText(item.summary || item.details || 'OSV vulnerability'),
     severity: extractOsvSeverity(item),
     publishedISO,
     aliases,
@@ -375,8 +353,22 @@ function normalizeDate(value) {
   return parsed.toISOString();
 }
 
-function stripHtml(text) {
-  return text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+function decodeEntities(text) {
+  return text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
+function cleanFeedText(text) {
+  if (!text) return '';
+  return decodeEntities(String(text))
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function getTagValue(block, tag) {
@@ -437,7 +429,7 @@ function mapAdvisoryItem(item) {
     url: item.url,
     publishedISO: item.dateISO,
     vendor: item.sourceName,
-    summary: item.summary,
+    summary: cleanFeedText(item.summary),
     cves: item.cves || []
   };
 }
@@ -451,7 +443,7 @@ function mapStatusItem(item) {
     statusType: item.status || 'incident',
     publishedISO: item.dateISO,
     url: item.url,
-    summary: item.summary
+    summary: cleanFeedText(item.summary)
   };
 }
 
