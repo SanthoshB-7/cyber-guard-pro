@@ -2610,6 +2610,167 @@ body{
     background: rgba(34, 211, 238, 0.08);
 }
 
+.risk-controls-section {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    background: rgba(12, 16, 24, 0.7);
+    border: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.risk-controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.risk-controls-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.risk-controls-search {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.risk-controls-suggestions,
+.risk-controls-auto {
+    display: grid;
+    gap: 8px;
+}
+
+.risk-control-suggestion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+}
+
+.mapped-controls-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.mapped-control-row {
+    border-radius: 12px;
+    background: rgba(8, 12, 20, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.mapped-control-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mapped-control-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255, 176, 32, 0.2);
+    color: #ffb020;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.mapped-control-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.mapped-control-type {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mapped-control-remove {
+    border: none;
+    background: rgba(255, 0, 64, 0.15);
+    color: #ff0040;
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.mapped-control-fields {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.mapped-control-fields textarea {
+    min-height: 70px;
+}
+
+.risk-controls-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0f1419;
+    background: rgba(34, 211, 238, 0.9);
+}
+
+.risk-treatment-modal .modal-body {
+    display: grid;
+    gap: 16px;
+}
+
+.risk-treatment-summary {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.risk-treatment-controls {
+    display: grid;
+    gap: 10px;
+}
+
+.risk-treatment-evidence {
+    display: grid;
+    gap: 12px;
+}
+
+.risk-treatment-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.risk-treatment-notes textarea {
+    min-height: 90px;
+}
+
 .checklist-summary {
     display: grid;
     gap: 10px;
@@ -4718,6 +4879,28 @@ window.addEventListener('DOMContentLoaded', () => {
                         </select>
                     </div>
                 </div>
+                <div class="risk-controls-section">
+                    <div class="risk-controls-header">
+                        <div>
+                            <h4 style="margin-bottom:4px; color:#ffb020;">Mitigating Controls</h4>
+                            <div style="font-size:12px; color: rgba(255,255,255,0.65);">Map the risk to control families or specific controls to track treatment progress.</div>
+                        </div>
+                        <div class="risk-controls-actions">
+                            <button class="library-action-btn" type="button" data-risk-control-suggest="true">Auto-suggest controls</button>
+                            <button class="library-action-btn" type="button" data-risk-control-clear="true">Clear mappings</button>
+                        </div>
+                    </div>
+                    <div class="risk-controls-search">
+                        <input class="form-input" id="risk-control-search" type="text" placeholder="Search control families or specific controls (e.g., Access Control, MFA, AU-2)">
+                        <div class="risk-controls-suggestions" id="risk-control-suggestions"></div>
+                    </div>
+                    <div class="risk-controls-auto" id="risk-control-auto"></div>
+                    <div class="mapped-controls-list" id="risk-control-list"></div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label for="risk-treatment-notes">Treatment Plan Notes</label>
+                        <textarea class="form-input" id="risk-treatment-notes" rows="3" placeholder="Add tracking notes, mitigation plans, or evidence pointers."></textarea>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="risk-notes">Notes</label>
                     <textarea class="form-input" id="risk-notes" rows="3"></textarea>
@@ -4727,6 +4910,16 @@ window.addEventListener('DOMContentLoaded', () => {
                     <button class="btn btn-danger" type="button" id="risk-delete-btn" style="display:none;">Delete Risk</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="risk-treatment-modal" aria-hidden="true">
+        <div class="modal risk-treatment-modal" role="dialog" aria-modal="true" aria-labelledby="risk-treatment-modal-title">
+            <div class="modal-header">
+                <h3 id="risk-treatment-modal-title" style="font-size: 18px; color: #ffb020;">Risk Treatment Plan</h3>
+                <button class="modal-close" type="button" aria-label="Close risk treatment plan">Close</button>
+            </div>
+            <div class="modal-body" id="risk-treatment-modal-body"></div>
         </div>
     </div>
 
@@ -8731,7 +8924,42 @@ function analyzePassword() {
             status: 'all',
             rating: 'Low',
             category: 'all',
-            sort: 'rating'
+            sort: 'rating',
+            unmappedOnly: false,
+            inProgressOnly: false
+        };
+
+        const riskRegisterModalState = {
+            mappedControls: [],
+            autoSuggestions: []
+        };
+
+        const controlStatusOptions = ['Planned', 'In Progress', 'Implemented'];
+
+        const controlKeywordMappings = [
+            { keywords: ['phishing', 'awareness', 'training', 'social engineering'], families: ['AT'] },
+            { keywords: ['mfa', 'authentication', 'identity', 'sso', 'access', 'privilege'], families: ['IA', 'AC'] },
+            { keywords: ['logging', 'monitoring', 'siem', 'audit'], families: ['AU'] },
+            { keywords: ['ransomware', 'incident', 'containment', 'forensic'], families: ['IR', 'CP'] },
+            { keywords: ['backup', 'recovery', 'bcp', 'dr'], families: ['CP'] },
+            { keywords: ['vendor', 'third party', 'supplier', 'outsourced'], families: ['SA', 'RA'] },
+            { keywords: ['patch', 'patching', 'vulnerability', 'cve'], families: ['SI', 'CM', 'RA'] },
+            { keywords: ['encryption', 'key management', 'crypto'], families: ['SC', 'AC'] },
+            { keywords: ['cloud', 'misconfig', 'configuration'], families: ['CM', 'AC', 'AU'] }
+        ];
+
+        const controlEvidenceTemplates = {
+            AC: ['Access reviews', 'IAM policy document', 'MFA settings screenshots', 'Role matrix', 'Privileged access approvals'],
+            AU: ['Log retention policy', 'SIEM alert samples', 'Audit log samples', 'Monitoring dashboard screenshots'],
+            IR: ['Incident response plan', 'Tabletop exercise results', 'Ticket samples', 'Post-incident report'],
+            CP: ['Backup policy', 'Restore test evidence', 'BCP/DR runbooks', 'RTO/RPO metrics'],
+            AT: ['Training completion reports', 'Phishing simulation results', 'Role-based training roster'],
+            IA: ['Authentication logs', 'Password policy', 'MFA enrollment report'],
+            CM: ['Baseline configuration docs', 'Change tickets', 'Configuration inventory'],
+            SI: ['Vulnerability scan results', 'Patch tracking logs', 'Malware protection configuration'],
+            RA: ['Risk assessment report', 'Vendor risk reviews', 'Threat modeling notes'],
+            SA: ['Vendor security questionnaires', 'Contract security clauses', 'Third-party assessments'],
+            SC: ['Encryption standards', 'Key management procedures', 'TLS configuration evidence']
         };
 
         let riskMatrixState = loadRiskMatrixConfig();
@@ -8828,6 +9056,41 @@ function analyzePassword() {
             localStorage.setItem(riskMatrixStorageKey, JSON.stringify(riskMatrixState));
         }
 
+        function normalizeMappedControl(entry) {
+            if (!entry || typeof entry !== 'object') {
+                return {
+                    type: 'family',
+                    id: '',
+                    title: '',
+                    rationale: '',
+                    status: 'Planned',
+                    owner: '',
+                    dueDate: ''
+                };
+            }
+            return {
+                type: entry.type === 'control' ? 'control' : 'family',
+                id: entry.id || '',
+                title: entry.title || '',
+                rationale: entry.rationale || '',
+                status: controlStatusOptions.includes(entry.status) ? entry.status : 'Planned',
+                owner: entry.owner || '',
+                dueDate: entry.dueDate || ''
+            };
+        }
+
+        function normalizeRiskRegisterItem(item) {
+            if (!item || typeof item !== 'object') return null;
+            const mappedControls = Array.isArray(item.mappedControls)
+                ? item.mappedControls.map(normalizeMappedControl).filter(entry => entry.id || entry.title)
+                : [];
+            return {
+                ...item,
+                mappedControls,
+                treatmentPlanNotes: item.treatmentPlanNotes || ''
+            };
+        }
+
         function loadRiskRegister() {
             try {
                 const raw = localStorage.getItem(riskRegisterStorageKey);
@@ -8842,9 +9105,12 @@ function analyzePassword() {
                     localStorage.setItem(riskRegisterStorageKey, JSON.stringify(defaults));
                     return defaults;
                 }
+                const normalizedItems = Array.isArray(parsed.items)
+                    ? parsed.items.map(normalizeRiskRegisterItem).filter(Boolean)
+                    : [];
                 const normalized = {
                     version: 1,
-                    items: Array.isArray(parsed.items) ? parsed.items : [],
+                    items: normalizedItems,
                     updatedAt: parsed.updatedAt || null
                 };
                 localStorage.setItem(riskRegisterStorageKey, JSON.stringify(normalized));
@@ -8995,6 +9261,7 @@ function analyzePassword() {
                 const ratingLabel = updateRiskRegisterRating(item);
                 const dueLabel = item.dueDate ? new Date(item.dueDate).toLocaleDateString() : '—';
                 const updatedLabel = item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : '—';
+                const mappedCount = item.mappedControls?.length || 0;
                 return `
                     <tr data-risk-row="true" data-risk-id="${escapeHtml(item.id)}" data-clipboard-anchor="risk:${escapeHtml(item.id)}">
                         <td>${getRiskRatingBadge(ratingLabel)}</td>
@@ -9004,8 +9271,10 @@ function analyzePassword() {
                         <td>${escapeHtml(item.status || 'Open')}</td>
                         <td>${dueLabel}</td>
                         <td>${updatedLabel}</td>
+                        <td><span class="risk-controls-count">${mappedCount}</span></td>
                         <td>
                             <div class="risk-row-actions">
+                                <button class="library-action-btn" type="button" data-risk-action="plan" data-risk-id="${escapeHtml(item.id)}">Treatment Plan</button>
                                 <button class="library-action-btn" type="button" data-risk-action="clipboard" data-risk-id="${escapeHtml(item.id)}">Pin</button>
                                 <button class="library-action-btn" type="button" data-risk-action="case" data-risk-id="${escapeHtml(item.id)}">Case</button>
                                 <button class="library-action-btn" type="button" data-risk-action="library" data-risk-id="${escapeHtml(item.id)}">Save</button>
@@ -9025,6 +9294,7 @@ function analyzePassword() {
                             <button class="btn btn-primary" type="button" data-risk-add="true">Add Risk</button>
                             <button class="library-action-btn" type="button" data-risk-export="csv">Export CSV</button>
                             <button class="library-action-btn" type="button" data-risk-export="pdf">Export PDF</button>
+                            <button class="library-action-btn" type="button" data-risk-export="controls">Export Controls Mapping CSV</button>
                         </div>
                     </div>
                     <div class="risk-register-filters">
@@ -9032,6 +9302,14 @@ function analyzePassword() {
                         <select class="form-input" data-risk-filter="rating">${filterOptions}</select>
                         <select class="form-input" data-risk-filter="category">${categoryOptions}</select>
                         <select class="form-input" data-risk-sort="true">${sortOptions}</select>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color: rgba(255,255,255,0.7);">
+                            <input type="checkbox" data-risk-filter="unmapped" ${riskRegisterUiState.unmappedOnly ? 'checked' : ''}>
+                            Unmapped risks only
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color: rgba(255,255,255,0.7);">
+                            <input type="checkbox" data-risk-filter="inprogress" ${riskRegisterUiState.inProgressOnly ? 'checked' : ''}>
+                            Has controls In Progress
+                        </label>
                     </div>
                     <div style="overflow-x:auto;">
                         <table class="data-table risk-register-table">
@@ -9044,11 +9322,12 @@ function analyzePassword() {
                                     <th>Status</th>
                                     <th>Due</th>
                                     <th>Updated</th>
+                                    <th>Controls</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${rows || `<tr><td colspan="8" style="text-align:center; color: rgba(255,255,255,0.6);">No risks yet. Add your first entry.</td></tr>`}
+                                ${rows || `<tr><td colspan="9" style="text-align:center; color: rgba(255,255,255,0.6);">No risks yet. Add your first entry.</td></tr>`}
                             </tbody>
                         </table>
                     </div>
@@ -9061,6 +9340,8 @@ function analyzePassword() {
             const filtered = riskRegisterState.items.filter(item => {
                 if (riskRegisterUiState.status !== 'all' && item.status !== riskRegisterUiState.status) return false;
                 if (riskRegisterUiState.category !== 'all' && item.category !== riskRegisterUiState.category) return false;
+                if (riskRegisterUiState.unmappedOnly && (item.mappedControls || []).length > 0) return false;
+                if (riskRegisterUiState.inProgressOnly && !(item.mappedControls || []).some(ctrl => ctrl.status === 'In Progress')) return false;
                 const ratingLabel = getRiskCellRating(item.likelihood, item.impact);
                 return getRiskRatingRank(ratingLabel) >= minRating;
             });
@@ -9082,6 +9363,185 @@ function analyzePassword() {
             return riskRegisterState.items.find(item => item.id === id);
         }
 
+        function getControlFamilyByCode(code) {
+            return dataBankData.controlFamilies.find(fam => fam.code === code);
+        }
+
+        function getControlCatalog() {
+            const catalog = [];
+            dataBankData.controlFamilies.forEach(family => {
+                catalog.push({
+                    type: 'family',
+                    id: family.code,
+                    title: family.name,
+                    familyId: family.id
+                });
+                const details = family.key_controls_detail || family.key_controls || [];
+                details.forEach((detail, index) => {
+                    const name = typeof detail === 'string' ? detail : detail.name;
+                    if (!name) return;
+                    catalog.push({
+                        type: 'control',
+                        id: `${family.code}-${index + 1}`,
+                        title: name,
+                        familyCode: family.code,
+                        familyId: family.id
+                    });
+                });
+            });
+            return catalog;
+        }
+
+        function setRiskRegisterModalState(item) {
+            riskRegisterModalState.mappedControls = (item?.mappedControls || []).map(normalizeMappedControl);
+            riskRegisterModalState.autoSuggestions = [];
+            renderMappedControlsList();
+            renderControlAutoSuggestions([]);
+            updateControlSearchSuggestions('');
+        }
+
+        function renderMappedControlsList() {
+            const list = document.getElementById('risk-control-list');
+            if (!list) return;
+            if (!riskRegisterModalState.mappedControls.length) {
+                list.innerHTML = `<div style="font-size:12px; color: rgba(255,255,255,0.6);">No controls mapped yet. Add a family or specific control.</div>`;
+                return;
+            }
+            list.innerHTML = riskRegisterModalState.mappedControls.map((entry, index) => {
+                const familyCode = entry.type === 'family' ? entry.id : entry.id.split('-')[0];
+                const family = getControlFamilyByCode(familyCode);
+                const label = entry.type === 'family' ? `${entry.id} — ${entry.title}` : `${entry.id} — ${entry.title}`;
+                return `
+                    <div class="mapped-control-row" data-mapped-index="${index}">
+                        <div class="mapped-control-header">
+                            <div class="mapped-control-meta">
+                                <span class="mapped-control-badge">${escapeHtml(entry.id || familyCode || 'CTRL')}</span>
+                                <div>
+                                    <div style="font-weight:600;">${escapeHtml(label)}</div>
+                                    <div class="mapped-control-type">${escapeHtml(entry.type === 'family' ? 'Control Family' : 'Specific Control')}${family?.name ? ` · ${escapeHtml(family.name)}` : ''}</div>
+                                </div>
+                            </div>
+                            <button class="mapped-control-remove" type="button" data-mapped-remove="${index}">Remove</button>
+                        </div>
+                        <div class="mapped-control-fields">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-input" data-mapped-field="status" data-mapped-index="${index}">
+                                    ${controlStatusOptions.map(option => `
+                                        <option value="${option}" ${option === entry.status ? 'selected' : ''}>${option}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Owner</label>
+                                <input class="form-input" type="text" data-mapped-field="owner" data-mapped-index="${index}" value="${escapeHtml(entry.owner || '')}">
+                            </div>
+                            <div class="form-group">
+                                <label>Due date</label>
+                                <input class="form-input" type="date" data-mapped-field="dueDate" data-mapped-index="${index}" value="${escapeHtml(entry.dueDate || '')}">
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Rationale (optional)</label>
+                                <textarea class="form-input" rows="2" data-mapped-field="rationale" data-mapped-index="${index}">${escapeHtml(entry.rationale || '')}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateControlSearchSuggestions(query) {
+            const container = document.getElementById('risk-control-suggestions');
+            if (!container) return;
+            const trimmed = query.trim().toLowerCase();
+            const catalog = getControlCatalog();
+            const matches = trimmed
+                ? catalog.filter(item => {
+                    const haystack = `${item.id} ${item.title} ${item.familyCode || ''}`.toLowerCase();
+                    return haystack.includes(trimmed);
+                })
+                : catalog.slice(0, 6);
+            if (!matches.length) {
+                container.innerHTML = `<div style="font-size:12px; color: rgba(255,255,255,0.6);">No matching controls found.</div>`;
+                return;
+            }
+            container.innerHTML = matches.slice(0, 8).map(item => `
+                <div class="risk-control-suggestion">
+                    <div>
+                        <div style="font-weight:600;">${escapeHtml(item.id)} — ${escapeHtml(item.title)}</div>
+                        <div style="font-size:11px; color: rgba(255,255,255,0.6);">${escapeHtml(item.type === 'family' ? 'Control Family' : `Control (${item.familyCode})`)}</div>
+                    </div>
+                    <button class="library-action-btn" type="button" data-control-add="${escapeHtml(item.id)}" data-control-type="${escapeHtml(item.type)}" data-control-title="${escapeHtml(item.title)}">Add</button>
+                </div>
+            `).join('');
+        }
+
+        function renderControlAutoSuggestions(list) {
+            const container = document.getElementById('risk-control-auto');
+            if (!container) return;
+            if (!list.length) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = `
+                <div style="font-size:12px; color: rgba(255,255,255,0.6);">Auto-suggested families</div>
+                ${list.map(item => `
+                    <div class="risk-control-suggestion">
+                        <div>
+                            <div style="font-weight:600;">${escapeHtml(item.id)} — ${escapeHtml(item.title)}</div>
+                            <div style="font-size:11px; color: rgba(255,255,255,0.6);">Control Family · score ${item.score}</div>
+                        </div>
+                        <button class="library-action-btn" type="button" data-control-add="${escapeHtml(item.id)}" data-control-type="family" data-control-title="${escapeHtml(item.title)}">Add</button>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function addMappedControlEntry(entry) {
+            if (!entry?.id) return;
+            const exists = riskRegisterModalState.mappedControls.some(ctrl => ctrl.id === entry.id && ctrl.type === entry.type);
+            if (exists) {
+                showToast('Control already mapped');
+                return;
+            }
+            riskRegisterModalState.mappedControls.push({
+                type: entry.type || 'family',
+                id: entry.id,
+                title: entry.title || entry.id,
+                rationale: '',
+                status: 'Planned',
+                owner: '',
+                dueDate: ''
+            });
+            renderMappedControlsList();
+        }
+
+        function clearMappedControls() {
+            riskRegisterModalState.mappedControls = [];
+            renderMappedControlsList();
+        }
+
+        function getAutoSuggestedFamilies(item) {
+            const text = [item?.title, item?.description, item?.category].filter(Boolean).join(' ').toLowerCase();
+            const scores = {};
+            controlKeywordMappings.forEach(mapping => {
+                if (mapping.keywords.some(keyword => text.includes(keyword))) {
+                    mapping.families.forEach(code => {
+                        scores[code] = (scores[code] || 0) + 1;
+                    });
+                }
+            });
+            const ranked = Object.entries(scores)
+                .map(([code, score]) => {
+                    const family = getControlFamilyByCode(code);
+                    return family ? { id: family.code, title: family.name, score } : null;
+                })
+                .filter(Boolean)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 5);
+            return ranked;
+        }
+
         function openRiskRegisterModal(item = null) {
             const modal = document.getElementById('risk-register-modal');
             if (!modal) return;
@@ -9099,6 +9559,10 @@ function analyzePassword() {
             document.getElementById('risk-due').value = item?.dueDate || '';
             document.getElementById('risk-status').value = item?.status || 'Open';
             document.getElementById('risk-notes').value = item?.notes || '';
+            document.getElementById('risk-treatment-notes').value = item?.treatmentPlanNotes || '';
+            const controlSearch = document.getElementById('risk-control-search');
+            if (controlSearch) controlSearch.value = '';
+            setRiskRegisterModalState(item);
             updateRiskRatingPreview();
             const deleteBtn = document.getElementById('risk-delete-btn');
             if (deleteBtn) {
@@ -9162,7 +9626,9 @@ function analyzePassword() {
                 owner: document.getElementById('risk-owner').value.trim(),
                 dueDate: document.getElementById('risk-due').value,
                 status: document.getElementById('risk-status').value,
-                notes: document.getElementById('risk-notes').value.trim()
+                notes: document.getElementById('risk-notes').value.trim(),
+                mappedControls: riskRegisterModalState.mappedControls.map(normalizeMappedControl),
+                treatmentPlanNotes: document.getElementById('risk-treatment-notes').value.trim()
             };
             const existingIndex = riskRegisterState.items.findIndex(item => item.id === payload.id);
             if (existingIndex >= 0) {
@@ -9280,6 +9746,242 @@ function analyzePassword() {
             });
             pdf.save(`risk-register-${Date.now()}.pdf`);
             showToast('Risk register PDF exported');
+        }
+
+        function exportRiskControlsMappingCsv() {
+            const rows = [];
+            riskRegisterState.items.forEach(item => {
+                const mapped = item.mappedControls || [];
+                mapped.forEach(control => {
+                    rows.push([
+                        item.id,
+                        item.title,
+                        getRiskCellRating(item.likelihood, item.impact),
+                        control.id,
+                        control.title,
+                        control.status,
+                        control.owner,
+                        control.dueDate
+                    ]);
+                });
+            });
+            if (!rows.length) {
+                showToast('No control mappings to export');
+                return;
+            }
+            const headers = ['riskId', 'riskTitle', 'rating', 'mappedControlId', 'mappedControlTitle', 'status', 'owner', 'dueDate'];
+            const csv = [headers, ...rows]
+                .map(row => row.map(value => `"${String(value || '').replace(/"/g, '""')}"`).join(','))
+                .join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `risk-control-mapping-${Date.now()}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast('Controls mapping CSV exported');
+        }
+
+        function getMappedFamilyCodes(item) {
+            const codes = new Set();
+            (item.mappedControls || []).forEach(control => {
+                const code = control.type === 'family' ? control.id : control.id.split('-')[0];
+                if (code) codes.add(code);
+            });
+            return [...codes];
+        }
+
+        function getEvidenceChecklistForRisk(item) {
+            const families = getMappedFamilyCodes(item);
+            return families.map(code => {
+                const template = controlEvidenceTemplates[code];
+                if (template?.length) {
+                    return { code, items: template.slice(0, 6) };
+                }
+                const family = getControlFamilyByCode(code);
+                const evidence = family?.evidence || [];
+                return { code, items: evidence.length ? evidence.slice(0, 6) : ['Evidence pending'] };
+            });
+        }
+
+        function renderRiskTreatmentPlan(item) {
+            const ratingLabel = getRiskCellRating(item.likelihood, item.impact);
+            const mappedControls = item.mappedControls || [];
+            const evidenceGroups = getEvidenceChecklistForRisk(item);
+            return `
+                <div class="risk-treatment-summary">
+                    <div style="display:flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-weight:600; font-size:16px;">${escapeHtml(item.title)}</div>
+                            <div style="font-size:12px; color: rgba(255,255,255,0.65);">${escapeHtml(item.category || 'Uncategorized')}</div>
+                        </div>
+                        <div>${getRiskRatingBadge(ratingLabel)}</div>
+                    </div>
+                    <div style="display:grid; gap:6px; font-size:13px; color: rgba(255,255,255,0.7);">
+                        <div><strong>Treatment:</strong> ${escapeHtml(item.treatment || 'Mitigate')}</div>
+                        <div><strong>Owner:</strong> ${escapeHtml(item.owner || 'Unassigned')}</div>
+                        <div><strong>Due:</strong> ${item.dueDate ? new Date(item.dueDate).toLocaleDateString() : '—'}</div>
+                        <div><strong>Status:</strong> ${escapeHtml(item.status || 'Open')}</div>
+                    </div>
+                </div>
+                <div class="risk-treatment-controls">
+                    <div style="font-weight:600; color:#ffb020;">Mapped Controls</div>
+                    ${mappedControls.length ? mappedControls.map(control => `
+                        <div class="risk-control-suggestion">
+                            <div>
+                                <div style="font-weight:600;">${escapeHtml(control.id)} — ${escapeHtml(control.title)}</div>
+                                <div style="font-size:11px; color: rgba(255,255,255,0.6);">${escapeHtml(control.status || 'Planned')} · ${escapeHtml(control.owner || 'Unassigned')} · ${control.dueDate ? new Date(control.dueDate).toLocaleDateString() : 'No due date'}</div>
+                                ${control.rationale ? `<div style="font-size:11px; color: rgba(255,255,255,0.6); margin-top:4px;">${escapeHtml(control.rationale)}</div>` : ''}
+                            </div>
+                        </div>
+                    `).join('') : `<div style="font-size:12px; color: rgba(255,255,255,0.6);">No controls mapped yet.</div>`}
+                </div>
+                <div class="risk-treatment-evidence">
+                    <div style="font-weight:600; color:#22d3ee;">Evidence Checklist</div>
+                    ${evidenceGroups.length ? evidenceGroups.map(group => `
+                        <div>
+                            <div style="font-size:12px; color: rgba(255,255,255,0.65); margin-bottom:6px;">${escapeHtml(group.code)} Evidence</div>
+                            <div class="checklist-items">
+                                ${group.items.map(itemText => `
+                                    <label class="checklist-item">
+                                        <input type="checkbox" disabled>
+                                        <span>${escapeHtml(itemText)}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('') : `<div style="font-size:12px; color: rgba(255,255,255,0.6);">Map controls to generate evidence checklists.</div>`}
+                </div>
+                <div class="risk-treatment-notes">
+                    <label style="font-size:12px; color: rgba(255,255,255,0.65);">Notes</label>
+                    <textarea class="form-input" data-treatment-notes="${escapeHtml(item.id)}">${escapeHtml(item.treatmentPlanNotes || '')}</textarea>
+                </div>
+                <div class="risk-treatment-actions">
+                    <button class="library-action-btn" type="button" data-risk-plan-action="clipboard" data-risk-id="${escapeHtml(item.id)}">Pin plan to Clipboard</button>
+                    <button class="library-action-btn" type="button" data-risk-plan-action="case" data-risk-id="${escapeHtml(item.id)}">Add plan to Case</button>
+                    <button class="library-action-btn" type="button" data-risk-plan-action="library" data-risk-id="${escapeHtml(item.id)}">Save plan to Library</button>
+                    <button class="library-action-btn" type="button" data-risk-plan-action="export" data-risk-id="${escapeHtml(item.id)}">Export Treatment Plan</button>
+                </div>
+            `;
+        }
+
+        function openRiskTreatmentModal(item) {
+            const modal = document.getElementById('risk-treatment-modal');
+            const body = document.getElementById('risk-treatment-modal-body');
+            if (!modal || !body || !item) return;
+            body.innerHTML = renderRiskTreatmentPlan(item);
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRiskTreatmentModal() {
+            const modal = document.getElementById('risk-treatment-modal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function buildTreatmentPlanPayload(item) {
+            const rating = getRiskCellRating(item.likelihood, item.impact);
+            const controls = (item.mappedControls || []).map(control => `${control.id} (${control.status || 'Planned'})`).join(', ');
+            return {
+                id: `risk-plan:${item.id}`,
+                anchor: `risk-plan:${item.id}`,
+                type: 'risk-plan',
+                title: `Treatment Plan: ${item.title}`,
+                subtitle: `${rating} • ${item.treatment || 'Mitigate'}`,
+                url: '',
+                severity: rating.toUpperCase(),
+                meta: {
+                    owner: item.owner || 'Unassigned',
+                    dueDate: item.dueDate || '',
+                    controls: controls || 'No controls mapped'
+                }
+            };
+        }
+
+        function saveRiskTreatmentNotes(id, value) {
+            const item = getRiskRegisterItemById(id);
+            if (!item) return;
+            item.treatmentPlanNotes = value.trim();
+            saveRiskRegister();
+        }
+
+        function exportRiskTreatmentPlan(item) {
+            if (!item) return;
+            if (!window.jspdf?.jsPDF) {
+                const payload = {
+                    title: 'Risk Treatment Plan',
+                    generatedAt: new Date().toISOString(),
+                    risk: item
+                };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `risk-treatment-plan-${Date.now()}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('PDF unavailable, exported JSON instead');
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            let y = 50;
+            pdf.setFontSize(16);
+            pdf.text('Risk Treatment Plan', 40, y);
+            y += 18;
+            pdf.setFontSize(10);
+            pdf.text(`Generated: ${new Date().toLocaleString()}`, 40, y);
+            y += 18;
+            pdf.setFontSize(12);
+            pdf.text(`Risk: ${item.title}`, 40, y);
+            y += 16;
+            const rating = getRiskCellRating(item.likelihood, item.impact);
+            pdf.setFontSize(10);
+            pdf.text(`Rating: ${rating}`, 40, y);
+            y += 14;
+            pdf.text(`Treatment: ${item.treatment || 'Mitigate'}`, 40, y);
+            y += 14;
+            pdf.text(`Owner: ${item.owner || 'Unassigned'} | Due: ${item.dueDate || '—'}`, 40, y);
+            y += 18;
+            pdf.setFontSize(11);
+            pdf.text('Mapped Controls:', 40, y);
+            y += 14;
+            (item.mappedControls || []).forEach(control => {
+                if (y > 760) {
+                    pdf.addPage();
+                    y = 40;
+                }
+                const line = `${control.id} - ${control.title} (${control.status || 'Planned'})`;
+                pdf.text(line, 40, y);
+                y += 12;
+            });
+            y += 6;
+            pdf.setFontSize(11);
+            pdf.text('Evidence Checklist:', 40, y);
+            y += 14;
+            getEvidenceChecklistForRisk(item).forEach(group => {
+                if (y > 760) {
+                    pdf.addPage();
+                    y = 40;
+                }
+                pdf.text(`${group.code}:`, 40, y);
+                y += 12;
+                group.items.forEach(evidence => {
+                    if (y > 760) {
+                        pdf.addPage();
+                        y = 40;
+                    }
+                    pdf.text(`- ${evidence}`, 50, y);
+                    y += 12;
+                });
+            });
+            pdf.save(`risk-treatment-plan-${Date.now()}.pdf`);
+            showToast('Treatment plan exported');
         }
 
         function buildRiskClipboardPayload(item) {
@@ -10202,6 +10904,7 @@ function analyzePassword() {
                     const type = riskExportBtn.dataset.riskExport;
                     if (type === 'csv') exportRiskRegisterCsv();
                     if (type === 'pdf') exportRiskRegisterPdf();
+                    if (type === 'controls') exportRiskControlsMappingCsv();
                     return;
                 }
 
@@ -10211,7 +10914,9 @@ function analyzePassword() {
                     const action = riskActionBtn.dataset.riskAction;
                     const item = getRiskRegisterItemById(id);
                     if (!item) return;
-                    if (action === 'clipboard') {
+                    if (action === 'plan') {
+                        openRiskTreatmentModal(item);
+                    } else if (action === 'clipboard') {
                         upsertClipboardItem(buildRiskClipboardPayload(item));
                         renderClipboard();
                         updatePinButtons();
@@ -10221,6 +10926,46 @@ function analyzePassword() {
                     } else if (action === 'library') {
                         addRiskToLibrary(item);
                     }
+                    return;
+                }
+
+                const controlAddBtn = event.target.closest('[data-control-add]');
+                if (controlAddBtn) {
+                    addMappedControlEntry({
+                        id: controlAddBtn.dataset.controlAdd,
+                        type: controlAddBtn.dataset.controlType,
+                        title: controlAddBtn.dataset.controlTitle
+                    });
+                    return;
+                }
+
+                const mappedRemoveBtn = event.target.closest('[data-mapped-remove]');
+                if (mappedRemoveBtn) {
+                    const index = Number(mappedRemoveBtn.dataset.mappedRemove);
+                    if (!Number.isNaN(index)) {
+                        riskRegisterModalState.mappedControls.splice(index, 1);
+                        renderMappedControlsList();
+                    }
+                    return;
+                }
+
+                const controlSuggestBtn = event.target.closest('[data-risk-control-suggest]');
+                if (controlSuggestBtn) {
+                    const currentId = document.getElementById('risk-id')?.value;
+                    const item = currentId ? getRiskRegisterItemById(currentId) : {
+                        title: document.getElementById('risk-title')?.value,
+                        description: document.getElementById('risk-description')?.value,
+                        category: document.getElementById('risk-category')?.value
+                    };
+                    const suggestions = getAutoSuggestedFamilies(item);
+                    riskRegisterModalState.autoSuggestions = suggestions;
+                    renderControlAutoSuggestions(suggestions);
+                    return;
+                }
+
+                const controlClearBtn = event.target.closest('[data-risk-control-clear]');
+                if (controlClearBtn) {
+                    clearMappedControls();
                     return;
                 }
 
@@ -10346,6 +11091,48 @@ function analyzePassword() {
                     }
                 }
 
+                const riskTreatmentModal = document.getElementById('risk-treatment-modal');
+                if (riskTreatmentModal && riskTreatmentModal.classList.contains('active')) {
+                    if (event.target.closest('#risk-treatment-modal .modal-close') || event.target === riskTreatmentModal) {
+                        closeRiskTreatmentModal();
+                        return;
+                    }
+                }
+
+                const riskPlanAction = event.target.closest('[data-risk-plan-action]');
+                if (riskPlanAction) {
+                    const id = riskPlanAction.dataset.riskId;
+                    const item = getRiskRegisterItemById(id);
+                    if (!item) return;
+                    const action = riskPlanAction.dataset.riskPlanAction;
+                    if (action === 'clipboard') {
+                        upsertClipboardItem(buildTreatmentPlanPayload(item));
+                        renderClipboard();
+                        updatePinButtons();
+                        showToast('Treatment plan pinned');
+                    } else if (action === 'case') {
+                        addRiskToCase({
+                            ...item,
+                            title: `Treatment Plan: ${item.title}`,
+                            description: item.treatmentPlanNotes || item.description || ''
+                        });
+                    } else if (action === 'library') {
+                        addLibraryItem({
+                            id: `risk-plan:${item.id}`,
+                            type: 'risk-plan',
+                            title: `Treatment Plan: ${item.title}`,
+                            summary: item.treatmentPlanNotes || item.description || '',
+                            source: 'Risk Register',
+                            date: new Date().toLocaleDateString(),
+                            url: '',
+                            tags: ['risk', 'treatment', getRiskCellRating(item.likelihood, item.impact)]
+                        });
+                    } else if (action === 'export') {
+                        exportRiskTreatmentPlan(item);
+                    }
+                    return;
+                }
+
                 if (!event.target.closest('.databank-search-wrapper')) {
                     const resultsContainer = document.getElementById('databank-search-results');
                     if (resultsContainer) {
@@ -10378,6 +11165,8 @@ function analyzePassword() {
                     if (type === 'status') riskRegisterUiState.status = event.target.value;
                     if (type === 'rating') riskRegisterUiState.rating = event.target.value;
                     if (type === 'category') riskRegisterUiState.category = event.target.value;
+                    if (type === 'unmapped') riskRegisterUiState.unmappedOnly = event.target.checked;
+                    if (type === 'inprogress') riskRegisterUiState.inProgressOnly = event.target.checked;
                     renderDataBankSection('risk', dataBankState.search);
                     return;
                 }
@@ -10390,6 +11179,15 @@ function analyzePassword() {
 
                 if (event.target.id === 'risk-likelihood' || event.target.id === 'risk-impact') {
                     updateRiskRatingPreview();
+                    return;
+                }
+
+                if (event.target.matches('[data-mapped-field]')) {
+                    const index = Number(event.target.dataset.mappedIndex);
+                    const field = event.target.dataset.mappedField;
+                    const entry = riskRegisterModalState.mappedControls[index];
+                    if (!entry || !field) return;
+                    entry[field] = event.target.value;
                     return;
                 }
 
@@ -10422,6 +11220,24 @@ function analyzePassword() {
                         }
                     }
                 }
+
+                if (event.target.id === 'risk-control-search') {
+                    updateControlSearchSuggestions(event.target.value);
+                    return;
+                }
+
+                if (event.target.matches('[data-mapped-field]')) {
+                    const index = Number(event.target.dataset.mappedIndex);
+                    const field = event.target.dataset.mappedField;
+                    const entry = riskRegisterModalState.mappedControls[index];
+                    if (!entry || !field) return;
+                    entry[field] = event.target.value;
+                    return;
+                }
+
+                if (event.target.matches('[data-treatment-notes]')) {
+                    saveRiskTreatmentNotes(event.target.dataset.treatmentNotes, event.target.value);
+                }
             });
 
             const riskForm = document.getElementById('risk-register-form');
@@ -10446,6 +11262,7 @@ function analyzePassword() {
                 if (event.key === 'Escape') {
                     closeDataBankModal();
                     closeRiskRegisterModal();
+                    closeRiskTreatmentModal();
                     closeChecklistModal();
                 }
             });
