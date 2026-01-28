@@ -73,29 +73,52 @@ export default async function handler(req, res) {
   }
 
   const forceRefresh = req.query?.force === '1';
+  const cveOnly = req.query?.cveOnly === '1' || req.query?.cveOnly === 'true';
   const cacheKey = buildCacheKey(type, req.query || {});
   const now = Date.now();
   const cachedEntry = forceRefresh ? null : getCachedEntry(type, cacheKey, now);
   if (cachedEntry) {
-    return res.status(200).json({
-      type,
-      items: cachedEntry.items,
-      timestamp: cachedEntry.timestamp,
-      cached: true,
-      degraded: false,
-      sourceCount: cachedEntry.sourceCount
-    });
+    return res.status(200).json(
+      buildResponse({
+        type,
+        items: cachedEntry.items,
+        timestamp: cachedEntry.timestamp,
+        cached: true,
+        sourceCount: cachedEntry.sourceCount,
+        fetchedCount: cachedEntry.fetchedCount,
+        parsedCount: cachedEntry.parsedCount,
+        filteredCount: cachedEntry.filteredCount,
+        errors: cachedEntry.errors,
+        filteredByCveOnly: cachedEntry.filteredByCveOnly
+      })
+    );
   }
 
   try {
     let items = [];
     let sourceCount = 0;
+    let fetchedCount = 0;
+    let parsedCount = 0;
+    let filteredCount = 0;
+    let errors = [];
+    let filteredByCveOnly = false;
 
     if (type === 'advisories') {
-      items = await fetchAdvisoryFeeds();
+      const result = await fetchAdvisoryFeeds({ cveOnly });
+      items = result.items;
+      fetchedCount = result.fetchedCount;
+      parsedCount = result.parsedCount;
+      filteredCount = result.filteredCount;
+      errors = result.errors;
+      filteredByCveOnly = result.filteredByCveOnly;
       sourceCount = advisoryFeeds.length;
     } else if (type === 'status') {
-      items = await fetchStatusFeeds();
+      const result = await fetchStatusFeeds();
+      items = result.items;
+      fetchedCount = result.fetchedCount;
+      parsedCount = result.parsedCount;
+      filteredCount = result.filteredCount;
+      errors = result.errors;
       sourceCount = statusFeeds.length;
     } else if (type === 'osv') {
       const ecosystems = parseEcosystems(req.query?.ecosystem);
@@ -105,7 +128,11 @@ export default async function handler(req, res) {
           fetchOsvFeed(ecosystem, Number.isFinite(days) ? days : 30)
         )
       );
-      items = results.flat();
+      items = results.flatMap((result) => result.items);
+      fetchedCount = results.reduce((total, result) => total + result.fetchedCount, 0);
+      parsedCount = results.reduce((total, result) => total + result.parsedCount, 0);
+      filteredCount = results.reduce((total, result) => total + result.filteredCount, 0);
+      errors = results.flatMap((result) => result.errors);
       sourceCount = ecosystems.length;
     }
 
@@ -114,23 +141,35 @@ export default async function handler(req, res) {
       items = items
         .sort((a, b) => new Date(b.publishedISO || 0) - new Date(a.publishedISO || 0))
         .slice(0, OSV_MAX_ITEMS);
+      filteredCount = items.length;
     }
 
     cache[type] = {
       key: cacheKey,
       timestamp,
       items,
-      sourceCount
+      sourceCount,
+      fetchedCount,
+      parsedCount,
+      filteredCount,
+      errors,
+      filteredByCveOnly
     };
 
-    return res.status(200).json({
-      type,
-      items,
-      timestamp,
-      cached: false,
-      degraded: false,
-      sourceCount
-    });
+    return res.status(200).json(
+      buildResponse({
+        type,
+        items,
+        timestamp,
+        cached: false,
+        sourceCount,
+        fetchedCount,
+        parsedCount,
+        filteredCount: type === 'osv' ? items.length : filteredCount,
+        errors,
+        filteredByCveOnly
+      })
+    );
   } catch (error) {
     return res.status(500).json({
       error: 'Feeds API failed',
@@ -149,6 +188,10 @@ function buildCacheKey(type, query) {
     const days = Number(query?.days || 30);
     return `${type}:${ecosystem}:${Number.isFinite(days) ? days : 30}`;
   }
+  if (type === 'advisories') {
+    const cveOnly = query?.cveOnly === '1' || query?.cveOnly === 'true';
+    return `${type}:${cveOnly ? 'cve-only' : 'all'}`;
+  }
   return type;
 }
 
@@ -162,32 +205,80 @@ function getCachedEntry(type, cacheKey, now) {
   return null;
 }
 
-async function fetchAdvisoryFeeds() {
-  const items = await fetchRssFeeds(advisoryFeeds);
-  return dedupeItems(items)
-    .map(mapAdvisoryItem)
-    .filter(Boolean)
-    .slice(0, ADVISORY_MAX_ITEMS);
+async function fetchAdvisoryFeeds({ cveOnly = false } = {}) {
+  const { items, parsedCount, fetchedCount, errors } = await fetchRssFeeds(advisoryFeeds);
+  const mapped = dedupeItems(items).map(mapAdvisoryItem).filter(Boolean);
+  const filtered = cveOnly ? mapped.filter((item) => item.cves && item.cves.length > 0) : mapped;
+  const filteredByCveOnly = cveOnly && parsedCount > 0 && filtered.length === 0;
+  return {
+    items: filtered.slice(0, ADVISORY_MAX_ITEMS),
+    parsedCount,
+    fetchedCount,
+    filteredCount: filtered.length,
+    errors,
+    filteredByCveOnly
+  };
 }
 
 async function fetchStatusFeeds() {
-  const items = await fetchRssFeeds(statusFeeds);
+  const { items, parsedCount, fetchedCount, errors } = await fetchRssFeeds(statusFeeds);
   const sorted = items.sort((a, b) => new Date(b.dateISO || 0) - new Date(a.dateISO || 0));
-  return sorted
-    .map(mapStatusItem)
-    .filter(Boolean)
-    .slice(0, STATUS_MAX_ITEMS);
+  const mapped = sorted.map(mapStatusItem).filter(Boolean);
+  return {
+    items: mapped.slice(0, STATUS_MAX_ITEMS),
+    parsedCount,
+    fetchedCount,
+    filteredCount: mapped.length,
+    errors
+  };
 }
 
 async function fetchRssFeeds(feeds) {
   const results = await Promise.all(
     feeds.map(async (feed) => {
-      const xmlText = await fetchFeed(feed.url);
-      if (!xmlText) return [];
-      return parseFeed(xmlText, feed);
+      const response = await fetchFeed(feed.url);
+      if (!response.ok) {
+        return {
+          items: [],
+          parsedCount: 0,
+          fetched: false,
+          error: {
+            sourceName: feed.sourceName,
+            url: feed.url,
+            status: response.status,
+            message: response.message
+          }
+        };
+      }
+      try {
+        const parsed = parseFeed(response.text, feed);
+        return {
+          items: parsed.items,
+          parsedCount: parsed.items.length,
+          fetched: true
+        };
+      } catch (error) {
+        return {
+          items: [],
+          parsedCount: 0,
+          fetched: true,
+          error: {
+            sourceName: feed.sourceName,
+            url: feed.url,
+            status: response.status,
+            message: `Parse failed: ${error.message}`
+          }
+        };
+      }
     })
   );
-  return results.flat().map(normalizeRssItem).filter(Boolean);
+  const items = results.flatMap((result) => result.items);
+  return {
+    items: items.map(normalizeRssItem).filter(Boolean),
+    fetchedCount: results.filter((result) => result.fetched).length,
+    parsedCount: results.reduce((total, result) => total + (result.parsedCount || 0), 0),
+    errors: results.flatMap((result) => (result.error ? [result.error] : []))
+  };
 }
 
 async function fetchOsvFeed(ecosystem, days) {
@@ -207,11 +298,31 @@ async function fetchOsvFeed(ecosystem, days) {
     const data = await response.json();
     const vulns = extractOsvList(data);
     const normalized = vulns.map((item) => normalizeOsvItem(item, ecosystem)).filter(Boolean);
-    return normalized.filter(
+    const filtered = normalized.filter(
       (item) => new Date(item.publishedISO || 0) >= new Date(since)
     );
+    return {
+      items: filtered,
+      parsedCount: vulns.length,
+      fetchedCount: 1,
+      filteredCount: filtered.length,
+      errors: []
+    };
   } catch (error) {
-    return buildOsvFallback(ecosystem, since);
+    return {
+      items: buildOsvFallback(ecosystem, since),
+      parsedCount: 0,
+      fetchedCount: 0,
+      filteredCount: 0,
+      errors: [
+        {
+          sourceName: `OSV ${ecosystem}`,
+          url: baseUrl,
+          status: null,
+          message: error.message
+        }
+      ]
+    };
   }
 }
 
@@ -233,17 +344,40 @@ async function fetchFeed(url) {
   try {
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {
-      return null;
+      return {
+        ok: false,
+        status: response.status,
+        text: '',
+        message: response.statusText || 'Request failed'
+      };
     }
-    return await response.text();
+    return {
+      ok: true,
+      status: response.status,
+      text: await response.text(),
+      message: 'ok'
+    };
   } catch (error) {
-    return null;
+    return {
+      ok: false,
+      status: null,
+      text: '',
+      message: error.message
+    };
   } finally {
     clearTimeout(timeout);
   }
 }
 
 function parseFeed(xmlText, feed) {
+  const rssItems = parseRssItems(xmlText, feed);
+  const atomItems = parseAtomEntries(xmlText, feed);
+  return {
+    items: [...rssItems, ...atomItems]
+  };
+}
+
+function parseRssItems(xmlText, feed) {
   const items = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
   let match;
@@ -255,11 +389,17 @@ function parseFeed(xmlText, feed) {
       getTagValue(itemBlock, 'pubDate') ||
       getTagValue(itemBlock, 'dc:date') ||
       getTagValue(itemBlock, 'updated');
+    const contentRaw =
+      getTagValue(itemBlock, 'content:encoded') ||
+      getTagValue(itemBlock, 'content') ||
+      '';
     const descriptionRaw =
       getTagValue(itemBlock, 'description') ||
-      getTagValue(itemBlock, 'content:encoded') ||
+      getTagValue(itemBlock, 'summary') ||
+      contentRaw ||
       '';
     const summary = cleanFeedText(descriptionRaw);
+    const content = cleanFeedText(contentRaw);
     const dateISO = normalizeDate(pubDate);
 
     items.push({
@@ -267,6 +407,41 @@ function parseFeed(xmlText, feed) {
       url: link,
       dateISO,
       summary,
+      content,
+      sourceName: feed.sourceName,
+      sourceType: feed.sourceType
+    });
+  }
+  return items;
+}
+
+function parseAtomEntries(xmlText, feed) {
+  const items = [];
+  const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
+  let match;
+  while ((match = entryRegex.exec(xmlText)) !== null) {
+    const entryBlock = match[1];
+    const title = getTagValue(entryBlock, 'title') || 'Security Update';
+    const link = getAtomLink(entryBlock);
+    const pubDate = getTagValue(entryBlock, 'published') || getTagValue(entryBlock, 'updated');
+    const contentRaw =
+      getTagValue(entryBlock, 'content') ||
+      getTagValue(entryBlock, 'summary') ||
+      '';
+    const summaryRaw =
+      getTagValue(entryBlock, 'summary') ||
+      getTagValue(entryBlock, 'content') ||
+      '';
+    const summary = cleanFeedText(summaryRaw);
+    const content = cleanFeedText(contentRaw);
+    const dateISO = normalizeDate(pubDate);
+
+    items.push({
+      title,
+      url: link,
+      dateISO,
+      summary,
+      content,
       sourceName: feed.sourceName,
       sourceType: feed.sourceType
     });
@@ -277,9 +452,11 @@ function parseFeed(xmlText, feed) {
 function normalizeRssItem(item) {
   if (!item || !item.title) return null;
   const url = normalizeUrl(item.url);
-  const summary = cleanFeedText(item.summary || '');
-  const cves = extractCves(`${item.title} ${summary}`);
-  const severity = scoreSeverity(`${item.title} ${summary}`);
+  const summary = cleanFeedText(item.summary || item.content || '');
+  const content = cleanFeedText(item.content || '');
+  const textForExtraction = `${item.title} ${summary} ${content}`;
+  const cves = extractCves(textForExtraction);
+  const severity = scoreSeverity(textForExtraction);
   const dateISO = item.dateISO || new Date().toISOString();
   const idSeed = url || `${item.title}-${dateISO}-${item.sourceName}`;
 
@@ -310,6 +487,10 @@ function normalizeOsvItem(item, ecosystem) {
     ecosystem ||
     'Unknown';
   const publishedISO = item.published || item.modified || item.date || new Date().toISOString();
+  const lowerName = String(pkgName || '').toLowerCase();
+  if (['sample-package', 'example-lib'].includes(lowerName)) {
+    return null;
+  }
   const aliases = Array.isArray(item.aliases)
     ? item.aliases
     : Array.isArray(item.cve)
@@ -334,16 +515,62 @@ function normalizeOsvItem(item, ecosystem) {
 }
 
 function extractOsvSeverity(item) {
+  const cvssScore = extractCvssScore(item);
+  if (Number.isFinite(cvssScore)) {
+    return mapCvssScoreToSeverity(cvssScore);
+  }
+  const severityLabel = extractSeverityLabel(item);
+  return severityLabel || 'UNKNOWN';
+}
+
+function extractCvssScore(item) {
+  const candidates = [];
+  if (Array.isArray(item?.severity)) {
+    item.severity.forEach((entry) => {
+      if (!entry) return;
+      if (typeof entry === 'number' || typeof entry === 'string') {
+        candidates.push(entry);
+      } else if (entry.score) {
+        candidates.push(entry.score);
+      }
+    });
+  }
+  if (item?.cvss?.score) candidates.push(item.cvss.score);
+  if (item?.database_specific?.cvss?.score) candidates.push(item.database_specific.cvss.score);
+  for (const value of candidates) {
+    const numeric = Number.parseFloat(value);
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return null;
+}
+
+function extractSeverityLabel(item) {
   if (Array.isArray(item?.severity) && item.severity.length) {
     const primary = item.severity[0];
-    return primary.score || primary.type || 'UNKNOWN';
+    if (typeof primary === 'string') {
+      return normalizeSeverityLabel(primary);
+    }
+    if (primary?.type && typeof primary.type === 'string') {
+      return normalizeSeverityLabel(primary.type);
+    }
   }
-  const summary = `${item.summary || ''} ${item.details || ''}`.toLowerCase();
-  if (summary.includes('critical')) return 'CRITICAL';
-  if (summary.includes('high')) return 'HIGH';
-  if (summary.includes('medium')) return 'MEDIUM';
-  if (summary.includes('low')) return 'LOW';
-  return 'UNKNOWN';
+  return null;
+}
+
+function normalizeSeverityLabel(value) {
+  const normalized = String(value || '').toUpperCase();
+  if (normalized.includes('CRITICAL')) return 'CRITICAL';
+  if (normalized.includes('HIGH')) return 'HIGH';
+  if (normalized.includes('MEDIUM')) return 'MEDIUM';
+  if (normalized.includes('LOW')) return 'LOW';
+  return null;
+}
+
+function mapCvssScoreToSeverity(score) {
+  if (score >= 9.0) return 'CRITICAL';
+  if (score >= 7.0) return 'HIGH';
+  if (score >= 4.0) return 'MEDIUM';
+  return 'LOW';
 }
 
 function normalizeDate(value) {
@@ -372,12 +599,12 @@ function cleanFeedText(text) {
 }
 
 function getTagValue(block, tag) {
-  const regex = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, 'i');
+  const regex = new RegExp(`<${tag}(\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, 'i');
   const match = regex.exec(block);
   if (!match) {
     return '';
   }
-  return match[1].replace(/<!\\[CDATA\\[|\\]\\]>/g, '').trim();
+  return match[2].replace(/<!\\[CDATA\\[|\\]\\]>/g, '').trim();
 }
 
 function normalizeUrl(url) {
@@ -464,4 +691,38 @@ function dedupeItems(items) {
     seen.add(key);
     return true;
   });
+}
+
+function getAtomLink(block) {
+  const linkMatch = block.match(/<link[^>]*?href=["']([^"']+)["'][^>]*?>/i);
+  if (linkMatch) return linkMatch[1];
+  return getTagValue(block, 'link') || '';
+}
+
+function buildResponse({
+  type,
+  items,
+  timestamp,
+  cached,
+  sourceCount,
+  fetchedCount,
+  parsedCount,
+  filteredCount,
+  errors,
+  filteredByCveOnly
+}) {
+  const response = {
+    type,
+    items,
+    timestamp,
+    cached,
+    degraded: false,
+    sourceCount
+  };
+  if (Number.isFinite(fetchedCount)) response.fetchedCount = fetchedCount;
+  if (Number.isFinite(parsedCount)) response.parsedCount = parsedCount;
+  if (Number.isFinite(filteredCount)) response.filteredCount = filteredCount;
+  if (Array.isArray(errors)) response.errors = errors;
+  if (filteredByCveOnly) response.filteredByCveOnly = true;
+  return response;
 }
