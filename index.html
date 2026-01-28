@@ -2771,6 +2771,199 @@ body{
     min-height: 90px;
 }
 
+.risk-control-block {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(12, 16, 24, 0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.evidence-accordion {
+    background: rgba(10, 14, 22, 0.9);
+    border: 1px solid rgba(34,211,238,0.2);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.evidence-accordion summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #22d3ee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.evidence-accordion[open] summary {
+    margin-bottom: 12px;
+}
+
+.evidence-summary-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+}
+
+.evidence-items {
+    display: grid;
+    gap: 12px;
+}
+
+.evidence-item {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px;
+    background: rgba(8, 12, 20, 0.8);
+    display: grid;
+    gap: 8px;
+}
+
+.evidence-item-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.evidence-item-header .form-input {
+    flex: 1;
+}
+
+.evidence-item-grid {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.evidence-status-badge {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.evidence-status-missing {
+    background: rgba(255,84,89,0.18);
+    color: #ff5459;
+}
+
+.evidence-status-stale {
+    background: rgba(255,176,32,0.18);
+    color: #ffb020;
+}
+
+.evidence-status-ok {
+    background: rgba(0,255,136,0.18);
+    color: #00ff88;
+}
+
+.evidence-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.evidence-remove-btn {
+    background: rgba(255, 0, 64, 0.15);
+    color: #ff0040;
+    border: 1px solid rgba(255, 0, 64, 0.3);
+}
+
+.posture-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.posture-kpi-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 16px;
+}
+
+.posture-kpi-card {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(12, 16, 24, 0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: grid;
+    gap: 8px;
+}
+
+.posture-kpi-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: #22d3ee;
+}
+
+.posture-kpi-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.posture-bars {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.posture-bar {
+    display: grid;
+    gap: 6px;
+}
+
+.posture-bar-track {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+}
+
+.posture-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(34,211,238,0.8), rgba(139,92,246,0.9));
+}
+
+.posture-bar-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    justify-content: space-between;
+}
+
+.posture-due-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin-top: 16px;
+}
+
+.posture-due-card {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(10, 14, 22, 0.7);
+    display: grid;
+    gap: 6px;
+}
+
+.posture-due-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffb020;
+}
+
 .checklist-summary {
     display: grid;
     gap: 10px;
@@ -4762,6 +4955,7 @@ window.addEventListener('DOMContentLoaded', () => {
                             <button class="tab-btn" data-databank="controls" onclick="switchDataBankSection(&#39;controls&#39;)">🔗 Control Families</button>
                             <button class="tab-btn" data-databank="glossary" onclick="switchDataBankSection(&#39;glossary&#39;)">📖 Glossary</button>
                             <button class="tab-btn" data-databank="risk" onclick="switchDataBankSection(&#39;risk&#39;)">⚠️ Risk Matrices</button>
+                            <button class="tab-btn" data-databank="posture" onclick="switchDataBankSection(&#39;posture&#39;)">📊 Posture</button>
                             <button class="tab-btn" data-databank="guides" onclick="switchDataBankSection(&#39;guides&#39;)">📝 Implementation Guides</button>
                         </div>
                         <div id="databank-content"></div>
@@ -8929,12 +9123,17 @@ function analyzePassword() {
             inProgressOnly: false
         };
 
+        const postureUiState = {
+            category: 'all'
+        };
+
         const riskRegisterModalState = {
             mappedControls: [],
             autoSuggestions: []
         };
 
         const controlStatusOptions = ['Planned', 'In Progress', 'Implemented'];
+        const evidenceFrequencyOptions = ['Monthly', 'Quarterly', 'Annually', 'Ad hoc'];
 
         const controlKeywordMappings = [
             { keywords: ['phishing', 'awareness', 'training', 'social engineering'], families: ['AT'] },
@@ -9056,6 +9255,51 @@ function analyzePassword() {
             localStorage.setItem(riskMatrixStorageKey, JSON.stringify(riskMatrixState));
         }
 
+        function getEvidenceFrequencyThresholdDays(frequency) {
+            switch (frequency) {
+                case 'Monthly':
+                    return 30;
+                case 'Quarterly':
+                    return 90;
+                case 'Annually':
+                    return 365;
+                case 'Ad hoc':
+                default:
+                    return 365;
+            }
+        }
+
+        function getEvidenceStatus(item) {
+            if (!item?.lastCollectedDate) return 'Missing';
+            const lastDate = new Date(item.lastCollectedDate);
+            if (Number.isNaN(lastDate.getTime())) return 'Missing';
+            const diffDays = (Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+            const threshold = getEvidenceFrequencyThresholdDays(item.frequency);
+            return diffDays > threshold ? 'Stale' : 'OK';
+        }
+
+        function normalizeEvidenceItem(item) {
+            const normalized = {
+                id: item?.id || `evidence-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                name: item?.name || '',
+                description: item?.description || '',
+                frequency: evidenceFrequencyOptions.includes(item?.frequency) ? item.frequency : 'Quarterly',
+                owner: item?.owner || '',
+                lastCollectedDate: item?.lastCollectedDate || '',
+                status: item?.status || 'Missing',
+                linkOrNote: item?.linkOrNote || ''
+            };
+            normalized.status = getEvidenceStatus(normalized);
+            return normalized;
+        }
+
+        function buildDefaultEvidenceItemsForControl(entry) {
+            const familyCode = entry?.type === 'family' ? entry.id : entry?.id?.split('-')[0];
+            const templates = familyCode ? controlEvidenceTemplates[familyCode] : null;
+            if (!templates?.length) return [];
+            return templates.slice(0, 6).map(name => normalizeEvidenceItem({ name, frequency: 'Quarterly' }));
+        }
+
         function normalizeMappedControl(entry) {
             if (!entry || typeof entry !== 'object') {
                 return {
@@ -9065,7 +9309,8 @@ function analyzePassword() {
                     rationale: '',
                     status: 'Planned',
                     owner: '',
-                    dueDate: ''
+                    dueDate: '',
+                    evidenceItems: []
                 };
             }
             return {
@@ -9075,7 +9320,10 @@ function analyzePassword() {
                 rationale: entry.rationale || '',
                 status: controlStatusOptions.includes(entry.status) ? entry.status : 'Planned',
                 owner: entry.owner || '',
-                dueDate: entry.dueDate || ''
+                dueDate: entry.dueDate || '',
+                evidenceItems: Array.isArray(entry.evidenceItems)
+                    ? entry.evidenceItems.map(normalizeEvidenceItem)
+                    : []
             };
         }
 
@@ -9359,6 +9607,152 @@ function analyzePassword() {
             return filtered;
         }
 
+        function getPostureFilteredRisks() {
+            if (postureUiState.category === 'all') return riskRegisterState.items;
+            return riskRegisterState.items.filter(item => item.category === postureUiState.category);
+        }
+
+        function getUpcomingDueCounts(items, dateField) {
+            const now = new Date();
+            const in7 = new Date(now);
+            in7.setDate(in7.getDate() + 7);
+            const in30 = new Date(now);
+            in30.setDate(in30.getDate() + 30);
+            const counts = { next7: 0, next30: 0 };
+            items.forEach(item => {
+                const dateValue = item?.[dateField];
+                if (!dateValue) return;
+                const dueDate = new Date(dateValue);
+                if (Number.isNaN(dueDate.getTime())) return;
+                if (dueDate >= now && dueDate <= in7) counts.next7 += 1;
+                if (dueDate >= now && dueDate <= in30) counts.next30 += 1;
+            });
+            return counts;
+        }
+
+        function renderPostureBar(label, value, total) {
+            const percent = total ? Math.round((value / total) * 100) : 0;
+            return `
+                <div class="posture-bar">
+                    <div class="posture-bar-label">
+                        <span>${escapeHtml(label)}</span>
+                        <span>${value} (${percent}%)</span>
+                    </div>
+                    <div class="posture-bar-track">
+                        <div class="posture-bar-fill" style="width:${percent}%;"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPostureSection() {
+            const categoryOptions = ['all', 'Security', 'Compliance', 'Vendor', 'Cloud']
+                .map(option => `<option value="${option}" ${postureUiState.category === option ? 'selected' : ''}>${option === 'all' ? 'All Categories' : option}</option>`)
+                .join('');
+            const filteredRisks = getPostureFilteredRisks();
+            const openRisks = filteredRisks.filter(item => item.status !== 'Closed');
+            const mappedControls = openRisks.flatMap(item => item.mappedControls || []);
+            const controlCounts = mappedControls.reduce((acc, control) => {
+                const status = control.status || 'Planned';
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, { 'Implemented': 0, 'In Progress': 0, 'Planned': 0 });
+            const evidenceCounts = mappedControls.reduce((acc, control) => {
+                const items = control.evidenceItems || [];
+                if (!items.length) {
+                    acc.Missing += 1;
+                    return acc;
+                }
+                items.forEach(item => {
+                    const status = getEvidenceStatus(item);
+                    acc[status] += 1;
+                });
+                return acc;
+            }, { OK: 0, Stale: 0, Missing: 0 });
+            const ratingCounts = openRisks.reduce((acc, item) => {
+                const rating = getRiskCellRating(item.likelihood, item.impact);
+                if (['Critical', 'High', 'Medium'].includes(rating)) {
+                    acc[rating] += 1;
+                }
+                return acc;
+            }, { Critical: 0, High: 0, Medium: 0 });
+            const riskDue = getUpcomingDueCounts(openRisks, 'dueDate');
+            const controlDue = getUpcomingDueCounts(mappedControls, 'dueDate');
+            const totalControls = mappedControls.length || 1;
+            const totalEvidence = Math.max(1, evidenceCounts.OK + evidenceCounts.Stale + evidenceCounts.Missing);
+
+            return `
+                <div class="premium-card">
+                    <div class="posture-toolbar">
+                        <div>
+                            <h3 style="color:#22d3ee; margin-bottom:4px;">Posture View</h3>
+                            <div style="font-size:13px; color: rgba(255,255,255,0.7);">Snapshot of control implementation, evidence freshness, and open risk exposure.</div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                            <select class="form-input" data-posture-filter="category">${categoryOptions}</select>
+                            <button class="library-action-btn" type="button" data-posture-export="true">Export Monthly GRC Report</button>
+                        </div>
+                    </div>
+                    <div class="posture-kpi-grid">
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Controls Implemented</div>
+                            <div class="posture-kpi-value">${controlCounts['Implemented'] || 0}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Controls In Progress</div>
+                            <div class="posture-kpi-value">${controlCounts['In Progress'] || 0}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Controls Planned</div>
+                            <div class="posture-kpi-value">${controlCounts['Planned'] || 0}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Evidence OK</div>
+                            <div class="posture-kpi-value">${evidenceCounts.OK}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Evidence Stale</div>
+                            <div class="posture-kpi-value">${evidenceCounts.Stale}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Evidence Missing</div>
+                            <div class="posture-kpi-value">${evidenceCounts.Missing}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Open Risks (Critical)</div>
+                            <div class="posture-kpi-value">${ratingCounts.Critical}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Open Risks (High)</div>
+                            <div class="posture-kpi-value">${ratingCounts.High}</div>
+                        </div>
+                        <div class="posture-kpi-card">
+                            <div class="posture-kpi-label">Open Risks (Medium)</div>
+                            <div class="posture-kpi-value">${ratingCounts.Medium}</div>
+                        </div>
+                    </div>
+                    <div class="posture-bars">
+                        ${renderPostureBar('Controls Implemented', controlCounts['Implemented'] || 0, totalControls)}
+                        ${renderPostureBar('Controls In Progress', controlCounts['In Progress'] || 0, totalControls)}
+                        ${renderPostureBar('Evidence OK', evidenceCounts.OK, totalEvidence)}
+                        ${renderPostureBar('Evidence Stale', evidenceCounts.Stale, totalEvidence)}
+                    </div>
+                    <div class="posture-due-grid">
+                        <div class="posture-due-card">
+                            <div style="font-size:12px; color: rgba(255,255,255,0.6);">Controls due in next 7 days</div>
+                            <div class="posture-due-value">${controlDue.next7}</div>
+                            <div style="font-size:11px; color: rgba(255,255,255,0.5);">Next 30 days: ${controlDue.next30}</div>
+                        </div>
+                        <div class="posture-due-card">
+                            <div style="font-size:12px; color: rgba(255,255,255,0.6);">Risks due in next 7 days</div>
+                            <div class="posture-due-value">${riskDue.next7}</div>
+                            <div style="font-size:11px; color: rgba(255,255,255,0.5);">Next 30 days: ${riskDue.next30}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function getRiskRegisterItemById(id) {
             return riskRegisterState.items.find(item => item.id === id);
         }
@@ -9504,7 +9898,7 @@ function analyzePassword() {
                 showToast('Control already mapped');
                 return;
             }
-            riskRegisterModalState.mappedControls.push({
+            const baseEntry = {
                 type: entry.type || 'family',
                 id: entry.id,
                 title: entry.title || entry.id,
@@ -9512,6 +9906,10 @@ function analyzePassword() {
                 status: 'Planned',
                 owner: '',
                 dueDate: ''
+            };
+            riskRegisterModalState.mappedControls.push({
+                ...baseEntry,
+                evidenceItems: buildDefaultEvidenceItemsForControl(baseEntry)
             });
             renderMappedControlsList();
         }
@@ -9805,6 +10203,83 @@ function analyzePassword() {
             });
         }
 
+        function getEvidenceStatusCountsForControl(control) {
+            const items = control?.evidenceItems || [];
+            if (!items.length) {
+                return { Missing: 1, Stale: 0, OK: 0 };
+            }
+            return items.reduce((acc, item) => {
+                const status = getEvidenceStatus(item);
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, { Missing: 0, Stale: 0, OK: 0 });
+        }
+
+        function renderEvidenceItems(control, controlIndex, riskId) {
+            const items = (control.evidenceItems || []).map(normalizeEvidenceItem);
+            control.evidenceItems = items;
+            const statusCounts = getEvidenceStatusCountsForControl({ evidenceItems: items });
+            const statusSummary = `${statusCounts.OK} OK · ${statusCounts.Stale} Stale · ${statusCounts.Missing} Missing`;
+            const evidenceList = items.length ? items.map((evidence, evidenceIndex) => {
+                const status = getEvidenceStatus(evidence);
+                return `
+                    <div class="evidence-item" data-evidence-item="true" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}">
+                        <div class="evidence-item-header">
+                            <input class="form-input" type="text" placeholder="Evidence name" value="${escapeHtml(evidence.name)}"
+                                data-evidence-field="name" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">
+                            <span class="evidence-status-badge evidence-status-${status.toLowerCase()}">${status}</span>
+                        </div>
+                        <textarea class="form-input" rows="2" placeholder="Description"
+                            data-evidence-field="description" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">${escapeHtml(evidence.description || '')}</textarea>
+                        <div class="evidence-item-grid">
+                            <div class="form-group">
+                                <label class="form-label">Frequency</label>
+                                <select class="form-input" data-evidence-field="frequency" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">
+                                    ${evidenceFrequencyOptions.map(option => `<option value="${option}" ${option === evidence.frequency ? 'selected' : ''}>${option}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Owner</label>
+                                <input class="form-input" type="text" value="${escapeHtml(evidence.owner || '')}"
+                                    data-evidence-field="owner" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last collected</label>
+                                <input class="form-input" type="date" value="${escapeHtml(evidence.lastCollectedDate || '')}"
+                                    data-evidence-field="lastCollectedDate" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Link / Notes</label>
+                            <input class="form-input" type="text" value="${escapeHtml(evidence.linkOrNote || '')}"
+                                data-evidence-field="linkOrNote" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">
+                        </div>
+                        <div class="evidence-item-actions">
+                            <button class="library-action-btn" type="button" data-evidence-mark="true" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">Mark collected today</button>
+                            <button class="library-action-btn evidence-remove-btn" type="button" data-evidence-remove="true" data-control-index="${controlIndex}" data-evidence-index="${evidenceIndex}" data-risk-id="${escapeHtml(riskId)}">Remove</button>
+                        </div>
+                    </div>
+                `;
+            }).join('') : `
+                <div style="font-size:12px; color: rgba(255,255,255,0.6);">No evidence items yet. Add your first proof point.</div>
+            `;
+            return `
+                <details class="evidence-accordion">
+                    <summary>
+                        Evidence Tracker
+                        <span class="evidence-summary-pill">${statusSummary}</span>
+                    </summary>
+                    <div class="evidence-items">
+                        ${evidenceList}
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap: wrap;">
+                        <button class="library-action-btn" type="button" data-evidence-add="true" data-control-index="${controlIndex}" data-risk-id="${escapeHtml(riskId)}">Add evidence item</button>
+                        <button class="library-action-btn" type="button" data-evidence-copy="true" data-control-index="${controlIndex}" data-risk-id="${escapeHtml(riskId)}">Copy evidence checklist</button>
+                    </div>
+                </details>
+            `;
+        }
+
         function renderRiskTreatmentPlan(item) {
             const ratingLabel = getRiskCellRating(item.likelihood, item.impact);
             const mappedControls = item.mappedControls || [];
@@ -9827,13 +10302,16 @@ function analyzePassword() {
                 </div>
                 <div class="risk-treatment-controls">
                     <div style="font-weight:600; color:#ffb020;">Mapped Controls</div>
-                    ${mappedControls.length ? mappedControls.map(control => `
-                        <div class="risk-control-suggestion">
-                            <div>
-                                <div style="font-weight:600;">${escapeHtml(control.id)} — ${escapeHtml(control.title)}</div>
-                                <div style="font-size:11px; color: rgba(255,255,255,0.6);">${escapeHtml(control.status || 'Planned')} · ${escapeHtml(control.owner || 'Unassigned')} · ${control.dueDate ? new Date(control.dueDate).toLocaleDateString() : 'No due date'}</div>
-                                ${control.rationale ? `<div style="font-size:11px; color: rgba(255,255,255,0.6); margin-top:4px;">${escapeHtml(control.rationale)}</div>` : ''}
+                    ${mappedControls.length ? mappedControls.map((control, index) => `
+                        <div class="risk-control-block">
+                            <div class="risk-control-suggestion" style="margin:0;">
+                                <div>
+                                    <div style="font-weight:600;">${escapeHtml(control.id)} — ${escapeHtml(control.title)}</div>
+                                    <div style="font-size:11px; color: rgba(255,255,255,0.6);">${escapeHtml(control.status || 'Planned')} · ${escapeHtml(control.owner || 'Unassigned')} · ${control.dueDate ? new Date(control.dueDate).toLocaleDateString() : 'No due date'}</div>
+                                    ${control.rationale ? `<div style="font-size:11px; color: rgba(255,255,255,0.6); margin-top:4px;">${escapeHtml(control.rationale)}</div>` : ''}
+                                </div>
                             </div>
+                            ${renderEvidenceItems(control, index, item.id)}
                         </div>
                     `).join('') : `<div style="font-size:12px; color: rgba(255,255,255,0.6);">No controls mapped yet.</div>`}
                 </div>
@@ -9862,6 +10340,7 @@ function analyzePassword() {
                     <button class="library-action-btn" type="button" data-risk-plan-action="case" data-risk-id="${escapeHtml(item.id)}">Add plan to Case</button>
                     <button class="library-action-btn" type="button" data-risk-plan-action="library" data-risk-id="${escapeHtml(item.id)}">Save plan to Library</button>
                     <button class="library-action-btn" type="button" data-risk-plan-action="export" data-risk-id="${escapeHtml(item.id)}">Export Treatment Plan</button>
+                    <button class="library-action-btn" type="button" data-risk-plan-action="evidence-export" data-risk-id="${escapeHtml(item.id)}">Export Evidence Pack</button>
                 </div>
             `;
         }
@@ -9871,6 +10350,7 @@ function analyzePassword() {
             const body = document.getElementById('risk-treatment-modal-body');
             if (!modal || !body || !item) return;
             body.innerHTML = renderRiskTreatmentPlan(item);
+            modal.dataset.riskId = item.id;
             modal.classList.add('active');
             modal.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
@@ -9908,6 +10388,82 @@ function analyzePassword() {
             if (!item) return;
             item.treatmentPlanNotes = value.trim();
             saveRiskRegister();
+        }
+
+        function refreshRiskTreatmentModal(id) {
+            const item = getRiskRegisterItemById(id);
+            if (!item) return;
+            openRiskTreatmentModal(item);
+        }
+
+        function updateEvidenceField(riskId, controlIndex, evidenceIndex, field, value) {
+            const item = getRiskRegisterItemById(riskId);
+            if (!item) return null;
+            const control = item.mappedControls?.[controlIndex];
+            if (!control) return null;
+            if (!Array.isArray(control.evidenceItems)) {
+                control.evidenceItems = [];
+            }
+            const evidence = control.evidenceItems[evidenceIndex];
+            if (!evidence) return null;
+            evidence[field] = value;
+            evidence.status = getEvidenceStatus(evidence);
+            saveRiskRegister();
+            return evidence;
+        }
+
+        function handleEvidenceFieldUpdate(target) {
+            const riskId = target.dataset.riskId;
+            const controlIndex = Number(target.dataset.controlIndex);
+            const evidenceIndex = Number(target.dataset.evidenceIndex);
+            const field = target.dataset.evidenceField;
+            if (!riskId || Number.isNaN(controlIndex) || Number.isNaN(evidenceIndex) || !field) return;
+            const updated = updateEvidenceField(riskId, controlIndex, evidenceIndex, field, target.value);
+            const parent = target.closest('[data-evidence-item]');
+            if (parent && updated) {
+                const badge = parent.querySelector('.evidence-status-badge');
+                if (badge) {
+                    badge.textContent = updated.status;
+                    badge.className = `evidence-status-badge evidence-status-${updated.status.toLowerCase()}`;
+                }
+            }
+        }
+
+        function addEvidenceItemToControl(riskId, controlIndex) {
+            const item = getRiskRegisterItemById(riskId);
+            if (!item) return;
+            const control = item.mappedControls?.[controlIndex];
+            if (!control) return;
+            if (!Array.isArray(control.evidenceItems)) {
+                control.evidenceItems = [];
+            }
+            control.evidenceItems.push(normalizeEvidenceItem({}));
+            saveRiskRegister();
+            refreshRiskTreatmentModal(riskId);
+        }
+
+        function removeEvidenceItemFromControl(riskId, controlIndex, evidenceIndex) {
+            const item = getRiskRegisterItemById(riskId);
+            if (!item) return;
+            const control = item.mappedControls?.[controlIndex];
+            if (!control?.evidenceItems?.length) return;
+            control.evidenceItems.splice(evidenceIndex, 1);
+            saveRiskRegister();
+            refreshRiskTreatmentModal(riskId);
+        }
+
+        function copyEvidenceChecklist(control) {
+            const items = control?.evidenceItems || [];
+            if (!items.length) {
+                showToast('No evidence items to copy');
+                return;
+            }
+            const text = items.map(item => `• ${item.name || 'Untitled'}${item.description ? ` — ${item.description}` : ''}`).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Evidence checklist copied');
+            }).catch(() => {
+                showToast('Unable to copy evidence checklist');
+            });
         }
 
         function exportRiskTreatmentPlan(item) {
@@ -9982,6 +10538,199 @@ function analyzePassword() {
             });
             pdf.save(`risk-treatment-plan-${Date.now()}.pdf`);
             showToast('Treatment plan exported');
+        }
+
+        function exportEvidencePack(item) {
+            if (!item) return;
+            const rows = [];
+            (item.mappedControls || []).forEach(control => {
+                const evidenceItems = control.evidenceItems?.length ? control.evidenceItems : [normalizeEvidenceItem({})];
+                evidenceItems.forEach(evidence => {
+                    const status = getEvidenceStatus(evidence);
+                    rows.push([
+                        item.id,
+                        item.title,
+                        control.id,
+                        control.title,
+                        evidence.name,
+                        evidence.description,
+                        evidence.frequency,
+                        evidence.owner,
+                        evidence.lastCollectedDate,
+                        status,
+                        evidence.linkOrNote
+                    ]);
+                });
+            });
+            if (!rows.length) {
+                showToast('No evidence items to export');
+                return;
+            }
+            const headers = ['riskId', 'riskTitle', 'controlId', 'controlTitle', 'evidenceName', 'description', 'frequency', 'owner', 'lastCollectedDate', 'status', 'linkOrNote'];
+            const csv = [headers, ...rows]
+                .map(row => row.map(value => `"${String(value || '').replace(/"/g, '""')}"`).join(','))
+                .join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `evidence-pack-${item.id}-${Date.now()}.csv`;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            if (!window.jspdf?.jsPDF) {
+                const payload = {
+                    title: 'Evidence Pack',
+                    generatedAt: new Date().toISOString(),
+                    risk: item
+                };
+                const jsonBlob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const jsonUrl = URL.createObjectURL(jsonBlob);
+                const jsonLink = document.createElement('a');
+                jsonLink.href = jsonUrl;
+                jsonLink.download = `evidence-pack-${item.id}-${Date.now()}.json`;
+                jsonLink.click();
+                URL.revokeObjectURL(jsonUrl);
+                showToast('Evidence CSV exported (PDF unavailable)');
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            let y = 50;
+            pdf.setFontSize(16);
+            pdf.text(`Evidence Pack - ${item.title}`, 40, y);
+            y += 18;
+            pdf.setFontSize(10);
+            pdf.text(`Generated: ${new Date().toLocaleString()}`, 40, y);
+            y += 18;
+            (item.mappedControls || []).forEach(control => {
+                if (y > 760) {
+                    pdf.addPage();
+                    y = 40;
+                }
+                pdf.setFontSize(12);
+                pdf.text(`${control.id} - ${control.title}`, 40, y);
+                y += 14;
+                pdf.setFontSize(10);
+                (control.evidenceItems || []).forEach(evidence => {
+                    if (y > 760) {
+                        pdf.addPage();
+                        y = 40;
+                    }
+                    const status = getEvidenceStatus(evidence);
+                    const line = `• ${evidence.name || 'Untitled'} (${status}, ${evidence.frequency || 'Quarterly'})`;
+                    pdf.text(line, 50, y);
+                    y += 12;
+                    if (evidence.description) {
+                        pdf.text(`  ${evidence.description}`, 60, y);
+                        y += 12;
+                    }
+                });
+                y += 6;
+            });
+            pdf.save(`evidence-pack-${item.id}-${Date.now()}.pdf`);
+            showToast('Evidence pack exported');
+        }
+
+        function exportMonthlyGrcReport() {
+            const filteredRisks = getPostureFilteredRisks();
+            const openRisks = filteredRisks.filter(item => item.status !== 'Closed');
+            const mappedControls = openRisks.flatMap(item => item.mappedControls || []);
+            const controlCounts = mappedControls.reduce((acc, control) => {
+                const status = control.status || 'Planned';
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, { 'Implemented': 0, 'In Progress': 0, 'Planned': 0 });
+            const evidenceCounts = mappedControls.reduce((acc, control) => {
+                const items = control.evidenceItems || [];
+                if (!items.length) {
+                    acc.Missing += 1;
+                    return acc;
+                }
+                items.forEach(item => {
+                    const status = getEvidenceStatus(item);
+                    acc[status] += 1;
+                });
+                return acc;
+            }, { OK: 0, Stale: 0, Missing: 0 });
+            const ratingCounts = openRisks.reduce((acc, item) => {
+                const rating = getRiskCellRating(item.likelihood, item.impact);
+                if (['Critical', 'High', 'Medium'].includes(rating)) {
+                    acc[rating] += 1;
+                }
+                return acc;
+            }, { Critical: 0, High: 0, Medium: 0 });
+            const payload = {
+                title: 'Monthly GRC Report',
+                generatedAt: new Date().toISOString(),
+                category: postureUiState.category,
+                controls: controlCounts,
+                evidence: evidenceCounts,
+                openRisks: ratingCounts,
+                risks: openRisks.map(risk => ({
+                    id: risk.id,
+                    title: risk.title,
+                    rating: getRiskCellRating(risk.likelihood, risk.impact),
+                    status: risk.status,
+                    dueDate: risk.dueDate || ''
+                }))
+            };
+
+            if (!window.jspdf?.jsPDF) {
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `monthly-grc-report-${Date.now()}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('PDF unavailable, exported JSON instead');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            let y = 50;
+            pdf.setFontSize(16);
+            pdf.text('Monthly GRC Report', 40, y);
+            y += 18;
+            pdf.setFontSize(10);
+            pdf.text(`Generated: ${new Date().toLocaleString()}`, 40, y);
+            y += 18;
+            pdf.text(`Category: ${postureUiState.category === 'all' ? 'All' : postureUiState.category}`, 40, y);
+            y += 18;
+            pdf.setFontSize(12);
+            pdf.text(`Controls Implemented: ${controlCounts['Implemented'] || 0}`, 40, y);
+            y += 14;
+            pdf.text(`Controls In Progress: ${controlCounts['In Progress'] || 0}`, 40, y);
+            y += 14;
+            pdf.text(`Controls Planned: ${controlCounts['Planned'] || 0}`, 40, y);
+            y += 18;
+            pdf.text(`Evidence OK: ${evidenceCounts.OK}`, 40, y);
+            y += 14;
+            pdf.text(`Evidence Stale: ${evidenceCounts.Stale}`, 40, y);
+            y += 14;
+            pdf.text(`Evidence Missing: ${evidenceCounts.Missing}`, 40, y);
+            y += 18;
+            pdf.text(`Open Risks - Critical: ${ratingCounts.Critical}`, 40, y);
+            y += 14;
+            pdf.text(`Open Risks - High: ${ratingCounts.High}`, 40, y);
+            y += 14;
+            pdf.text(`Open Risks - Medium: ${ratingCounts.Medium}`, 40, y);
+            y += 18;
+            pdf.setFontSize(11);
+            pdf.text('Open Risks Detail:', 40, y);
+            y += 14;
+            openRisks.forEach(risk => {
+                if (y > 760) {
+                    pdf.addPage();
+                    y = 40;
+                }
+                pdf.text(`• ${risk.title} (${getRiskCellRating(risk.likelihood, risk.impact)})`, 40, y);
+                y += 12;
+            });
+            pdf.save(`monthly-grc-report-${Date.now()}.pdf`);
+            showToast('Monthly GRC report exported');
         }
 
         function buildRiskClipboardPayload(item) {
@@ -10446,7 +11195,7 @@ function analyzePassword() {
             if (activeBtn) {
                 activeBtn.classList.add('active');
             }
-            if (section === 'risk') {
+            if (section === 'risk' || section === 'posture') {
                 initializeRiskMatrixAndRegister();
             }
             renderDataBankSection(section, dataBankState.search);
@@ -10564,6 +11313,8 @@ function analyzePassword() {
                 })) {
                     html += `<div class='premium-card'><p>No matches in Risk Matrices.</p></div>`;
                 }
+            } else if (section === 'posture') {
+                html += renderPostureSection();
             } else if (section === 'guides') {
                 const guides = dataBankData.guides.filter(item => {
                     if (!query) return true;
@@ -10908,6 +11659,12 @@ function analyzePassword() {
                     return;
                 }
 
+                const postureExportBtn = event.target.closest('[data-posture-export]');
+                if (postureExportBtn) {
+                    exportMonthlyGrcReport();
+                    return;
+                }
+
                 const riskActionBtn = event.target.closest('[data-risk-action]');
                 if (riskActionBtn) {
                     const id = riskActionBtn.dataset.riskId;
@@ -10925,6 +11682,56 @@ function analyzePassword() {
                         addRiskToCase(item);
                     } else if (action === 'library') {
                         addRiskToLibrary(item);
+                    }
+                    return;
+                }
+
+                const evidenceAddBtn = event.target.closest('[data-evidence-add]');
+                if (evidenceAddBtn) {
+                    addEvidenceItemToControl(evidenceAddBtn.dataset.riskId, Number(evidenceAddBtn.dataset.controlIndex));
+                    return;
+                }
+
+                const evidenceRemoveBtn = event.target.closest('[data-evidence-remove]');
+                if (evidenceRemoveBtn) {
+                    removeEvidenceItemFromControl(
+                        evidenceRemoveBtn.dataset.riskId,
+                        Number(evidenceRemoveBtn.dataset.controlIndex),
+                        Number(evidenceRemoveBtn.dataset.evidenceIndex)
+                    );
+                    return;
+                }
+
+                const evidenceMarkBtn = event.target.closest('[data-evidence-mark]');
+                if (evidenceMarkBtn) {
+                    const today = new Date().toISOString().split('T')[0];
+                    const updated = updateEvidenceField(
+                        evidenceMarkBtn.dataset.riskId,
+                        Number(evidenceMarkBtn.dataset.controlIndex),
+                        Number(evidenceMarkBtn.dataset.evidenceIndex),
+                        'lastCollectedDate',
+                        today
+                    );
+                    const parent = evidenceMarkBtn.closest('[data-evidence-item]');
+                    if (parent) {
+                        const dateInput = parent.querySelector('[data-evidence-field="lastCollectedDate"]');
+                        if (dateInput) dateInput.value = today;
+                        const badge = parent.querySelector('.evidence-status-badge');
+                        if (badge && updated) {
+                            badge.textContent = updated.status;
+                            badge.className = `evidence-status-badge evidence-status-${updated.status.toLowerCase()}`;
+                        }
+                    }
+                    showToast('Evidence marked collected');
+                    return;
+                }
+
+                const evidenceCopyBtn = event.target.closest('[data-evidence-copy]');
+                if (evidenceCopyBtn) {
+                    const item = getRiskRegisterItemById(evidenceCopyBtn.dataset.riskId);
+                    const control = item?.mappedControls?.[Number(evidenceCopyBtn.dataset.controlIndex)];
+                    if (control) {
+                        copyEvidenceChecklist(control);
                     }
                     return;
                 }
@@ -11129,6 +11936,8 @@ function analyzePassword() {
                         });
                     } else if (action === 'export') {
                         exportRiskTreatmentPlan(item);
+                    } else if (action === 'evidence-export') {
+                        exportEvidencePack(item);
                     }
                     return;
                 }
@@ -11177,6 +11986,12 @@ function analyzePassword() {
                     return;
                 }
 
+                if (event.target.matches('[data-posture-filter]')) {
+                    postureUiState.category = event.target.value;
+                    renderDataBankSection('posture', dataBankState.search);
+                    return;
+                }
+
                 if (event.target.id === 'risk-likelihood' || event.target.id === 'risk-impact') {
                     updateRiskRatingPreview();
                     return;
@@ -11188,6 +12003,11 @@ function analyzePassword() {
                     const entry = riskRegisterModalState.mappedControls[index];
                     if (!entry || !field) return;
                     entry[field] = event.target.value;
+                    return;
+                }
+
+                if (event.target.matches('[data-evidence-field]')) {
+                    handleEvidenceFieldUpdate(event.target);
                     return;
                 }
 
@@ -11232,6 +12052,11 @@ function analyzePassword() {
                     const entry = riskRegisterModalState.mappedControls[index];
                     if (!entry || !field) return;
                     entry[field] = event.target.value;
+                    return;
+                }
+
+                if (event.target.matches('[data-evidence-field]')) {
+                    handleEvidenceFieldUpdate(event.target);
                     return;
                 }
 
