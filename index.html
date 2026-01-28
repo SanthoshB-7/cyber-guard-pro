@@ -4297,7 +4297,7 @@ async function loadVendorAdvisories(force = false) {
     listEl.innerHTML = '<div style="text-align:center; padding:24px; color:#22d3ee;"><span class="spinner" style="width:28px; height:28px;"></span><br><br>Loading vendor advisories...</div>';
 
     try {
-        const url = `/api/advisories${force ? '?force=1' : ''}`;
+        const url = `/api/feeds?type=advisories${force ? '&force=1' : ''}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('Vendor advisories unavailable');
         const data = await res.json();
@@ -4404,7 +4404,7 @@ async function loadOsvAdvisories(force = false) {
 
     try {
         const ecosystems = (osvState.ecosystems || []).join(',');
-        const url = `/api/osv?ecosystem=${encodeURIComponent(ecosystems)}&days=7${force ? '&force=1' : ''}`;
+        const url = `/api/feeds?type=osv&ecosystem=${encodeURIComponent(ecosystems)}&days=7${force ? '&force=1' : ''}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('OSV advisories unavailable');
         const data = await res.json();
@@ -4506,7 +4506,7 @@ async function loadStatusBoard(force = false) {
     listEl.innerHTML = '<div style="text-align:center; padding:24px; color:#22d3ee;"><span class="spinner" style="width:28px; height:28px;"></span><br><br>Loading status updates...</div>';
 
     try {
-        const url = `/api/status${force ? '?force=1' : ''}`;
+        const url = `/api/feeds?type=status${force ? '&force=1' : ''}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('Status feeds unavailable');
         const data = await res.json();
