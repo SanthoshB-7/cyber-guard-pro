@@ -291,12 +291,14 @@ body{
     }
 }
 
-.tab-content {
+.tab-content,
+.main-panel {
     display: none;
     animation: fadeIn var(--duration-slow) var(--ease-standard);
 }
 
-.tab-content.active {
+.tab-content.active,
+.main-panel.active {
     display: block;
 }
 
@@ -3811,7 +3813,7 @@ p, .muted-text, .subtitle{
         <!-- Main Content -->
         <main class="main-content">
             <!-- Dashboard Tab -->
-            <div class="tab-content active" id="dashboard-tab">
+            <div class="tab-content main-panel active" id="dashboard-tab">
                 <!-- Real-Time CISA KEV Data Notice -->
 <div class="premium-card" style="background: rgba(15,20,25,0.9); color: #ff4444; border-left: 4px solid #ff0040; margin-bottom: 18px;">
     <div style="font-size: 14px; font-weight: 500; color: #ff0040; margin-bottom: 6px;">LIVE DATA from <strong>CISA Known Exploited Vulnerabilities Catalog</strong></div>
@@ -4284,7 +4286,7 @@ window.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <!-- Threat Intelligence Tab -->
-            <div class="tab-content" id="threats-tab">
+            <div class="tab-content main-panel" id="threats-tab">
                 <!-- Real-Time API Notice -->
                 <div class="premium-card" style="background: rgba(34,211,238,0.1); border-left: 4px solid #22d3ee; margin-bottom: 20px;">
                     <div style="font-size: 15px; font-weight: 600; color: #22d3ee; margin-bottom: 8px;">🔴 LIVE THREAT INTELLIGENCE</div>
@@ -4394,7 +4396,7 @@ window.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <!-- Security Tools Tab -->
-            <div class="tab-content" id="tools-tab">
+            <div class="tab-content main-panel" id="tools-tab">
                 <div class="tools-grid">
                     <!-- Password Strength Analyzer -->
 <div class="premium-card tool-card">
@@ -4492,7 +4494,7 @@ window.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <!-- Learning Hub Tab -->
-            <div class="tab-content" id="learning-tab">
+            <div class="tab-content main-panel" id="learning-tab">
                 <!-- Learning Hub Sub-Navigation -->
                 <div class="learning-hub-subtabs">
                     <button id="learning-news-btn" class="learning-subtab-btn active" data-subtab="news">📰 News</button>
@@ -4504,7 +4506,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- News Feed Sub-Tab -->
-                <div class="learning-subtab active" id="learning-news-content">
+                <div class="learning-subtab learning-subpanel active" id="learning-news-content">
                     <div class="premium-card news-brief" id="news-brief">
                         <div class="news-brief-header">
                             <div>
@@ -4569,7 +4571,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- Deep Research Sub-Tab -->
-                <div class="learning-subtab" id="learning-research-content">
+                <div class="learning-subtab learning-subpanel" id="learning-research-content">
                     <!-- API Key Configuration -->
                     <div class="premium-card" style="background: linear-gradient(135deg, rgba(34,211,238,0.1) 0%, rgba(255,165,0,0.1) 100%); border: 2px solid rgba(34,211,238,0.3);">
                         <h3 style="margin-bottom: 16px; font-size: 18px; display: flex; align-items: center; gap: 8px;">
@@ -4632,7 +4634,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- YouTube Analyzer Sub-Tab -->
-                <div class="learning-subtab" id="learning-youtube-content">
+                <div class="learning-subtab learning-subpanel" id="learning-youtube-content">
                     <div class="premium-card">
                         <h2 style="margin-bottom: 24px; font-size: 24px;">📺 YouTube Video Analyzer</h2>
                         
@@ -4680,7 +4682,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <!-- Document Analyzer Sub-Tab -->
-                <div class="learning-subtab" id="learning-docs-content">
+                <div class="learning-subtab learning-subpanel" id="learning-docs-content">
                     <div class="premium-card">
                         <h2 style="margin-bottom: 24px; font-size: 24px;">📄 Document Analyzer</h2>
                         
@@ -4737,10 +4739,70 @@ window.addEventListener('DOMContentLoaded', () => {
                         </ul>
                     </div>
                 </div>
+
+                <!-- Library Sub-Tab -->
+                <div class="learning-subtab learning-subpanel" id="learning-library-content">
+                    <div class="premium-card">
+                        <h2 style="margin-bottom: 8px; font-size: 24px;">📂 Saved Library</h2>
+                        <p style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                            Collect research highlights, threat intel, and CVEs into a weekly brief.
+                        </p>
+                        <div class="library-toolbar">
+                            <input type="text" class="form-input" id="library-search" placeholder="Search saved items (title, summary, tags)">
+                            <div class="library-controls">
+                                <select class="form-select" id="library-sort">
+                                    <option value="saved">Newest saved</option>
+                                    <option value="date">Date</option>
+                                    <option value="type">Type</option>
+                                </select>
+                                <button class="library-action-btn" id="library-export" type="button">📤 Export Weekly Brief</button>
+                            </div>
+                        </div>
+                        <div class="library-tag-filters" id="library-tag-filters"></div>
+                        <div class="library-items" id="library-items"></div>
+                        <div class="library-empty" id="library-empty">No saved items yet. Save from News/CVEs/Breaches.</div>
+                    </div>
+                </div>
+
+                <!-- Data Bank Sub-Tab (Posture lives only under Learning Hub → Data Bank) -->
+                <div class="learning-subtab learning-subpanel" id="learning-databank-content">
+                    <div class="premium-card">
+                        <h2 style="margin-bottom: 20px; font-size: 24px; display: flex; align-items: center; gap: 8px;">
+                            <span>📚</span> Cybersecurity &amp; GRC Data Bank
+                        </h2>
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <div class="databank-search-wrapper">
+                                <input type="text" class="form-input" id="databank-search" placeholder="🔎 Quick Search (e.g., NIST, Risk Matrix, Access Control ...)">
+                                <div class="databank-search-results" id="databank-search-results" role="listbox" aria-label="Data Bank search results"></div>
+                            </div>
+                        </div>
+                        <div class="databank-mini-rows">
+                            <div class="databank-mini-row">
+                                <div class="databank-mini-header">⭐ Favorites</div>
+                                <div class="databank-mini-list" id="databank-favorites"></div>
+                                <div class="databank-mini-empty" id="databank-favorites-empty">No favorites yet. Star items to pin them here.</div>
+                            </div>
+                            <div class="databank-mini-row">
+                                <div class="databank-mini-header">🕘 Recently viewed</div>
+                                <div class="databank-mini-list" id="databank-recent"></div>
+                                <div class="databank-mini-empty" id="databank-recent-empty">Items you open will appear here.</div>
+                            </div>
+                        </div>
+                        <div class="nav-tabs" style="position: static; top: auto; background: transparent; backdrop-filter: none; border: none; padding: 0; gap: 8px; margin-bottom: 18px;">
+                            <button class="tab-btn active" data-databank="frameworks" onclick="switchDataBankSection(&#39;frameworks&#39;)">🛡️ Frameworks &amp; Standards</button>
+                            <button class="tab-btn" data-databank="controls" onclick="switchDataBankSection(&#39;controls&#39;)">🔗 Control Families</button>
+                            <button class="tab-btn" data-databank="glossary" onclick="switchDataBankSection(&#39;glossary&#39;)">📖 Glossary</button>
+                            <button class="tab-btn" data-databank="risk" onclick="switchDataBankSection(&#39;risk&#39;)">⚠️ Risk Matrices</button>
+                            <button class="tab-btn" data-databank="posture" onclick="switchDataBankSection(&#39;posture&#39;)">📊 Posture</button>
+                            <button class="tab-btn" data-databank="guides" onclick="switchDataBankSection(&#39;guides&#39;)">📝 Implementation Guides</button>
+                        </div>
+                        <div id="databank-content"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Settings Tab -->
-            <div class="tab-content" id="settings-tab">
+            <div class="tab-content main-panel" id="settings-tab">
                 <div class="premium-card">
                     <h2 style="margin-bottom: 24px; font-size: 24px;">⚙️ Settings &amp; API Keys</h2>
                     
@@ -5017,66 +5079,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     <div id="document-results" class="hidden"></div>
                 </div>
             </div>
-
-                <!-- Library Sub-Tab -->
-                <div class="learning-subtab" id="learning-library-content">
-                    <div class="premium-card">
-                        <h2 style="margin-bottom: 8px; font-size: 24px;">📂 Saved Library</h2>
-                        <p style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
-                            Collect research highlights, threat intel, and CVEs into a weekly brief.
-                        </p>
-                        <div class="library-toolbar">
-                            <input type="text" class="form-input" id="library-search" placeholder="Search saved items (title, summary, tags)">
-                            <div class="library-controls">
-                                <select class="form-select" id="library-sort">
-                                    <option value="saved">Newest saved</option>
-                                    <option value="date">Date</option>
-                                    <option value="type">Type</option>
-                                </select>
-                                <button class="library-action-btn" id="library-export" type="button">📤 Export Weekly Brief</button>
-                            </div>
-                        </div>
-                        <div class="library-tag-filters" id="library-tag-filters"></div>
-                        <div class="library-items" id="library-items"></div>
-                        <div class="library-empty" id="library-empty">No saved items yet. Save from News/CVEs/Breaches.</div>
-                    </div>
-                </div>
-
-                <!-- Data Bank Sub-Tab (Posture lives only under Learning Hub → Data Bank) -->
-                <div class="learning-subtab" id="learning-databank-content">
-                    <div class="premium-card">
-                        <h2 style="margin-bottom: 20px; font-size: 24px; display: flex; align-items: center; gap: 8px;">
-                            <span>📚</span> Cybersecurity &amp; GRC Data Bank
-                        </h2>
-                        <div class="form-group" style="margin-bottom: 24px;">
-                            <div class="databank-search-wrapper">
-                                <input type="text" class="form-input" id="databank-search" placeholder="🔎 Quick Search (e.g., NIST, Risk Matrix, Access Control ...)">
-                                <div class="databank-search-results" id="databank-search-results" role="listbox" aria-label="Data Bank search results"></div>
-                            </div>
-                        </div>
-                        <div class="databank-mini-rows">
-                            <div class="databank-mini-row">
-                                <div class="databank-mini-header">⭐ Favorites</div>
-                                <div class="databank-mini-list" id="databank-favorites"></div>
-                                <div class="databank-mini-empty" id="databank-favorites-empty">No favorites yet. Star items to pin them here.</div>
-                            </div>
-                            <div class="databank-mini-row">
-                                <div class="databank-mini-header">🕘 Recently viewed</div>
-                                <div class="databank-mini-list" id="databank-recent"></div>
-                                <div class="databank-mini-empty" id="databank-recent-empty">Items you open will appear here.</div>
-                            </div>
-                        </div>
-                        <div class="nav-tabs" style="position: static; top: auto; background: transparent; backdrop-filter: none; border: none; padding: 0; gap: 8px; margin-bottom: 18px;">
-                            <button class="tab-btn active" data-databank="frameworks" onclick="switchDataBankSection(&#39;frameworks&#39;)">🛡️ Frameworks &amp; Standards</button>
-                            <button class="tab-btn" data-databank="controls" onclick="switchDataBankSection(&#39;controls&#39;)">🔗 Control Families</button>
-                            <button class="tab-btn" data-databank="glossary" onclick="switchDataBankSection(&#39;glossary&#39;)">📖 Glossary</button>
-                            <button class="tab-btn" data-databank="risk" onclick="switchDataBankSection(&#39;risk&#39;)">⚠️ Risk Matrices</button>
-                            <button class="tab-btn" data-databank="posture" onclick="switchDataBankSection(&#39;posture&#39;)">📊 Posture</button>
-                            <button class="tab-btn" data-databank="guides" onclick="switchDataBankSection(&#39;guides&#39;)">📝 Implementation Guides</button>
-                        </div>
-                        <div id="databank-content"></div>
-                    </div>
-                </div>
 
         </main>
         <aside class="clipboard-panel" id="clipboard-panel" aria-live="polite">
@@ -5537,7 +5539,9 @@ window.addEventListener('DOMContentLoaded', () => {
         function setupTabNavigation() {
             // Bind only main tabs (data-tab) to prevent Data Bank sub-tabs from leaking across pages.
             const tabButtons = document.querySelectorAll('.tab-btn[data-tab]');
-            const tabContents = document.querySelectorAll('.tab-content');
+            const tabContents = document.querySelectorAll('.main-panel');
+            const learningSubpanels = document.querySelectorAll('.learning-subpanel');
+            const databankRoot = document.getElementById('learning-databank-content');
 
             tabButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -5550,9 +5554,31 @@ window.addEventListener('DOMContentLoaded', () => {
                     tabContents.forEach(content => {
                         content.classList.remove('active');
                     });
-                    
-                    document.getElementById(`${tabName}-tab`).classList.add('active');
+
+                    const targetPanel = document.getElementById(`${tabName}-tab`);
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
                     appState.currentTab = tabName;
+
+                    if (tabName !== 'learning') {
+                        learningSubpanels.forEach(panel => {
+                            panel.classList.remove('active');
+                            panel.style.display = 'none';
+                        });
+                    } else {
+                        learningSubpanels.forEach(panel => {
+                            panel.style.display = '';
+                        });
+                        const activeButton = document.querySelector('.learning-subtab-btn.active');
+                        const subtab = activeButton?.dataset?.subtab || 'news';
+                        activateLearningSubTab(subtab);
+                    }
+
+                    if (tabName !== 'learning' && databankRoot) {
+                        databankRoot.classList.remove('active');
+                        databankRoot.style.display = 'none';
+                    }
                     
                     // Load threat intel data when tab is opened
                     if (tabName === 'threats') {
@@ -7375,7 +7401,9 @@ function analyzePassword() {
         function setupTabNavigation() {
             // Bind only main tabs (data-tab) to prevent Data Bank sub-tabs from leaking across pages.
             const tabButtons = document.querySelectorAll('.tab-btn[data-tab]');
-            const tabContents = document.querySelectorAll('.tab-content');
+            const tabContents = document.querySelectorAll('.main-panel');
+            const learningSubpanels = document.querySelectorAll('.learning-subpanel');
+            const databankRoot = document.getElementById('learning-databank-content');
 
             tabButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -7388,10 +7416,36 @@ function analyzePassword() {
                     tabContents.forEach(content => {
                         content.classList.remove('active');
                     });
-                    
-                    document.getElementById(`${tabName}-tab`).classList.add('active');
+
+                    const targetPanel = document.getElementById(`${tabName}-tab`);
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
                     appState.currentTab = tabName;
 
+                    if (tabName !== 'learning') {
+                        learningSubpanels.forEach(panel => {
+                            panel.classList.remove('active');
+                            panel.style.display = 'none';
+                        });
+                    } else {
+                        learningSubpanels.forEach(panel => {
+                            panel.style.display = '';
+                        });
+                        const activeButton = document.querySelector('.learning-subtab-btn.active');
+                        const subtab = activeButton?.dataset?.subtab || 'news';
+                        activateLearningSubTab(subtab);
+                    }
+
+                    if (tabName !== 'learning' && databankRoot) {
+                        databankRoot.classList.remove('active');
+                        databankRoot.style.display = 'none';
+                    }
+
+                    if (tabName === 'threats') {
+                        loadNVDCVEs();
+                        loadMITREThreatActors();
+                    }
                 });
             });
         }
