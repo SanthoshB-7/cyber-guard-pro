@@ -4,6 +4,10 @@ const FEED_TTLS_MS = {
   status: 15 * 60 * 1000
 };
 
+const ADVISORY_MAX_ITEMS = 50;
+const STATUS_MAX_ITEMS = 50;
+const OSV_MAX_ITEMS = 50;
+
 const advisoryFeeds = [
   {
     sourceName: 'CISA Advisories',
@@ -68,43 +72,64 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid type. Use advisories, osv, or status.' });
   }
 
+  const forceRefresh = req.query?.force === '1';
   const cacheKey = buildCacheKey(type, req.query || {});
   const now = Date.now();
-  const cachedEntry = getCachedEntry(type, cacheKey, now);
+  const cachedEntry = forceRefresh ? null : getCachedEntry(type, cacheKey, now);
   if (cachedEntry) {
     return res.status(200).json({
       type,
       items: cachedEntry.items,
       timestamp: cachedEntry.timestamp,
-      cached: true
+      cached: true,
+      degraded: false,
+      sourceCount: cachedEntry.sourceCount
     });
   }
 
   try {
     let items = [];
+    let sourceCount = 0;
 
     if (type === 'advisories') {
       items = await fetchAdvisoryFeeds();
+      sourceCount = advisoryFeeds.length;
     } else if (type === 'status') {
       items = await fetchStatusFeeds();
+      sourceCount = statusFeeds.length;
     } else if (type === 'osv') {
-      const ecosystem = String(req.query?.ecosystem || 'npm');
+      const ecosystems = parseEcosystems(req.query?.ecosystem);
       const days = Number(req.query?.days || 30);
-      items = await fetchOsvFeed(ecosystem, Number.isFinite(days) ? days : 30);
+      const results = await Promise.all(
+        ecosystems.map((ecosystem) =>
+          fetchOsvFeed(ecosystem, Number.isFinite(days) ? days : 30)
+        )
+      );
+      items = results.flat();
+      sourceCount = ecosystems.length;
     }
 
     const timestamp = new Date().toISOString();
+    if (type === 'osv') {
+      items = items
+        .sort((a, b) => new Date(b.publishedISO || 0) - new Date(a.publishedISO || 0))
+        .slice(0, OSV_MAX_ITEMS);
+    }
+
     cache[type] = {
       key: cacheKey,
       timestamp,
-      items
+      items,
+      sourceCount
     };
 
     return res.status(200).json({
       type,
       items,
       timestamp,
-      cached: false
+      cached: false,
+      degraded: false,
+      sourceCount
     });
   } catch (error) {
     return res.status(500).json({
@@ -116,7 +141,11 @@ export default async function handler(req, res) {
 
 function buildCacheKey(type, query) {
   if (type === 'osv') {
-    const ecosystem = String(query?.ecosystem || 'npm').toLowerCase();
+    const ecosystem = String(query?.ecosystem || 'npm')
+      .split(',')
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean)
+      .join(',');
     const days = Number(query?.days || 30);
     return `${type}:${ecosystem}:${Number.isFinite(days) ? days : 30}`;
   }
@@ -135,13 +164,19 @@ function getCachedEntry(type, cacheKey, now) {
 
 async function fetchAdvisoryFeeds() {
   const items = await fetchRssFeeds(advisoryFeeds);
-  return dedupeItems(items).slice(0, 80);
+  return dedupeItems(items)
+    .map(mapAdvisoryItem)
+    .filter(Boolean)
+    .slice(0, ADVISORY_MAX_ITEMS);
 }
 
 async function fetchStatusFeeds() {
   const items = await fetchRssFeeds(statusFeeds);
   const sorted = items.sort((a, b) => new Date(b.dateISO || 0) - new Date(a.dateISO || 0));
-  return sorted.slice(0, 60);
+  return sorted
+    .map(mapStatusItem)
+    .filter(Boolean)
+    .slice(0, STATUS_MAX_ITEMS);
 }
 
 async function fetchRssFeeds(feeds) {
@@ -172,7 +207,9 @@ async function fetchOsvFeed(ecosystem, days) {
     const data = await response.json();
     const vulns = extractOsvList(data);
     const normalized = vulns.map((item) => normalizeOsvItem(item, ecosystem)).filter(Boolean);
-    return normalized.filter((item) => new Date(item.modified || item.published || 0) >= new Date(since));
+    return normalized.filter(
+      (item) => new Date(item.publishedISO || 0) >= new Date(since)
+    );
   } catch (error) {
     return buildOsvFallback(ecosystem, since);
   }
@@ -194,28 +231,22 @@ function buildOsvFallback(ecosystem, since) {
       ecosystem,
       package: 'sample-package',
       summary: 'Sample supply chain vulnerability (fallback entry).',
-      details: 'Unable to reach OSV API; showing fallback data.',
       severity: 'HIGH',
-      published: now.toISOString(),
-      modified: now.toISOString(),
+      publishedISO: now.toISOString(),
       aliases: [],
-      references: [],
-      source: 'fallback'
+      url: `https://osv.dev/vulnerability/OSV-${ecosystem.toUpperCase()}-0001`
     },
     {
       id: `OSV-${ecosystem.toUpperCase()}-0002`,
       ecosystem,
       package: 'example-lib',
       summary: 'Dependency vulnerability with remote code execution risk.',
-      details: 'Fallback item used when OSV API is unavailable.',
       severity: 'CRITICAL',
-      published: now.toISOString(),
-      modified: now.toISOString(),
+      publishedISO: now.toISOString(),
       aliases: [],
-      references: [],
-      source: 'fallback'
+      url: `https://osv.dev/vulnerability/OSV-${ecosystem.toUpperCase()}-0002`
     }
-  ].filter((item) => new Date(item.modified) >= new Date(since));
+  ].filter((item) => new Date(item.publishedISO) >= new Date(since));
 }
 
 async function fetchFeed(url) {
@@ -300,22 +331,27 @@ function normalizeOsvItem(item, ecosystem) {
     item.affected?.[0]?.package?.ecosystem ||
     ecosystem ||
     'Unknown';
-  const published = item.published || item.date || new Date().toISOString();
-  const modified = item.modified || item.last_modified || published;
+  const publishedISO = item.published || item.modified || item.date || new Date().toISOString();
+  const aliases = Array.isArray(item.aliases)
+    ? item.aliases
+    : Array.isArray(item.cve)
+      ? item.cve
+      : item.cve
+        ? [item.cve]
+        : [];
+  const url =
+    (Array.isArray(item.references) && item.references[0]?.url) ||
+    item.url ||
+    `https://osv.dev/vulnerability/${encodeURIComponent(item.id || '')}`;
   return {
-    id: item.id || item.osvId || createId(`${eco}-${pkgName}-${published}`),
+    id: item.id || item.osvId || createId(`${eco}-${pkgName}-${publishedISO}`),
     ecosystem: eco,
     package: pkgName,
     summary: item.summary || item.details || 'OSV vulnerability',
-    details: item.details || '',
     severity: extractOsvSeverity(item),
-    published,
-    modified,
-    aliases: item.aliases || item.cve || [],
-    references: Array.isArray(item.references)
-      ? item.references.map((ref) => ({ type: ref.type || 'UNKNOWN', url: ref.url }))
-      : [],
-    source: item.source || 'osv'
+    publishedISO,
+    aliases,
+    url
   };
 }
 
@@ -380,10 +416,43 @@ function scoreSeverity(text) {
 function inferStatus(title, summary) {
   const text = `${title} ${summary}`.toLowerCase();
   if (text.includes('resolved')) return 'resolved';
-  if (text.includes('monitoring')) return 'monitoring';
-  if (text.includes('identified')) return 'identified';
-  if (text.includes('investigating')) return 'investigating';
+  if (text.includes('maintenance')) return 'maintenance';
   return 'incident';
+}
+
+function parseEcosystems(raw) {
+  if (!raw) return ['npm'];
+  const list = String(raw)
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return list.length ? list : ['npm'];
+}
+
+function mapAdvisoryItem(item) {
+  if (!item) return null;
+  return {
+    id: item.id,
+    title: item.title,
+    url: item.url,
+    publishedISO: item.dateISO,
+    vendor: item.sourceName,
+    summary: item.summary,
+    cves: item.cves || []
+  };
+}
+
+function mapStatusItem(item) {
+  if (!item) return null;
+  return {
+    id: item.id,
+    service: item.sourceName,
+    title: item.title,
+    statusType: item.status || 'incident',
+    publishedISO: item.dateISO,
+    url: item.url,
+    summary: item.summary
+  };
 }
 
 function createId(input) {
