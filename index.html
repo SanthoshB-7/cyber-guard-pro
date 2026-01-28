@@ -2964,6 +2964,119 @@ body{
     color: #ffb020;
 }
 
+.posture-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.posture-hero-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.posture-hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.posture-dashboard {
+    display: grid;
+    gap: 18px;
+}
+
+.posture-dashboard-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+}
+
+.posture-card {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(12, 16, 24, 0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: grid;
+    gap: 12px;
+}
+
+.posture-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.posture-card-title button {
+    font-size: 12px;
+}
+
+.posture-list {
+    display: grid;
+    gap: 10px;
+}
+
+.posture-list-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(8, 12, 20, 0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.posture-list-content {
+    display: grid;
+    gap: 6px;
+    flex: 1;
+}
+
+.posture-list-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+}
+
+.posture-list-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.posture-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+}
+
+.posture-empty {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    padding: 8px 0;
+}
+
+@media (max-width: 980px) {
+    .posture-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .checklist-summary {
     display: grid;
     gap: 10px;
@@ -3687,6 +3800,7 @@ p, .muted-text, .subtitle{
         <!-- Navigation Tabs -->
         <nav class="nav-tabs">
             <button class="tab-btn active" data-tab="dashboard">🏠 Dashboard</button>
+            <button class="tab-btn" data-tab="posture">📊 Posture</button>
             <button class="tab-btn" data-tab="threats">📺 Threat Intel</button>
             <button class="tab-btn" data-tab="tools">🔐 Security Tools</button>
             <button class="tab-btn" data-tab="learning">🧠 Learning Hub</button>
@@ -3805,6 +3919,7 @@ async function loadCISAKEV() {
             `;
         }).join('');
         updatePinButtons();
+        renderPostureDashboard();
     } catch (err) {
         grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff0040;">Error loading CISA data: ${err.message}<br><br>Please refresh and try again.</div>`;
     }
@@ -3932,6 +4047,7 @@ async function loadRealBreaches() {
     // Reset and show first 5
     currentBreachesShown = 5;
     updateBreachFilters();
+    renderPostureDashboard();
     console.log('✅ Loaded ' + allBreachesData.length + ' breaches from backend');
     
   } catch (error) {
@@ -3975,6 +4091,7 @@ async function loadRealBreaches() {
       
       currentBreachesShown = 5;
       updateBreachFilters();
+      renderPostureDashboard();
       console.log('📦 Using local fallback data');
     }
   }
@@ -4165,6 +4282,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
+            </div>
+
+            <!-- Posture Tab -->
+            <div class="tab-content" id="posture-tab">
+                <div class="premium-card posture-hero">
+                    <div class="posture-hero-title">
+                        <div>
+                            <h2 style="margin-bottom: 6px; font-size: 22px; font-weight: 600;">🧭 Posture View</h2>
+                            <p style="font-size: 13px; color: rgba(255,255,255,0.7);">Executive snapshot of risk exposure, control execution, and urgent priorities.</p>
+                        </div>
+                        <div class="posture-hero-actions">
+                            <select class="form-input" id="posture-time-range" aria-label="Posture time range">
+                                <option value="24h">Last 24h</option>
+                                <option value="7d" selected>Last 7 days</option>
+                                <option value="30d">Last 30 days</option>
+                            </select>
+                            <button class="btn btn-primary" id="posture-briefing-btn" type="button">Generate Briefing Pack</button>
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: rgba(255,255,255,0.6);" id="posture-range-label">Loading posture summary...</div>
+                </div>
+                <div class="posture-dashboard" id="posture-dashboard"></div>
             </div>
 
             <!-- Threat Intelligence Tab -->
@@ -5413,6 +5552,8 @@ window.addEventListener('DOMContentLoaded', () => {
             setupLibrary();
             setupActorDetailModal();
             setupDataBank();
+            setupPostureDashboard();
+            renderPostureDashboard();
         }
         
         // Load Threat Intel data when user opens Threat Intel tab
@@ -5516,6 +5657,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     });
                     renderNVDCVEs(nvdCVEsCache);
                 }
+                renderPostureDashboard();
             } catch (err) {
                 grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff0040;">Error loading NVD data: ${err.message}<br><br>Note: NVD API has rate limits. Please wait a moment and try refreshing.</div>`;
             }
@@ -7170,6 +7312,7 @@ function analyzePassword() {
             if (meta) {
                 meta.textContent = `Showing ${newsState.filtered.length} stories • ${newsState.items.length} total • ${newsState.timeRange.toUpperCase()} range`;
             }
+            renderPostureDashboard();
         }
 
         function updateNewsView() {
@@ -7269,6 +7412,10 @@ function analyzePassword() {
                     
                     document.getElementById(`${tabName}-tab`).classList.add('active');
                     appState.currentTab = tabName;
+
+                    if (tabName === 'posture') {
+                        renderPostureDashboard();
+                    }
                 });
             });
         }
@@ -9127,6 +9274,9 @@ function analyzePassword() {
             category: 'all'
         };
 
+        const postureFiltersKey = 'posture_filters_v1';
+        let postureFiltersState = loadPostureFilters();
+
         const riskRegisterModalState = {
             mappedControls: [],
             autoSuggestions: []
@@ -9368,6 +9518,24 @@ function analyzePassword() {
                 localStorage.setItem(riskRegisterStorageKey, JSON.stringify(defaults));
                 return defaults;
             }
+        }
+
+        function loadPostureFilters() {
+            try {
+                const raw = localStorage.getItem(postureFiltersKey);
+                if (!raw) return { timeRange: '7d' };
+                const parsed = JSON.parse(raw);
+                const allowed = ['24h', '7d', '30d'];
+                return {
+                    timeRange: allowed.includes(parsed?.timeRange) ? parsed.timeRange : '7d'
+                };
+            } catch (error) {
+                return { timeRange: '7d' };
+            }
+        }
+
+        function savePostureFilters() {
+            localStorage.setItem(postureFiltersKey, JSON.stringify(postureFiltersState));
         }
 
         function initializeRiskMatrixAndRegister() {
@@ -9753,6 +9921,644 @@ function analyzePassword() {
             `;
         }
 
+        function getPostureTimeRangeWindow(range) {
+            const now = new Date();
+            const start = new Date(now);
+            if (range === '24h') {
+                start.setHours(start.getHours() - 24);
+            } else if (range === '30d') {
+                start.setDate(start.getDate() - 30);
+            } else {
+                start.setDate(start.getDate() - 7);
+            }
+            return {
+                start,
+                end: now
+            };
+        }
+
+        function formatPostureRangeLabel(range) {
+            if (range === '24h') return 'Last 24 hours';
+            if (range === '30d') return 'Last 30 days';
+            return 'Last 7 days';
+        }
+
+        function isWithinPostureRange(dateValue, range) {
+            if (!dateValue) return false;
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) return false;
+            const window = getPostureTimeRangeWindow(range);
+            return date >= window.start && date <= window.end;
+        }
+
+        function getPostureFixFirstItems() {
+            const source = (fixFirstSourceCache && fixFirstSourceCache.length) ? fixFirstSourceCache : nvdCVEsCache;
+            const items = buildFixFirstItems(source || []).map(item => ({
+                ...item,
+                score: getFixFirstScore(item, 'combined'),
+                recencyBoost: getRecencyBoost(item.publishedDate)
+            }));
+            return items.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                if (b.recencyBoost !== a.recencyBoost) return b.recencyBoost - a.recencyBoost;
+                if ((b.epssPercent || 0) !== (a.epssPercent || 0)) return (b.epssPercent || 0) - (a.epssPercent || 0);
+                return (b.cvss || 0) - (a.cvss || 0);
+            });
+        }
+
+        function getPostureRiskSnapshot() {
+            const openRisks = (riskRegisterState.items || []).filter(item => item.status !== 'Closed');
+            const mappedControls = openRisks.flatMap(item => item.mappedControls || []);
+            const controlCounts = mappedControls.reduce((acc, control) => {
+                const status = control.status || 'Planned';
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, { 'Implemented': 0, 'In Progress': 0, 'Planned': 0 });
+            const evidenceConfigured = mappedControls.some(control => (control.evidenceItems || []).length > 0);
+            const evidenceCounts = evidenceConfigured
+                ? mappedControls.reduce((acc, control) => {
+                    const items = control.evidenceItems || [];
+                    if (!items.length) {
+                        acc.Missing += 1;
+                        return acc;
+                    }
+                    items.forEach(item => {
+                        const status = getEvidenceStatus(item);
+                        acc[status] += 1;
+                    });
+                    return acc;
+                }, { OK: 0, Stale: 0, Missing: 0 })
+                : null;
+            const ratingCounts = openRisks.reduce((acc, item) => {
+                const rating = getRiskCellRating(item.likelihood, item.impact);
+                if (['Critical', 'High', 'Medium'].includes(rating)) {
+                    acc[rating] += 1;
+                }
+                return acc;
+            }, { Critical: 0, High: 0, Medium: 0 });
+            const riskDue = getUpcomingDueCounts(openRisks, 'dueDate');
+            const controlDue = getUpcomingDueCounts(mappedControls, 'dueDate');
+            return {
+                openRisks,
+                mappedControls,
+                controlCounts,
+                evidenceCounts,
+                evidenceConfigured,
+                ratingCounts,
+                riskDue,
+                controlDue
+            };
+        }
+
+        function renderPostureDashboard() {
+            const container = document.getElementById('posture-dashboard');
+            if (!container) return;
+            const range = postureFiltersState.timeRange || '7d';
+            const rangeLabel = document.getElementById('posture-range-label');
+            if (rangeLabel) {
+                const window = getPostureTimeRangeWindow(range);
+                rangeLabel.textContent = `${formatPostureRangeLabel(range)} · ${window.start.toLocaleDateString()} → ${window.end.toLocaleDateString()}`;
+            }
+            const snapshot = getPostureRiskSnapshot();
+            const fixFirstItems = getPostureFixFirstItems();
+            const fixFirstTop = fixFirstItems.slice(0, 10);
+            const kevCount = fixFirstItems.filter(item => item.isKEV).length;
+            const epss10Count = fixFirstItems.filter(item => (item.epssPercent || 0) >= 10).length;
+            const dueSoonWindow = 14;
+            const dueCutoff = new Date();
+            dueCutoff.setDate(dueCutoff.getDate() + dueSoonWindow);
+            const dueSoonItems = snapshot.openRisks.flatMap(risk => {
+                const dueItems = [];
+                if (risk.dueDate) {
+                    const due = new Date(risk.dueDate);
+                    if (!Number.isNaN(due.getTime()) && due <= dueCutoff && due >= new Date()) {
+                        dueItems.push({
+                            type: 'risk',
+                            id: risk.id,
+                            title: risk.title,
+                            dueDate: risk.dueDate,
+                            rating: getRiskCellRating(risk.likelihood, risk.impact)
+                        });
+                    }
+                }
+                (risk.mappedControls || []).forEach(control => {
+                    if (!control.dueDate) return;
+                    const due = new Date(control.dueDate);
+                    if (!Number.isNaN(due.getTime()) && due <= dueCutoff && due >= new Date()) {
+                        dueItems.push({
+                            type: 'control',
+                            id: `${risk.id}:${control.id}`,
+                            riskId: risk.id,
+                            title: control.title || control.id,
+                            dueDate: control.dueDate,
+                            status: control.status || 'Planned'
+                        });
+                    }
+                });
+                return dueItems;
+            }).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).slice(0, 10);
+
+            const riskSorted = [...snapshot.openRisks].sort((a, b) => {
+                const ratingA = getRiskRatingRank(getRiskCellRating(a.likelihood, a.impact));
+                const ratingB = getRiskRatingRank(getRiskCellRating(b.likelihood, b.impact));
+                if (ratingB !== ratingA) return ratingB - ratingA;
+                return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+            }).slice(0, 5);
+
+            const evidenceCardValue = snapshot.evidenceConfigured
+                ? `${snapshot.evidenceCounts.OK} / ${snapshot.evidenceCounts.Stale} / ${snapshot.evidenceCounts.Missing}`
+                : 'Not configured yet';
+
+            const evidenceCardSub = snapshot.evidenceConfigured
+                ? 'OK / Stale / Missing'
+                : 'Add evidence items to mapped controls';
+
+            const dueSoonTotal7 = snapshot.riskDue.next7 + snapshot.controlDue.next7;
+            const dueSoonTotal30 = snapshot.riskDue.next30 + snapshot.controlDue.next30;
+
+            const riskDistributionTotal = snapshot.ratingCounts.Critical + snapshot.ratingCounts.High + snapshot.ratingCounts.Medium || 1;
+            const controlDistributionTotal = (snapshot.controlCounts['Implemented'] || 0) + (snapshot.controlCounts['In Progress'] || 0) + (snapshot.controlCounts['Planned'] || 0) || 1;
+
+            container.innerHTML = `
+                <div class="posture-kpi-grid">
+                    <div class="posture-kpi-card">
+                        <div class="posture-kpi-label">Open Risks (Critical / High / Medium)</div>
+                        <div class="posture-kpi-value">${snapshot.ratingCounts.Critical} / ${snapshot.ratingCounts.High} / ${snapshot.ratingCounts.Medium}</div>
+                    </div>
+                    <div class="posture-kpi-card">
+                        <div class="posture-kpi-label">Controls Status (Implemented / In Progress / Planned)</div>
+                        <div class="posture-kpi-value">${snapshot.controlCounts['Implemented'] || 0} / ${snapshot.controlCounts['In Progress'] || 0} / ${snapshot.controlCounts['Planned'] || 0}</div>
+                    </div>
+                    <div class="posture-kpi-card">
+                        <div class="posture-kpi-label">Evidence Freshness</div>
+                        <div class="posture-kpi-value">${evidenceCardValue}</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.6);">${evidenceCardSub}</div>
+                    </div>
+                    <div class="posture-kpi-card">
+                        <div class="posture-kpi-label">Fix-First (KEV / EPSS ≥ 10%)</div>
+                        <div class="posture-kpi-value">${kevCount} / ${epss10Count}</div>
+                    </div>
+                    <div class="posture-kpi-card">
+                        <div class="posture-kpi-label">Upcoming Due Dates</div>
+                        <div class="posture-kpi-value">${dueSoonTotal7}</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.6);">Next 30 days: ${dueSoonTotal30}</div>
+                    </div>
+                </div>
+                <div class="posture-dashboard-grid">
+                    <div style="display: grid; gap: 16px;">
+                        <div class="posture-card">
+                            <div class="posture-card-title">
+                                <span>Risk Distribution</span>
+                            </div>
+                            <div class="posture-bars">
+                                ${renderPostureBar('Critical', snapshot.ratingCounts.Critical, riskDistributionTotal)}
+                                ${renderPostureBar('High', snapshot.ratingCounts.High, riskDistributionTotal)}
+                                ${renderPostureBar('Medium', snapshot.ratingCounts.Medium, riskDistributionTotal)}
+                            </div>
+                        </div>
+                        <div class="posture-card">
+                            <div class="posture-card-title">
+                                <span>Control Implementation</span>
+                            </div>
+                            <div class="posture-bars">
+                                ${renderPostureBar('Implemented', snapshot.controlCounts['Implemented'] || 0, controlDistributionTotal)}
+                                ${renderPostureBar('In Progress', snapshot.controlCounts['In Progress'] || 0, controlDistributionTotal)}
+                                ${renderPostureBar('Planned', snapshot.controlCounts['Planned'] || 0, controlDistributionTotal)}
+                            </div>
+                        </div>
+                        <div class="posture-card">
+                            <div class="posture-card-title">
+                                <span>Fix First (Top 10)</span>
+                                <button class="library-action-btn" type="button" data-posture-view="fix-first">View all</button>
+                            </div>
+                            <div class="posture-list">
+                                ${fixFirstTop.length ? fixFirstTop.map(item => {
+                                    const epssLabel = item.epssPercent != null ? `${item.epssPercent.toFixed(1)}%` : '--';
+                                    const cvssLabel = item.cvss ? item.cvss.toFixed(1) : '--';
+                                    const anchorId = `cve:${item.cveId}`;
+                                    return `
+                                        <div class="posture-list-item">
+                                            <div class="posture-list-content">
+                                                <div style="font-weight: 600;">${escapeHtml(item.cveId)}</div>
+                                                <div style="font-size: 12px; color: rgba(255,255,255,0.7);">${escapeHtml(item.title)}</div>
+                                                <div class="posture-list-meta">
+                                                    ${item.isKEV ? '<span class="posture-pill" style="border-color: rgba(255,68,68,0.6); color: #ff4444;">KEV</span>' : ''}
+                                                    <span class="posture-pill">EPSS ${epssLabel}</span>
+                                                    <span class="posture-pill">CVSS ${cvssLabel}</span>
+                                                </div>
+                                            </div>
+                                            <div class="posture-list-actions">
+                                                ${getPinButtonMarkup({
+                                                    id: anchorId,
+                                                    anchor: anchorId,
+                                                    type: 'cve',
+                                                    title: item.cveId,
+                                                    subtitle: item.vendorProduct,
+                                                    url: `https://nvd.nist.gov/vuln/detail/${item.cveId}`,
+                                                    severity: null,
+                                                    meta: {
+                                                        cveId: item.cveId,
+                                                        title: item.title,
+                                                        cvss: item.cvss,
+                                                        epss: item.epssPercent != null ? `${item.epssPercent.toFixed(1)}%` : 'Unknown',
+                                                        isKEV: item.isKEV ? 'Yes' : 'No'
+                                                    }
+                                                }, { compact: true })}
+                                                <button class="library-action-btn" type="button" data-posture-open="cve" data-posture-id="${escapeHtml(anchorId)}">Open</button>
+                                                <button class="library-action-btn" type="button" data-posture-case="cve" data-posture-id="${escapeHtml(item.cveId)}">Case</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('') : `<div class="posture-empty">No Fix-First items yet. Load Threat Intel to populate.</div>`}
+                            </div>
+                        </div>
+                        <div class="posture-card">
+                            <div class="posture-card-title">
+                                <span>Highest Risks</span>
+                                <button class="library-action-btn" type="button" data-posture-view="risks">View all</button>
+                            </div>
+                            <div class="posture-list">
+                                ${riskSorted.length ? riskSorted.map(item => {
+                                    const rating = getRiskCellRating(item.likelihood, item.impact);
+                                    return `
+                                        <div class="posture-list-item">
+                                            <div class="posture-list-content">
+                                                <div style="font-weight: 600;">${escapeHtml(item.title)}</div>
+                                                <div style="font-size: 12px; color: rgba(255,255,255,0.7);">${escapeHtml(item.category || 'Uncategorized')} • ${escapeHtml(item.owner || 'Unassigned')}</div>
+                                                <div class="posture-list-meta">
+                                                    <span class="posture-pill">${escapeHtml(rating)}</span>
+                                                    ${item.dueDate ? `<span class="posture-pill">Due ${escapeHtml(item.dueDate)}</span>` : ''}
+                                                </div>
+                                            </div>
+                                            <div class="posture-list-actions">
+                                                ${getPinButtonMarkup(buildRiskClipboardPayload(item), { compact: true })}
+                                                <button class="library-action-btn" type="button" data-posture-open="risk" data-posture-id="${escapeHtml(item.id)}">Open</button>
+                                                <button class="library-action-btn" type="button" data-posture-case="risk" data-posture-id="${escapeHtml(item.id)}">Case</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('') : `<div class="posture-empty">No open risks yet.</div>`}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: grid; gap: 16px;">
+                        <div class="posture-card">
+                            <div class="posture-card-title">
+                                <span>Due Soon (Next 14 Days)</span>
+                                <button class="library-action-btn" type="button" data-posture-view="due">View all</button>
+                            </div>
+                            <div class="posture-list">
+                                ${dueSoonItems.length ? dueSoonItems.map(item => {
+                                    const badge = item.type === 'risk' ? `Risk • ${escapeHtml(item.rating || '')}` : `Control • ${escapeHtml(item.status || '')}`;
+                                    const riskItem = item.type === 'risk' ? getRiskRegisterItemById(item.id) : null;
+                                    const payload = item.type === 'risk' && riskItem
+                                        ? buildRiskClipboardPayload(riskItem)
+                                        : item.type === 'control'
+                                            ? {
+                                                id: `control:${item.riskId}:${item.title}`,
+                                                anchor: `risk:${item.riskId}`,
+                                                type: 'control',
+                                                title: `Control: ${item.title}`,
+                                                subtitle: `Due ${item.dueDate}`,
+                                                url: '',
+                                                severity: null,
+                                                meta: { status: item.status || 'Planned' }
+                                            }
+                                            : null;
+                                    return `
+                                        <div class="posture-list-item">
+                                            <div class="posture-list-content">
+                                                <div style="font-weight: 600;">${escapeHtml(item.title)}</div>
+                                                <div style="font-size: 12px; color: rgba(255,255,255,0.7);">${badge}</div>
+                                                <div class="posture-list-meta">
+                                                    <span class="posture-pill">Due ${escapeHtml(item.dueDate)}</span>
+                                                </div>
+                                            </div>
+                                            <div class="posture-list-actions">
+                                                ${payload ? getPinButtonMarkup(payload, { compact: true }) : ''}
+                                                <button class="library-action-btn" type="button" data-posture-open="${escapeHtml(item.type)}" data-posture-id="${escapeHtml(item.type === 'risk' ? item.id : item.riskId)}">Open</button>
+                                                <button class="library-action-btn" type="button" data-posture-case="${escapeHtml(item.type)}" data-posture-id="${escapeHtml(item.type === 'risk' ? item.id : item.riskId)}" data-posture-title="${escapeHtml(item.title)}">Case</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('') : `<div class="posture-empty">No upcoming due dates.</div>`}
+                            </div>
+                        </div>
+                        <div class="posture-card">
+                            <div class="posture-card-title">
+                                <span>Due Date Outlook</span>
+                            </div>
+                            <div class="posture-due-grid">
+                                <div class="posture-due-card">
+                                    <div style="font-size:12px; color: rgba(255,255,255,0.6);">Controls due in next 7 days</div>
+                                    <div class="posture-due-value">${snapshot.controlDue.next7}</div>
+                                    <div style="font-size:11px; color: rgba(255,255,255,0.5);">Next 30 days: ${snapshot.controlDue.next30}</div>
+                                </div>
+                                <div class="posture-due-card">
+                                    <div style="font-size:12px; color: rgba(255,255,255,0.6);">Risks due in next 7 days</div>
+                                    <div class="posture-due-value">${snapshot.riskDue.next7}</div>
+                                    <div style="font-size:11px; color: rgba(255,255,255,0.5);">Next 30 days: ${snapshot.riskDue.next30}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            updatePinButtons();
+        }
+
+        function openRiskRegisterFromPosture() {
+            activateMainTab('learning');
+            setTimeout(() => {
+                activateLearningSubTab('databank');
+                switchDataBankSection('risk');
+            }, 120);
+        }
+
+        function addCveToCase(cveId) {
+            if (!cveId) return;
+            const data = loadCaseBuilder();
+            const entry = {
+                id: `case-item:${Date.now()}`,
+                title: `CVE: ${cveId}`,
+                description: 'Added from Posture Fix-First list.',
+                type: 'CVE',
+                createdAt: new Date().toISOString()
+            };
+            if (data.cases.length) {
+                if (!Array.isArray(data.cases[0].items)) {
+                    data.cases[0].items = [];
+                }
+                data.cases[0].items.unshift(entry);
+            } else {
+                data.cases.unshift({
+                    id: `case:${Date.now()}`,
+                    title: `Case: ${cveId}`,
+                    description: entry.description,
+                    items: [entry],
+                    createdAt: new Date().toISOString()
+                });
+            }
+            saveCaseBuilder(data);
+            showToast('Added CVE to case');
+        }
+
+        function addControlToCase(riskId, title) {
+            const data = loadCaseBuilder();
+            const entry = {
+                id: `case-item:${Date.now()}`,
+                title: `Control: ${title}`,
+                description: `From risk ${riskId}`,
+                type: 'Control',
+                createdAt: new Date().toISOString()
+            };
+            if (data.cases.length) {
+                if (!Array.isArray(data.cases[0].items)) {
+                    data.cases[0].items = [];
+                }
+                data.cases[0].items.unshift(entry);
+            } else {
+                data.cases.unshift({
+                    id: `case:${Date.now()}`,
+                    title: `Case: ${title}`,
+                    description: entry.description,
+                    items: [entry],
+                    createdAt: new Date().toISOString()
+                });
+            }
+            saveCaseBuilder(data);
+            showToast('Added control to case');
+        }
+
+        function setupPostureDashboard() {
+            const rangeSelect = document.getElementById('posture-time-range');
+            if (rangeSelect) {
+                rangeSelect.value = postureFiltersState.timeRange || '7d';
+                rangeSelect.addEventListener('change', () => {
+                    postureFiltersState.timeRange = rangeSelect.value;
+                    savePostureFilters();
+                    renderPostureDashboard();
+                });
+            }
+            const briefingBtn = document.getElementById('posture-briefing-btn');
+            if (briefingBtn) {
+                briefingBtn.addEventListener('click', generateBriefingPack);
+            }
+
+            document.addEventListener('click', event => {
+                const openBtn = event.target.closest('[data-posture-open]');
+                if (openBtn) {
+                    const type = openBtn.dataset.postureOpen;
+                    const id = openBtn.dataset.postureId;
+                    if (type === 'cve') {
+                        activateMainTab('threats');
+                        setTimeout(() => scrollToClipboardAnchor(id), 200);
+                        return;
+                    }
+                    if (type === 'risk') {
+                        const item = getRiskRegisterItemById(id);
+                        if (item) {
+                            openRiskTreatmentModal(item);
+                        } else {
+                            openRiskRegisterFromPosture();
+                        }
+                        return;
+                    }
+                    if (type === 'control') {
+                        const item = getRiskRegisterItemById(id);
+                        if (item) {
+                            openRiskTreatmentModal(item);
+                        } else {
+                            openRiskRegisterFromPosture();
+                        }
+                    }
+                }
+
+                const viewBtn = event.target.closest('[data-posture-view]');
+                if (viewBtn) {
+                    const view = viewBtn.dataset.postureView;
+                    if (view === 'fix-first') {
+                        activateMainTab('threats');
+                        return;
+                    }
+                    openRiskRegisterFromPosture();
+                    return;
+                }
+
+                const caseBtn = event.target.closest('[data-posture-case]');
+                if (caseBtn) {
+                    const type = caseBtn.dataset.postureCase;
+                    const id = caseBtn.dataset.postureId;
+                    if (type === 'cve') {
+                        addCveToCase(id);
+                        return;
+                    }
+                    if (type === 'risk') {
+                        const item = getRiskRegisterItemById(id);
+                        if (item) addRiskToCase(item);
+                        return;
+                    }
+                    if (type === 'control') {
+                        addControlToCase(id, caseBtn.dataset.postureTitle || 'Control');
+                    }
+                }
+            });
+        }
+
+        function buildBriefingPackData() {
+            const range = postureFiltersState.timeRange || '7d';
+            const window = getPostureTimeRangeWindow(range);
+            const snapshot = getPostureRiskSnapshot();
+            const fixFirstTop = getPostureFixFirstItems().slice(0, 10);
+            const topRisks = [...snapshot.openRisks].sort((a, b) => {
+                const ratingA = getRiskRatingRank(getRiskCellRating(a.likelihood, a.impact));
+                const ratingB = getRiskRatingRank(getRiskCellRating(b.likelihood, b.impact));
+                return ratingB - ratingA;
+            }).slice(0, 5);
+            const breaches = (allBreachesData || []).filter(item => isWithinPostureRange(item.date, range));
+            const incidents = (newsState.items || []).filter(item => {
+                const hasTag = (item.tags || []).some(tag => ['incident', 'breach', 'ransomware'].includes(tag.toLowerCase()));
+                return hasTag && isWithinPostureRange(item.dateISO, range);
+            });
+            const actions = [];
+            const highRisks = snapshot.openRisks.filter(item => ['High', 'Critical'].includes(getRiskCellRating(item.likelihood, item.impact))).slice(0, 3);
+            if (highRisks.length) {
+                actions.push(`Mitigate top risks: ${highRisks.map(item => item.title).join(', ')}`);
+            }
+            if (snapshot.riskDue.next7 || snapshot.controlDue.next7) {
+                actions.push(`Complete ${snapshot.riskDue.next7} risk items and ${snapshot.controlDue.next7} controls due in the next 7 days.`);
+            }
+            if (!actions.length) {
+                actions.push('Maintain monitoring cadence; no critical deadlines detected this week.');
+            }
+
+            return {
+                title: 'Briefing Pack',
+                generatedAt: new Date().toISOString(),
+                range: {
+                    label: formatPostureRangeLabel(range),
+                    start: window.start.toISOString(),
+                    end: window.end.toISOString()
+                },
+                executiveSummary: `Open risks remain the primary exposure area with ${snapshot.ratingCounts.Critical} critical and ${snapshot.ratingCounts.High} high risks. Fix-first queue highlights ${fixFirstTop.length} priority vulnerabilities, including ${fixFirstTop.filter(item => item.isKEV).length} KEV items.`,
+                topPriorities: fixFirstTop.map(item => ({
+                    cve: item.cveId,
+                    kev: item.isKEV,
+                    epss: item.epssPercent,
+                    cvss: item.cvss
+                })),
+                breaches: breaches.map(item => ({
+                    name: item.name,
+                    date: item.date,
+                    severity: item.severity,
+                    source: item.sourceName,
+                    url: item.url
+                })),
+                incidents: incidents.map(item => ({
+                    title: item.title,
+                    date: item.dateISO,
+                    source: item.sourceName,
+                    url: item.url
+                })),
+                risks: topRisks.map(item => ({
+                    title: item.title,
+                    rating: getRiskCellRating(item.likelihood, item.impact),
+                    owner: item.owner,
+                    due: item.dueDate,
+                    treatment: item.treatment
+                })),
+                controlSummary: snapshot.controlCounts,
+                actionsThisWeek: actions,
+                sources: {
+                    cves: fixFirstTop.map(item => `https://nvd.nist.gov/vuln/detail/${item.cveId}`),
+                    breaches: breaches.map(item => item.url).filter(Boolean),
+                    incidents: incidents.map(item => item.url).filter(Boolean)
+                }
+            };
+        }
+
+        function generateBriefingPack() {
+            const data = buildBriefingPackData();
+            if (!window.jspdf?.jsPDF) {
+                const blob = new Blob([JSON.stringify({ version: 1, ...data }, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'briefing_pack_v1.json';
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('Briefing pack generated');
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            const margin = 40;
+            const width = pdf.internal.pageSize.getWidth() - margin * 2;
+            let y = 50;
+            const addSection = (title, lines) => {
+                pdf.setFontSize(12);
+                if (y > 760) {
+                    pdf.addPage();
+                    y = 40;
+                }
+                pdf.text(title, margin, y);
+                y += 14;
+                pdf.setFontSize(10);
+                lines.forEach(line => {
+                    const wrapped = pdf.splitTextToSize(line, width);
+                    wrapped.forEach(textLine => {
+                        if (y > 760) {
+                            pdf.addPage();
+                            y = 40;
+                        }
+                        pdf.text(textLine, margin, y);
+                        y += 12;
+                    });
+                });
+                y += 8;
+            };
+
+            pdf.setFontSize(18);
+            pdf.text('Executive Briefing Pack', margin, y);
+            y += 18;
+            pdf.setFontSize(10);
+            pdf.text(`${data.range.label} · ${new Date(data.range.start).toLocaleDateString()} → ${new Date(data.range.end).toLocaleDateString()}`, margin, y);
+            y += 18;
+
+            addSection('1. Executive Summary', [data.executiveSummary]);
+            addSection('2. Top Priorities (Fix-First Top 10)', data.topPriorities.length
+                ? data.topPriorities.map(item => `${item.cve} • KEV: ${item.kev ? 'Yes' : 'No'} • EPSS: ${item.epss != null ? item.epss.toFixed(1) + '%' : 'N/A'} • CVSS: ${item.cvss || 'N/A'}`)
+                : ['No fix-first items available.']);
+
+            const breachLines = data.breaches.length
+                ? data.breaches.map(item => `${item.name} (${item.date}) • ${item.severity || 'Unknown'}${item.url ? ` • ${item.url}` : ''}`)
+                : ['No verified breaches in the selected range.'];
+            const incidentLines = data.incidents.length
+                ? data.incidents.map(item => `${item.title} (${formatNewsDate(item.date)}) • ${item.source}${item.url ? ` • ${item.url}` : ''}`)
+                : ['No incident feed items in the selected range.'];
+            addSection(`3. Breaches & Incidents (${data.range.label})`, [...breachLines, ...incidentLines]);
+
+            const riskLines = data.risks.length
+                ? data.risks.map(item => `${item.title} • ${item.rating} • Owner: ${item.owner || 'Unassigned'} • Due: ${item.due || 'N/A'} • Treatment: ${item.treatment || 'Mitigate'}`)
+                : ['No open risks logged.'];
+            addSection('4. Risk & Control Posture', [
+                ...riskLines,
+                `Control Status → Implemented: ${data.controlSummary['Implemented'] || 0}, In Progress: ${data.controlSummary['In Progress'] || 0}, Planned: ${data.controlSummary['Planned'] || 0}`
+            ]);
+
+            addSection('5. Actions This Week', data.actionsThisWeek);
+
+            const sourceLines = [
+                ...data.sources.cves.map(link => `CVE: ${link}`),
+                ...data.sources.breaches.map(link => `Breach: ${link}`),
+                ...data.sources.incidents.map(link => `Incident: ${link}`)
+            ];
+            addSection('6. Sources / Links', sourceLines.length ? sourceLines : ['No external links available.']);
+
+            pdf.save(`briefing-pack-${Date.now()}.pdf`);
+            showToast('Briefing pack generated');
+        }
+
         function getRiskRegisterItemById(id) {
             return riskRegisterState.items.find(item => item.id === id);
         }
@@ -10046,6 +10852,7 @@ function analyzePassword() {
             saveRiskRegister();
             closeRiskRegisterModal();
             renderDataBankSection('risk', dataBankState.search);
+            renderPostureDashboard();
             showToast('Risk saved');
         }
 
@@ -10054,6 +10861,7 @@ function analyzePassword() {
             saveRiskRegister();
             closeRiskRegisterModal();
             renderDataBankSection('risk', dataBankState.search);
+            renderPostureDashboard();
             showToast('Risk removed');
         }
 
