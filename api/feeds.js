@@ -49,6 +49,14 @@ const statusFeeds = [
   }
 ];
 
+const osvFeeds = [
+  {
+    sourceName: 'GitHub Advisory Database',
+    sourceType: 'osv',
+    url: 'https://github.com/advisories.atom'
+  }
+];
+
 const cache = {
   advisories: null,
   osv: null,
@@ -74,6 +82,7 @@ export default async function handler(req, res) {
 
   const forceRefresh = req.query?.force === '1';
   const cveOnly = req.query?.cveOnly === '1' || req.query?.cveOnly === 'true';
+  const debugMode = req.query?.debug === '1';
   const cacheKey = buildCacheKey(type, req.query || {});
   const now = Date.now();
   const cachedEntry = forceRefresh ? null : getCachedEntry(type, cacheKey, now);
@@ -89,7 +98,8 @@ export default async function handler(req, res) {
         parsedCount: cachedEntry.parsedCount,
         filteredCount: cachedEntry.filteredCount,
         errors: cachedEntry.errors,
-        filteredByCveOnly: cachedEntry.filteredByCveOnly
+        filteredByCveOnly: cachedEntry.filteredByCveOnly,
+        debugMode
       })
     );
   }
@@ -123,17 +133,16 @@ export default async function handler(req, res) {
     } else if (type === 'osv') {
       const ecosystems = parseEcosystems(req.query?.ecosystem);
       const days = Number(req.query?.days || 30);
-      const results = await Promise.all(
-        ecosystems.map((ecosystem) =>
-          fetchOsvFeed(ecosystem, Number.isFinite(days) ? days : 30)
-        )
-      );
-      items = results.flatMap((result) => result.items);
-      fetchedCount = results.reduce((total, result) => total + result.fetchedCount, 0);
-      parsedCount = results.reduce((total, result) => total + result.parsedCount, 0);
-      filteredCount = results.reduce((total, result) => total + result.filteredCount, 0);
-      errors = results.flatMap((result) => result.errors);
-      sourceCount = ecosystems.length;
+      const result = await fetchSupplyChainAdvisories({
+        ecosystems,
+        days: Number.isFinite(days) ? days : 30
+      });
+      items = result.items;
+      fetchedCount = result.fetchedCount;
+      parsedCount = result.parsedCount;
+      filteredCount = result.filteredCount;
+      errors = result.errors;
+      sourceCount = osvFeeds.length;
     }
 
     const timestamp = new Date().toISOString();
@@ -167,7 +176,8 @@ export default async function handler(req, res) {
         parsedCount,
         filteredCount: type === 'osv' ? items.length : filteredCount,
         errors,
-        filteredByCveOnly
+        filteredByCveOnly,
+        debugMode
       })
     );
   } catch (error) {
@@ -208,7 +218,12 @@ function getCachedEntry(type, cacheKey, now) {
 async function fetchAdvisoryFeeds({ cveOnly = false } = {}) {
   const { items, parsedCount, fetchedCount, errors } = await fetchRssFeeds(advisoryFeeds);
   const mapped = dedupeItems(items).map(mapAdvisoryItem).filter(Boolean);
-  const filtered = cveOnly ? mapped.filter((item) => item.cves && item.cves.length > 0) : mapped;
+  const sorted = mapped.sort(
+    (a, b) => new Date(b.publishedISO || 0) - new Date(a.publishedISO || 0)
+  );
+  const filtered = cveOnly
+    ? sorted.filter((item) => item.cves && item.cves.length > 0)
+    : sorted;
   const filteredByCveOnly = cveOnly && parsedCount > 0 && filtered.length === 0;
   return {
     items: filtered.slice(0, ADVISORY_MAX_ITEMS),
@@ -245,6 +260,7 @@ async function fetchRssFeeds(feeds) {
           error: {
             sourceName: feed.sourceName,
             url: feed.url,
+            step: 'fetch',
             status: response.status,
             message: response.message
           }
@@ -252,10 +268,12 @@ async function fetchRssFeeds(feeds) {
       }
       try {
         const parsed = parseFeed(response.text, feed);
+        const normalization = normalizeFeedItems(parsed.items, feed);
         return {
-          items: parsed.items,
+          items: normalization.items,
           parsedCount: parsed.items.length,
-          fetched: true
+          fetched: true,
+          errors: normalization.errors
         };
       } catch (error) {
         return {
@@ -265,6 +283,7 @@ async function fetchRssFeeds(feeds) {
           error: {
             sourceName: feed.sourceName,
             url: feed.url,
+            step: 'parse',
             status: response.status,
             message: `Parse failed: ${error.message}`
           }
@@ -273,76 +292,109 @@ async function fetchRssFeeds(feeds) {
     })
   );
   const items = results.flatMap((result) => result.items);
+  const normalizeErrors = results.flatMap((result) => result.errors || []);
   return {
-    items: items.map(normalizeRssItem).filter(Boolean),
+    items,
     fetchedCount: results.filter((result) => result.fetched).length,
     parsedCount: results.reduce((total, result) => total + (result.parsedCount || 0), 0),
-    errors: results.flatMap((result) => (result.error ? [result.error] : []))
+    errors: results
+      .flatMap((result) => (result.error ? [result.error] : []))
+      .concat(normalizeErrors)
   };
 }
 
-async function fetchOsvFeed(ecosystem, days) {
+async function fetchSupplyChainAdvisories({ ecosystems, days }) {
   const lookbackMs = days * 24 * 60 * 60 * 1000;
-  const since = new Date(Date.now() - lookbackMs).toISOString();
-  const baseUrl = `https://api.osv.dev/v1/last_modified/${encodeURIComponent(ecosystem)}`;
+  const since = new Date(Date.now() - lookbackMs);
+  const ecosystemSet = new Set((ecosystems || []).map((eco) => eco.toLowerCase()));
 
-  try {
-    const response = await fetch(baseUrl, {
-      headers: {
-        'user-agent': 'CyberSecCommand'
+  const results = await Promise.all(
+    osvFeeds.map(async (feed) => {
+      const response = await fetchFeed(feed.url);
+      if (!response.ok) {
+        return {
+          items: [],
+          parsedCount: 0,
+          fetched: false,
+          error: {
+            sourceName: feed.sourceName,
+            url: feed.url,
+            step: 'fetch',
+            status: response.status,
+            message: response.message
+          }
+        };
       }
-    });
-    if (!response.ok) {
-      throw new Error(`OSV request failed: ${response.status}`);
-    }
-    const data = await response.json();
-    const vulns = extractOsvList(data);
-    const normalized = vulns.map((item) => normalizeOsvItem(item, ecosystem)).filter(Boolean);
-    const filtered = normalized.filter(
-      (item) => new Date(item.publishedISO || 0) >= new Date(since)
-    );
-    return {
-      items: filtered,
-      parsedCount: vulns.length,
-      fetchedCount: 1,
-      filteredCount: filtered.length,
-      errors: []
-    };
-  } catch (error) {
-    return {
-      items: buildOsvFallback(ecosystem, since),
-      parsedCount: 0,
-      fetchedCount: 0,
-      filteredCount: 0,
-      errors: [
-        {
-          sourceName: `OSV ${ecosystem}`,
-          url: baseUrl,
-          status: null,
-          message: error.message
-        }
-      ]
-    };
-  }
-}
+      try {
+        const parsed = parseFeed(response.text, feed);
+        const normalized = [];
+        const errors = [];
+        parsed.items.forEach((item) => {
+          try {
+            const mapped = normalizeSupplyChainItem(item);
+            if (mapped) normalized.push(mapped);
+          } catch (error) {
+            errors.push({
+              sourceName: feed.sourceName,
+              url: feed.url,
+              step: 'normalize',
+              status: response.status,
+              message: `Normalize failed: ${error.message}`
+            });
+          }
+        });
+        return {
+          items: normalized,
+          parsedCount: parsed.items.length,
+          fetched: true,
+          errors
+        };
+      } catch (error) {
+        return {
+          items: [],
+          parsedCount: 0,
+          fetched: true,
+          error: {
+            sourceName: feed.sourceName,
+            url: feed.url,
+            step: 'parse',
+            status: response.status,
+            message: `Parse failed: ${error.message}`
+          }
+        };
+      }
+    })
+  );
 
-function extractOsvList(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.vulns)) return payload.vulns;
-  if (Array.isArray(payload?.vulnerabilities)) return payload.vulnerabilities;
-  if (Array.isArray(payload?.items)) return payload.items;
-  return [];
-}
+  const items = results.flatMap((result) => result.items);
+  const normalized = items.filter((item) => {
+    const published = new Date(item.publishedISO || 0);
+    if (Number.isNaN(published.getTime()) || published < since) return false;
+    if (!ecosystemSet.size) return true;
+    return ecosystemSet.has(String(item.ecosystem || '').toLowerCase());
+  });
 
-function buildOsvFallback(ecosystem, since) {
-  return [];
+  return {
+    items: normalized,
+    parsedCount: results.reduce((total, result) => total + (result.parsedCount || 0), 0),
+    fetchedCount: results.filter((result) => result.fetched).length,
+    filteredCount: normalized.length,
+    errors: results
+      .flatMap((result) => (result.error ? [result.error] : []))
+      .concat(results.flatMap((result) => result.errors || []))
+  };
 }
 
 async function fetchFeed(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    const response = await fetch(url, { signal: controller.signal });
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'user-agent': 'CyberSecCommand'
+      }
+    });
     if (!response.ok) {
       return {
         ok: false,
@@ -370,16 +422,28 @@ async function fetchFeed(url) {
 }
 
 function parseFeed(xmlText, feed) {
-  const rssItems = parseRssItems(xmlText, feed);
-  const atomItems = parseAtomEntries(xmlText, feed);
+  const feedType = detectFeedType(xmlText);
+  const rssItems = feedType === 'rss' || feedType === 'both' ? parseRssItems(xmlText, feed) : [];
+  const atomItems =
+    feedType === 'atom' || feedType === 'both' ? parseAtomEntries(xmlText, feed) : [];
   return {
     items: [...rssItems, ...atomItems]
   };
 }
 
+function detectFeedType(xmlText) {
+  const hasFeed = /<feed[\s>]/i.test(xmlText);
+  const hasEntry = /<entry[\s>]/i.test(xmlText);
+  const hasRss = /<rss[\s>]/i.test(xmlText);
+  const hasChannel = /<channel[\s>]/i.test(xmlText);
+  if ((hasFeed || hasEntry) && !(hasRss || hasChannel)) return 'atom';
+  if ((hasRss || hasChannel) && !(hasFeed || hasEntry)) return 'rss';
+  return 'both';
+}
+
 function parseRssItems(xmlText, feed) {
   const items = [];
-  const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+  const itemRegex = /<item\b[^>]*>([\s\S]*?)<\/item>/gi;
   let match;
   while ((match = itemRegex.exec(xmlText)) !== null) {
     const itemBlock = match[1];
@@ -417,7 +481,7 @@ function parseRssItems(xmlText, feed) {
 
 function parseAtomEntries(xmlText, feed) {
   const items = [];
-  const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
+  const entryRegex = /<entry\b[^>]*>([\s\S]*?)<\/entry>/gi;
   let match;
   while ((match = entryRegex.exec(xmlText)) !== null) {
     const entryBlock = match[1];
@@ -449,6 +513,26 @@ function parseAtomEntries(xmlText, feed) {
   return items;
 }
 
+function normalizeFeedItems(items, feed) {
+  const normalized = [];
+  const errors = [];
+  items.forEach((item) => {
+    try {
+      const mapped = normalizeRssItem(item);
+      if (mapped) normalized.push(mapped);
+    } catch (error) {
+      errors.push({
+        sourceName: feed.sourceName,
+        url: feed.url,
+        step: 'normalize',
+        status: null,
+        message: `Normalize failed: ${error.message}`
+      });
+    }
+  });
+  return { items: normalized, errors };
+}
+
 function normalizeRssItem(item) {
   if (!item || !item.title) return null;
   const url = normalizeUrl(item.url);
@@ -474,87 +558,55 @@ function normalizeRssItem(item) {
   };
 }
 
-function normalizeOsvItem(item, ecosystem) {
-  if (!item) return null;
-  const pkgName =
-    item.package?.name ||
-    item.affected?.[0]?.package?.name ||
-    item.package ||
-    'Unknown';
-  const eco =
-    item.package?.ecosystem ||
-    item.affected?.[0]?.package?.ecosystem ||
-    ecosystem ||
-    'Unknown';
-  const publishedISO = item.published || item.modified || item.date || new Date().toISOString();
+function normalizeSupplyChainItem(item) {
+  if (!item || !item.title) return null;
+  const combined = `${item.title} ${item.summary || ''} ${item.content || ''}`;
+  const metadata = extractSupplyChainMetadata(combined);
+  const pkgName = metadata.packageName || item.title || 'Unknown';
+  const eco = metadata.ecosystem || 'Unknown';
+  const publishedISO = item.dateISO || new Date().toISOString();
   const lowerName = String(pkgName || '').toLowerCase();
   if (['sample-package', 'example-lib'].includes(lowerName)) {
     return null;
   }
-  const aliases = Array.isArray(item.aliases)
-    ? item.aliases
-    : Array.isArray(item.cve)
-      ? item.cve
-      : item.cve
-        ? [item.cve]
-        : [];
-  const url =
-    (Array.isArray(item.references) && item.references[0]?.url) ||
-    item.url ||
-    `https://osv.dev/vulnerability/${encodeURIComponent(item.id || '')}`;
+  const aliases = Array.from(
+    new Set([...(metadata.aliases || []), ...extractCves(combined)])
+  );
   return {
-    id: item.id || item.osvId || createId(`${eco}-${pkgName}-${publishedISO}`),
+    id: createId(item.url || `${eco}-${pkgName}-${publishedISO}`),
     ecosystem: eco,
     package: pkgName,
-    summary: cleanFeedText(item.summary || item.details || 'OSV vulnerability'),
-    severity: extractOsvSeverity(item),
+    summary: cleanFeedText(item.summary || item.content || 'Supply chain advisory'),
+    severity: metadata.severity || 'UNKNOWN',
     publishedISO,
     aliases,
-    url
+    url: normalizeUrl(item.url)
   };
 }
 
-function extractOsvSeverity(item) {
-  const cvssScore = extractCvssScore(item);
-  if (Number.isFinite(cvssScore)) {
-    return mapCvssScoreToSeverity(cvssScore);
-  }
-  const severityLabel = extractSeverityLabel(item);
-  return severityLabel || 'UNKNOWN';
-}
-
-function extractCvssScore(item) {
-  const candidates = [];
-  if (Array.isArray(item?.severity)) {
-    item.severity.forEach((entry) => {
-      if (!entry) return;
-      if (typeof entry === 'number' || typeof entry === 'string') {
-        candidates.push(entry);
-      } else if (entry.score) {
-        candidates.push(entry.score);
-      }
-    });
-  }
-  if (item?.cvss?.score) candidates.push(item.cvss.score);
-  if (item?.database_specific?.cvss?.score) candidates.push(item.database_specific.cvss.score);
-  for (const value of candidates) {
-    const numeric = Number.parseFloat(value);
-    if (Number.isFinite(numeric)) return numeric;
-  }
-  return null;
-}
-
-function extractSeverityLabel(item) {
-  if (Array.isArray(item?.severity) && item.severity.length) {
-    const primary = item.severity[0];
-    if (typeof primary === 'string') {
-      return normalizeSeverityLabel(primary);
-    }
-    if (primary?.type && typeof primary.type === 'string') {
-      return normalizeSeverityLabel(primary.type);
-    }
-  }
-  return null;
+function extractSupplyChainMetadata(text) {
+  const cleaned = cleanFeedText(text || '');
+  const packageMatch = cleaned.match(/Package:\s*([^\n]+)/i);
+  const ecosystemMatch = cleaned.match(/Ecosystem:\s*([^\n]+)/i);
+  const severityMatch = cleaned.match(/Severity:\s*([^\n]+)/i);
+  const severityHintMatch = cleaned.match(/\b(critical|high|medium|low)\b/i);
+  const titlePackageMatch = cleaned.match(/\s+in\s+([A-Za-z0-9_.-]+)\b/i);
+  const ghsaMatch = cleaned.match(/GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}/i);
+  const packageName =
+    cleanFeedText(packageMatch?.[1] || '') || cleanFeedText(titlePackageMatch?.[1] || '');
+  const ecosystem = cleanFeedText(ecosystemMatch?.[1] || '');
+  const severity =
+    normalizeSeverityLabel(severityMatch?.[1] || '') ||
+    normalizeSeverityLabel(severityHintMatch?.[1] || '') ||
+    null;
+  const aliases = [];
+  if (ghsaMatch?.[0]) aliases.push(ghsaMatch[0].toUpperCase());
+  return {
+    packageName: packageName || null,
+    ecosystem: ecosystem || null,
+    severity,
+    aliases
+  };
 }
 
 function normalizeSeverityLabel(value) {
@@ -564,13 +616,6 @@ function normalizeSeverityLabel(value) {
   if (normalized.includes('MEDIUM')) return 'MEDIUM';
   if (normalized.includes('LOW')) return 'LOW';
   return null;
-}
-
-function mapCvssScoreToSeverity(score) {
-  if (score >= 9.0) return 'CRITICAL';
-  if (score >= 7.0) return 'HIGH';
-  if (score >= 4.0) return 'MEDIUM';
-  return 'LOW';
 }
 
 function normalizeDate(value) {
@@ -604,7 +649,7 @@ function getTagValue(block, tag) {
   if (!match) {
     return '';
   }
-  return match[2].replace(/<!\\[CDATA\\[|\\]\\]>/g, '').trim();
+  return match[2].replace(/<!\[CDATA\[|\]\]>/g, '').trim();
 }
 
 function normalizeUrl(url) {
@@ -694,8 +739,19 @@ function dedupeItems(items) {
 }
 
 function getAtomLink(block) {
-  const linkMatch = block.match(/<link[^>]*?href=["']([^"']+)["'][^>]*?>/i);
-  if (linkMatch) return linkMatch[1];
+  const links = [];
+  const linkRegex = /<link\s+([^>]*?)\/?>/gi;
+  let match;
+  while ((match = linkRegex.exec(block)) !== null) {
+    const attrs = match[1];
+    const hrefMatch = attrs.match(/href=["']([^"']+)["']/i);
+    if (!hrefMatch) continue;
+    const relMatch = attrs.match(/rel=["']([^"']+)["']/i);
+    links.push({ href: hrefMatch[1], rel: relMatch ? relMatch[1] : '' });
+  }
+  const preferred = links.find((link) => !link.rel || link.rel === 'alternate');
+  if (preferred) return preferred.href;
+  if (links.length) return links[0].href;
   return getTagValue(block, 'link') || '';
 }
 
@@ -709,7 +765,8 @@ function buildResponse({
   parsedCount,
   filteredCount,
   errors,
-  filteredByCveOnly
+  filteredByCveOnly,
+  debugMode
 }) {
   const response = {
     type,
@@ -724,5 +781,43 @@ function buildResponse({
   if (Number.isFinite(filteredCount)) response.filteredCount = filteredCount;
   if (Array.isArray(errors)) response.errors = errors;
   if (filteredByCveOnly) response.filteredByCveOnly = true;
+  if (debugMode) {
+    response.debug = buildDebugInfo({
+      type,
+      cached,
+      timestamp,
+      sourceCount,
+      fetchedCount,
+      parsedCount,
+      errors,
+      items
+    });
+  }
   return response;
+}
+
+function buildDebugInfo({
+  type,
+  cached,
+  timestamp,
+  sourceCount,
+  fetchedCount,
+  parsedCount,
+  errors,
+  items
+}) {
+  const titles = (items || [])
+    .map((item) => item?.title || item?.package || item?.summary || '')
+    .filter(Boolean)
+    .slice(0, 5);
+  return {
+    type,
+    cached,
+    timestamp,
+    sourceCount,
+    fetchedCount,
+    parsedCount,
+    errors: Array.isArray(errors) ? errors : [],
+    sampleTitles: titles
+  };
 }

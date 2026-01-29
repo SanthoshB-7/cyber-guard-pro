@@ -4465,7 +4465,7 @@ async function loadVendorAdvisories(force = false) {
         const data = await res.json();
         advisoriesState.items = data.items || [];
         advisoriesState.timestamp = data.timestamp;
-        advisoriesState.degraded = Boolean(data.degraded);
+        advisoriesState.degraded = Boolean(data.degraded) || !advisoriesState.items.length;
         advisoriesState.parsedCount = Number(data.parsedCount ?? advisoriesState.items.length);
         advisoriesState.fetchedCount = Number(data.fetchedCount ?? 0);
         advisoriesState.errors = data.errors || [];
@@ -4510,12 +4510,14 @@ function renderAdvisoriesList() {
     if (!visibleItems.length) {
         if (advisoriesState.parsedCount > 0 && advisoriesState.filteredCount === 0) {
             listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">Items were fetched but filtered out—try disabling Has CVE only / include unknown severity.</div>';
-        } else if (advisoriesState.errors.length && advisoriesState.parsedCount === 0) {
-            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.7);">No advisories available.</div>${renderDebugDetails(advisoriesState.errors)}`;
         } else if (!advisoriesState.items.length) {
-            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No items returned. Try Refresh or disable “Has CVE only”.</div>';
+            const diagnosticsLink = '<a href="/api/feeds?type=advisories&debug=1" target="_blank" rel="noopener" style="color:#22d3ee; font-size:12px;">Open Diagnostics</a>';
+            const errorDetails = advisoriesState.errors.length && advisoriesState.parsedCount === 0
+                ? renderDebugDetails(advisoriesState.errors)
+                : '';
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.75);">Degraded — no advisories returned.<br>${diagnosticsLink}</div>${errorDetails}`;
         } else {
-            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No advisories match the current filters.</div>';
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No advisories available at the moment.</div>';
         }
     } else {
         listEl.innerHTML = visibleItems.map(item => {
@@ -4603,7 +4605,7 @@ async function loadOsvAdvisories(force = false) {
         osvState.items = data.items || [];
         osvState.visible = 5;
         osvState.timestamp = data.timestamp;
-        osvState.degraded = Boolean(data.degraded);
+        osvState.degraded = Boolean(data.degraded) || !osvState.items.length;
         osvState.parsedCount = Number(data.parsedCount ?? osvState.items.length);
         osvState.fetchedCount = Number(data.fetchedCount ?? 0);
         osvState.errors = data.errors || [];
@@ -4646,11 +4648,15 @@ function renderOsvList() {
 
     if (!visibleItems.length) {
         if (osvState.parsedCount > 0 && osvState.filteredCount === 0) {
-            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">Items were fetched but filtered out—try disabling Has CVE only / include unknown severity.</div>';
-        } else if (osvState.errors.length && osvState.parsedCount === 0) {
-            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.7);">No OSV advisories available.</div>${renderDebugDetails(osvState.errors)}`;
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">Items were fetched but filtered out—try lowering the severity filter or include unknown severity.</div>';
+        } else if (!osvState.items.length) {
+            const diagnosticsLink = '<a href="/api/feeds?type=osv&debug=1" target="_blank" rel="noopener" style="color:#22d3ee; font-size:12px;">Open Diagnostics</a>';
+            const errorDetails = osvState.errors.length && osvState.parsedCount === 0
+                ? renderDebugDetails(osvState.errors)
+                : '';
+            listEl.innerHTML = `<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.75);">Degraded — no supply chain advisories returned.<br>${diagnosticsLink}</div>${errorDetails}`;
         } else {
-            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No OSV advisories match the current filters.</div>';
+            listEl.innerHTML = '<div style="text-align:center; padding:24px; color: rgba(255,255,255,0.6);">No supply chain advisories available at the moment.</div>';
         }
     } else {
         listEl.innerHTML = visibleItems.map(item => {
