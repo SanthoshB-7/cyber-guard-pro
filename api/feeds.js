@@ -20,9 +20,24 @@ const advisoryFeeds = [
     url: 'https://www.cisa.gov/news-events/alerts.xml'
   },
   {
-    sourceName: 'CERT-EU Advisories',
+    sourceName: 'NVD Recent CVEs',
     sourceType: 'advisory',
-    url: 'https://cert.europa.eu/cert/newsletter/en/latestRSS'
+    url: 'https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss-analyzed.xml'
+  },
+  {
+    sourceName: 'Microsoft MSRC',
+    sourceType: 'advisory',
+    url: 'https://msrc.microsoft.com/update-guide/rss'
+  },
+  {
+    sourceName: 'Cisco PSIRT',
+    sourceType: 'advisory',
+    url: 'https://tools.cisco.com/security/center/psirtrss20/CiscoSecurityAdvisory.xml'
+  },
+  {
+    sourceName: 'Cloudflare Security Blog',
+    sourceType: 'advisory',
+    url: 'https://blog.cloudflare.com/tag/security/rss/'
   }
 ];
 
@@ -53,7 +68,13 @@ const osvFeeds = [
   {
     sourceName: 'GitHub Advisory Database',
     sourceType: 'osv',
-    url: 'https://github.com/advisories.atom'
+    url: 'https://github.com/advisories.atom',
+    atomAcceptFallback: true
+  },
+  {
+    sourceName: 'OSV.dev (npm)',
+    sourceType: 'osv',
+    url: 'https://osv.dev/feeds/ecosystem/npm.atom'
   }
 ];
 
@@ -81,11 +102,21 @@ export default async function handler(req, res) {
   }
 
   const forceRefresh = req.query?.force === '1';
+  const refresh = req.query?.refresh === '1';
   const cveOnly = req.query?.cveOnly === '1' || req.query?.cveOnly === 'true';
   const debugMode = req.query?.debug === '1';
   const cacheKey = buildCacheKey(type, req.query || {});
   const now = Date.now();
-  const cachedEntry = forceRefresh ? null : getCachedEntry(type, cacheKey, now);
+  let cachedEntry = forceRefresh ? null : getCachedEntry(type, cacheKey, now);
+  if (
+    cachedEntry &&
+    (refresh || debugMode) &&
+    cachedEntry.items.length === 0 &&
+    Array.isArray(cachedEntry.errors) &&
+    cachedEntry.errors.length > 0
+  ) {
+    cachedEntry = null;
+  }
   if (cachedEntry) {
     return res.status(200).json(
       buildResponse({
@@ -251,7 +282,7 @@ async function fetchStatusFeeds() {
 async function fetchRssFeeds(feeds) {
   const results = await Promise.all(
     feeds.map(async (feed) => {
-      const response = await fetchFeed(feed.url);
+      const response = await fetchFeed(feed.url, feed);
       if (!response.ok) {
         return {
           items: [],
@@ -310,7 +341,7 @@ async function fetchSupplyChainAdvisories({ ecosystems, days }) {
 
   const results = await Promise.all(
     osvFeeds.map(async (feed) => {
-      const response = await fetchFeed(feed.url);
+      const response = await fetchFeed(feed.url, feed);
       if (!response.ok) {
         return {
           items: [],
@@ -385,16 +416,37 @@ async function fetchSupplyChainAdvisories({ ecosystems, days }) {
   };
 }
 
-async function fetchFeed(url) {
+const DEFAULT_FEED_HEADERS = {
+  Accept:
+    'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, text/html;q=0.7, */*;q=0.5',
+  'User-Agent': 'CyberSecCommand/1.0 (Vercel; +https://<your-site-domain>)',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Cache-Control': 'no-cache'
+};
+
+async function fetchFeed(url, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    const response = await fetch(url, {
+    const baseHeaders = {
+      ...DEFAULT_FEED_HEADERS,
+      ...(options.headers || {})
+    };
+    let response = await fetch(url, {
       signal: controller.signal,
-      headers: {
-        'user-agent': 'CyberSecCommand'
-      }
+      redirect: 'follow',
+      headers: baseHeaders
     });
+    if (response.status === 406 && options.atomAcceptFallback) {
+      response = await fetch(url, {
+        signal: controller.signal,
+        redirect: 'follow',
+        headers: {
+          ...baseHeaders,
+          Accept: 'application/atom+xml'
+        }
+      });
+    }
     if (!response.ok) {
       return {
         ok: false,
@@ -768,12 +820,19 @@ function buildResponse({
   filteredByCveOnly,
   debugMode
 }) {
+  const errorCount = Array.isArray(errors) ? errors.length : 0;
+  const noItemsFetched =
+    Number.isFinite(fetchedCount) &&
+    Number.isFinite(parsedCount) &&
+    fetchedCount === 0 &&
+    parsedCount === 0;
+  const degraded = errorCount > 0 || noItemsFetched;
   const response = {
     type,
     items,
     timestamp,
     cached,
-    degraded: false,
+    degraded,
     sourceCount
   };
   if (Number.isFinite(fetchedCount)) response.fetchedCount = fetchedCount;
@@ -790,7 +849,8 @@ function buildResponse({
       fetchedCount,
       parsedCount,
       errors,
-      items
+      items,
+      degraded
     });
   }
   return response;
@@ -804,7 +864,8 @@ function buildDebugInfo({
   fetchedCount,
   parsedCount,
   errors,
-  items
+  items,
+  degraded
 }) {
   const titles = (items || [])
     .map((item) => item?.title || item?.package || item?.summary || '')
@@ -817,6 +878,7 @@ function buildDebugInfo({
     sourceCount,
     fetchedCount,
     parsedCount,
+    degraded,
     errors: Array.isArray(errors) ? errors : [],
     sampleTitles: titles
   };
